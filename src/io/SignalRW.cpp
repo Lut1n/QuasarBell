@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iomanip> // put_time
 #include <ctime> // localtime
+#include <sstream>
 
 #include "io/RwHelpers.hpp"
 

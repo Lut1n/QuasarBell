@@ -9,7 +9,7 @@
 class PcmData
 {
 public:
-    void copy(const PcmData& other, unsigned oft = 0);
+    void copy(const PcmData& other, size_t oft = 0);
     
     PcmData operator<<(const PcmData& other) const;
     PcmData operator+(const PcmData& other) const;

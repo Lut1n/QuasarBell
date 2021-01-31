@@ -1,12 +1,14 @@
 #include "PcmData.hpp"
 
+#include "gui/Math.hpp"
+
 //--------------------------------------------------------------
-void PcmData::copy(const PcmData& other, unsigned oft)
+void PcmData::copy(const PcmData& other, size_t oft)
 {
     if(oft < samples.size())
     {
-        unsigned end = std::min(samples.size() - oft, other.samples.size());
-        for(unsigned i=0; i<end; ++i) samples[oft+i] = other.samples[i];
+        unsigned end = qb::min(samples.size() - oft, other.samples.size());
+        for(size_t i=0; i<end; ++i) samples[oft+i] = other.samples[i];
     }
 }
 //--------------------------------------------------------------
@@ -22,7 +24,7 @@ PcmData PcmData::operator<<(const PcmData& other) const
 PcmData PcmData::operator+(const PcmData& other) const
 {
     PcmData ret;
-    ret.samples.resize(std::max(samples.size(), other.samples.size()));
+    ret.samples.resize(qb::max(samples.size(), other.samples.size()));
     for(unsigned i=0; i<ret.samples.size(); ++i)
     {
         ret.samples[i] = samples[i] + other.samples[i];
@@ -53,7 +55,7 @@ size_t PcmData::pcmSize() const
 //--------------------------------------------------------------
 PcmData PcmData::subData(size_t oft, size_t size)
 {
-    unsigned effectiveSize = std::min(samples.size() - oft, size);
+    unsigned effectiveSize = qb::min(samples.size() - oft, size);
     
     PcmData res;
     res.samples.resize(effectiveSize);

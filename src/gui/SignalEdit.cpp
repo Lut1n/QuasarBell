@@ -29,7 +29,7 @@ void SignalEdit::render()
 //--------------------------------------------------------------
 void FrequencyEdit::resetValues()
 {
-    pitch = log2(440.0f);
+    pitch = qb::log2(440.0f);
     speed = 0.0f;
     acc = 0.0f;
     jerk = 0.0f;
@@ -40,7 +40,7 @@ void FrequencyEdit::resetValues()
 float FrequencyEdit::imgui_sampler(void* data, int idx)
 {
     FrequencyEdit& sampler = *(FrequencyEdit*)data;
-    return log2(sampler.sample((float)idx/100));
+    return qb::log2(sampler.sample((float)idx/100));
 }
 //--------------------------------------------------------------
 void FrequencyEdit::draw()
@@ -81,7 +81,7 @@ float FrequencyEdit::sample(float t)
     }
     
     float p = pitch + (speed + (acc + jerk * t) * t) * t;
-    float f = pow2(p);
+    float f = qb::pow2(p);
     f = f > 20000.0 ? 20000.0 : (f<0.0 ? 0.0 : f);
     return f;
 }

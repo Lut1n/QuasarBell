@@ -29,7 +29,7 @@ public:
     void render() override;
     
 public:
-    float pitch = log2(440.0f);
+    float pitch = qb::log2(440.0f);
     float speed = 0.0f;
     float acc = 0.0f;
     float jerk = 0.0f;

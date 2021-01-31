@@ -1,8 +1,9 @@
 #ifndef QUASAR_BELL_SIGNAL_HPP
 #define QUASAR_BELL_SIGNAL_HPP
 
-#include <cmath> // pow
 #include <vector>
+
+#include "gui/Math.hpp"
 
 //--------------------------------------------------------------
 #define La440 440.0f
@@ -106,27 +107,15 @@ private:
 };
 
 //--------------------------------------------------------------
-inline float log2(float v)
-{
-    return std::log(v) / std::log(2.0);
-}
-
-//--------------------------------------------------------------
-inline float pow2(float v)
-{
-    return std::pow(2, v);
-}
-
-//--------------------------------------------------------------
 inline float freqToPitch(float freq, float la440Pitch = 69/*MIDI*/, float semitones = 12)
 {
-    return la440Pitch + semitones * log2(freq / 440.0 );
+    return la440Pitch + semitones * qb::log2(freq / 440.0 );
 }
 
 //--------------------------------------------------------------
 inline float pitchToFreq(float pitch, float la440Pitch = 69/*MIDI*/, float semitones = 12)
 {
-    return pow2((pitch - la440Pitch) / semitones) * 440.0;
+    return qb::pow2((pitch - la440Pitch) / semitones) * 440.0;
 }
 
 #endif // QUASAR_BELL_SIGNAL_HPP
