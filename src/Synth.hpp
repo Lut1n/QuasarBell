@@ -10,11 +10,11 @@
 PcmData mix(const std::list<PcmData>& inputStream, float duration);
 
 //--------------------------------------------------------------
-class SynthModules : public ModuleGroup
+class SynthComponentGroup : public GuiComponentGroup
 {
 public:
-    SynthModules();
-    virtual ~SynthModules();
+    SynthComponentGroup();
+    virtual ~SynthComponentGroup();
 
 public:
     Keyboard* keyboard;
@@ -45,7 +45,7 @@ private:
     std::map<char, int> _keyMap;
     std::list<PcmData> _toQueue;
 
-    SynthModules _modules;
+    SynthComponentGroup _components;
     App* _app = nullptr;
     float _genTime = 0.0;
     

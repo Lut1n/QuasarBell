@@ -23,10 +23,10 @@ struct KeyEvent
     double time;
 };
 //--------------------------------------------------------------
-class GuiModule
+class GuiComponent
 {
 public:
-    virtual ~GuiModule() = default;
+    virtual ~GuiComponent() = default;
     virtual void render() = 0;
 
 public:
@@ -34,17 +34,17 @@ public:
     bool hasChanged = false;
 };
 //--------------------------------------------------------------
-class ModuleGroup
+class GuiComponentGroup : public GuiComponent
 {
 public:
-    virtual ~ModuleGroup() = default;
-    
-    void add(GuiModule* module) {modules.push_back(module);}
-    int count() const {return modules.size();}
-    GuiModule* get(int i){return modules[i];}
+    void add(GuiComponent* component);
+    int count() const;
+    GuiComponent* get(int i);
+
+    void render() override;
 
 public:
-    std::vector<GuiModule*> modules;
+    std::vector<GuiComponent*> components;
 };
 //--------------------------------------------------------------
 enum class ETool
@@ -71,7 +71,7 @@ public:
     GuiRenderer();
     ~GuiRenderer() = default;
     
-    void setModuleGroup(ModuleGroup* group);
+    void makeCurrent(GuiComponent* component);
     
     double getTime() const;
     
@@ -98,7 +98,7 @@ public:
 private:
     AboutPanel _aboutPanel;
     GLFWwindow* _window = nullptr;
-    ModuleGroup* _modules = nullptr;
+    GuiComponent* _currentComponent = nullptr;
     
     static std::list<KeyEvent> s_keyEvents;
 };

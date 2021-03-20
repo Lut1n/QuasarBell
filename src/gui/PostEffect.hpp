@@ -6,7 +6,7 @@
 #include "gui/SignalEdit.hpp"
 
 //--------------------------------------------------------------
-class RingModFxEdit : public GuiModule
+class RingModFxEdit : public GuiComponent
 {
 public:
     RingModFxEdit();
@@ -24,7 +24,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class TremoloFxEdit : public GuiModule
+class TremoloFxEdit : public GuiComponent
 {
 public:
     TremoloFxEdit();
@@ -45,7 +45,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class PostFxPanel : public GuiModule
+class PostFxPanel : public GuiComponent
 {
 public:
     void render() override;

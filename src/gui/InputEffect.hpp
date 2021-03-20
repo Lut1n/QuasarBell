@@ -6,7 +6,7 @@
 #include "gui/SignalEdit.hpp"
 
 //--------------------------------------------------------------
-class VibratoFxEdit : public GuiModule
+class VibratoFxEdit : public GuiComponent
 {
 public:
     VibratoFxEdit();
@@ -24,7 +24,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class ArpeggioFxEdit : public GuiModule
+class ArpeggioFxEdit : public GuiComponent
 {
 public:
     ArpeggioFxEdit();
@@ -44,7 +44,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class InputFxPanel : public GuiModule
+class InputFxPanel : public GuiComponent
 {
 public:
     void render() override;

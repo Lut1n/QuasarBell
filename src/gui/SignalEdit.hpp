@@ -8,7 +8,7 @@
 #include "gui/Gui.hpp"
 
 //--------------------------------------------------------------
-class SignalEdit : public GuiModule
+class SignalEdit : public GuiComponent
 {
 public:
     void render() override;
@@ -18,7 +18,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class FrequencyEdit : public GuiModule
+class FrequencyEdit : public GuiComponent
 {
 public:
     float sample(float t);
@@ -37,7 +37,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class AmplitudeEdit : public GuiModule
+class AmplitudeEdit : public GuiComponent
 {
 public:
     float sample(float t);
@@ -57,7 +57,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class WaveEdit : public GuiModule
+class WaveEdit : public GuiComponent
 {
 public:
     enum Wave
@@ -89,7 +89,7 @@ private:
 };
 
 //--------------------------------------------------------------
-class MainEdit : public GuiModule
+class MainEdit : public GuiComponent
 {
 public:
     void draw();
@@ -102,7 +102,7 @@ public:
 };
 
 //--------------------------------------------------------------
-class PcmPlayer : public GuiModule
+class PcmPlayer : public GuiComponent
 {
 public:
     void draw();

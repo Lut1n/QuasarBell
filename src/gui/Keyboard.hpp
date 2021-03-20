@@ -8,7 +8,7 @@
 #include "gui/Gui.hpp"
 
 //--------------------------------------------------------------
-class Keyboard : public GuiModule
+class Keyboard : public GuiComponent
 {
 public:
     enum KeyState

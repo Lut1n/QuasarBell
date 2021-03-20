@@ -31,6 +31,7 @@ add_executable(
     src/io/InputRW.hpp
     src/io/PostRW.hpp
     src/io/RwHelpers.hpp
+    src/io/FileExplorer.hpp
     src/render/AudioRenderer.hpp
     src/render/Error.hpp
     src/render/Format.hpp
@@ -58,6 +59,7 @@ add_executable(
     src/io/InputRW.cpp
     src/io/PostRW.cpp
     src/io/RwHelpers.cpp
+    src/io/FileExplorer.cpp
     src/render/AudioRenderer.cpp
     src/signal/LinearSamplers.cpp
     src/signal/Modulator.cpp

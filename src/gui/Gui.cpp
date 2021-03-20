@@ -20,10 +20,10 @@ void GuiRenderer::ioMenuItem(const char* text, const std::string& default_filepa
 {
     if(ImGui::MenuItem(text))
     {
-        if(fileInput.filepath.empty())
-            fileInput.filepath = default_filepath;
-        fileInput.request = req;
-        fileInput.open();
+        if(fileinput.filepath.empty())
+            fileinput.filepath = default_filepath;
+        fileinput.request = req;
+        fileinput.open();
     }
 }
 //--------------------------------------------------------------
@@ -48,15 +48,36 @@ void GuiRenderer::key_callback(GLFWwindow* window, int key, int scancode, int ac
     }        
 }
 //--------------------------------------------------------------
+void GuiComponentGroup::add(GuiComponent* component)
+{
+    components.push_back(component);
+}
+//--------------------------------------------------------------
+int GuiComponentGroup::count() const
+{
+    return components.size();
+}
+//--------------------------------------------------------------
+GuiComponent* GuiComponentGroup::get(int i)
+{
+    return components[i];
+}
+//--------------------------------------------------------------
+void GuiComponentGroup::render()
+{
+    for (auto& c : components)
+        c->render();
+}
+//--------------------------------------------------------------
 GuiRenderer::GuiRenderer()
-    : fileInput("project path")
-    , waveInput("wav path")
+    : fileInput("project path", ".json")
+    , waveInput("wav path", ".wav")
 {
 }
 //--------------------------------------------------------------
-void GuiRenderer::setModuleGroup(ModuleGroup* group)
+void GuiRenderer::makeCurrent(GuiComponent* component)
 {
-    _modules = group;
+    _currentComponent = component;
 }
 //--------------------------------------------------------------
 void GuiRenderer::open()
@@ -158,8 +179,8 @@ void GuiRenderer::display()
         }
         ImGui::EndMainMenuBar();
     }
-    for(auto m : _modules->modules)
-        m->render();
+    if(_currentComponent)
+        _currentComponent->render();
     
     fileInput.display();
     waveInput.display();

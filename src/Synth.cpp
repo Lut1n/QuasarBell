@@ -4,13 +4,13 @@
 #include "signal/Modulator.hpp"
 
 //--------------------------------------------------------------
-SynthModules::SynthModules()
+SynthComponentGroup::SynthComponentGroup()
 {
     keyboard = new Keyboard();
     add(keyboard);
 }
 //--------------------------------------------------------------
-SynthModules::~SynthModules()
+SynthComponentGroup::~SynthComponentGroup()
 {
     delete keyboard;
 }
@@ -78,18 +78,18 @@ void SynthWorkSpace::onEvent(const KeyEvent& event)
 //--------------------------------------------------------------
 void SynthWorkSpace::update(double t)
 {
-    for(auto& e : _modules.keyboard->events)
+    for(auto& e : _components.keyboard->events)
     {
         bool pressed = e.state == Keyboard::KeyState::Pressed;
         _onEventImpl(e.id, pressed);
     }
-    _modules.keyboard->events.clear();
+    _components.keyboard->events.clear();
     
     auto& sound = *(_app->sound);
     auto& gui = *(_app->gui);
     
-    gui.setModuleGroup(&_modules);
-    _modules.keyboard->reset();
+    gui.makeCurrent(&_components);
+    _components.keyboard->reset();
 
     float fracTime = 0.02;
     
@@ -99,14 +99,14 @@ void SynthWorkSpace::update(double t)
         
         if(_keyStates[keyIndex] == KeyState::Pressed)
         {
-            _modules.keyboard->setPressed(keyID);
+            _components.keyboard->setPressed(keyID);
             PcmData pcm = Modulator::attack(pitchToFreq(keyID), fracTime, 1.0f, 0.5f, _genTime);
             _toQueue.push_back(pcm);
             _keyStates[keyIndex] = KeyState::Maintained;
         }
         else if(_keyStates[keyIndex] == KeyState::Maintained)
         {
-            _modules.keyboard->setPressed(keyID);
+            _components.keyboard->setPressed(keyID);
             PcmData pcm = Modulator::generate(pitchToFreq(keyID), fracTime, 0.5f, 0.0f, _genTime);
             _toQueue.push_back(pcm);
         }

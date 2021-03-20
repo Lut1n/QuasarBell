@@ -6,11 +6,11 @@
 #include "gui/InputEffect.hpp"
 
 //--------------------------------------------------------------
-class SFXEditModules : public ModuleGroup
+class SFXEditorComponentGroup : public GuiComponentGroup
 {
 public:
-    SFXEditModules();
-    virtual ~SFXEditModules();
+    SFXEditorComponentGroup();
+    virtual ~SFXEditorComponentGroup();
     
 public:
     AmplitudeEdit* amplitudeEdit;
@@ -41,7 +41,7 @@ private:
     PcmData generate();
 
 private:
-    SFXEditModules _modules;
+    SFXEditorComponentGroup _components;
     App* _app = nullptr;
     float _startTime = 0.0;
     bool _doPlay = false;

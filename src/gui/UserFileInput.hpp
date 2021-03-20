@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "io/FileExplorer.hpp"
+
 //--------------------------------------------------------------
 class UserFileInput
 {
@@ -15,7 +17,7 @@ public:
         Export_Wav
     };
     
-    UserFileInput(const std::string& title);
+    UserFileInput(const std::string& title, const std::string& ext);
     virtual ~UserFileInput();
     
     void open();
@@ -31,8 +33,10 @@ public:
     std::string filepath;
     
 private:
+    FileExplorer _explorer;
     std::string _title;
     char _editBuffer[512] = "";
+    std::string _ext;
 };
 
 //--------------------------------------------------------------
