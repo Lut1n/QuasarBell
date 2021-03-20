@@ -1,16 +1,13 @@
 #include "gui/Gui.hpp"
 
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "gui/imgui_impl_glfw.h"
+#include "gui/imgui_impl_opengl3.h"
 
 #include "signal/Signal.hpp"
 
-
-//--------------------------------------------------------------
-// Append glad source code here
-#include "../../thirdparty/glad/src/glad.c"
-
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 //--------------------------------------------------------------
 std::list<KeyEvent> GuiRenderer::s_keyEvents;
@@ -27,16 +24,16 @@ void GuiRenderer::ioMenuItem(const char* text, const std::string& default_filepa
     }
 }
 //--------------------------------------------------------------
-void GuiRenderer::error_callback(int error, const char* description)
+/*void GuiRenderer::error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
-}
+}*/
 //--------------------------------------------------------------
-void GuiRenderer::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void GuiRenderer::key_callback(/*GLFWwindow* window, */int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    /*if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    
+    */
     if(key >= GLFW_KEY_A && key <= GLFW_KEY_Z && (action == GLFW_PRESS || action == GLFW_RELEASE))
     {
         char k = (key-GLFW_KEY_A) + 'a';
@@ -82,7 +79,7 @@ void GuiRenderer::makeCurrent(GuiComponent* component)
 //--------------------------------------------------------------
 void GuiRenderer::open()
 {
-    glfwSetErrorCallback(error_callback);
+    /*glfwSetErrorCallback(error_callback);
     
     if (!glfwInit())
         exit(EXIT_FAILURE);
@@ -101,22 +98,16 @@ void GuiRenderer::open()
     
     glfwMakeContextCurrent(_window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
+    glfwSwapInterval(1);*/
     
-    
-    IMGUI_CHECKVERSION();
+    /*IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer bindings
     const char* glsl_version = "#version 130";
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplOpenGL3_Init(glsl_version);*/
 }
 //--------------------------------------------------------------
 void GuiRenderer::close()
@@ -124,32 +115,32 @@ void GuiRenderer::close()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    glfwDestroyWindow(_window);
-    glfwTerminate();
+    //glfwDestroyWindow(_window);
+    //glfwTerminate();
 }
 //--------------------------------------------------------------
-double GuiRenderer::getTime() const
+/*double GuiRenderer::getTime() const
 {
     return glfwGetTime();
-}
+}*/
 //--------------------------------------------------------------
-bool GuiRenderer::shouldClose()
+/*bool GuiRenderer::shouldClose()
 {
     return glfwWindowShouldClose(_window);
-}
+}*/
 //--------------------------------------------------------------
 void GuiRenderer::display()
 {
-    int width, height;
+    /*int width, height;
     glfwGetFramebufferSize(_window, &width, &height);
 
     glViewport(0, 0, width, height);
     glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);*/
     
-    ImGui_ImplOpenGL3_NewFrame();
+    /*ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    ImGui::NewFrame();*/
     
     if(ImGui::BeginMainMenuBar())
     {
@@ -165,7 +156,7 @@ void GuiRenderer::display()
         {
             if( ImGui::MenuItem("SFX Edition") ) appState.toolMode = ETool::BasicEditor;
             if( ImGui::MenuItem("Synth") ) appState.toolMode = ETool::Synth;
-            // ImGui::MenuItem("Nodal Editor");
+            if( ImGui::MenuItem("Nodal Editor") ) appState.toolMode = ETool::NodalEditor;
             ImGui::EndMenu();
         }
         if(ImGui::BeginMenu("Export"))
@@ -186,11 +177,11 @@ void GuiRenderer::display()
     waveInput.display();
     _aboutPanel.display();
     
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    /*ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
 
-    glfwSwapBuffers(_window);
-    glfwPollEvents();
+    /*glfwSwapBuffers(_window);
+    glfwPollEvents();*/
 }
 //--------------------------------------------------------------
 bool GuiRenderer::hasEvent()

@@ -5,9 +5,9 @@
 #include <vector>
 
 // glad and glfw3
-#include "glad/glad.h"
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+// #include "glad/glad.h"
+//#define GLFW_INCLUDE_NONE
+//#include <GLFW/glfw3.h>
 
 #include "signal/PcmData.hpp"
 #include "gui/UserFileInput.hpp"
@@ -50,7 +50,8 @@ public:
 enum class ETool
 {
     Synth,
-    BasicEditor
+    BasicEditor,
+    NodalEditor
 };
 //--------------------------------------------------------------
 struct AppState
@@ -73,22 +74,23 @@ public:
     
     void makeCurrent(GuiComponent* component);
     
-    double getTime() const;
+    // double getTime() const;
     
     void open();
     void close();
     
-    bool shouldClose();
+    //bool shouldClose();
     void display();
     
     bool hasEvent();
     KeyEvent popEvent();
     
+    static void key_callback(/*GLFWwindow* window, */int key, int scancode, int action, int mods);
+
 private:
     void ioMenuItem(const char* text, const std::string& default_filepath, UserFileInput& fileinput, UserFileInput::Req req);
 
-    static void error_callback(int error, const char* description);
-    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    //static void error_callback(int error, const char* description);
 
 public:
     AppState appState;
@@ -97,7 +99,7 @@ public:
 
 private:
     AboutPanel _aboutPanel;
-    GLFWwindow* _window = nullptr;
+    //GLFWwindow* _window = nullptr;
     GuiComponent* _currentComponent = nullptr;
     
     static std::list<KeyEvent> s_keyEvents;

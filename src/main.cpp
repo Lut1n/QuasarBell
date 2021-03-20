@@ -1,6 +1,11 @@
 #include "App.hpp"
 #include "Synth.hpp"
 #include "SFXBasicEditor.hpp"
+#include "NodalEditor.hpp"
+
+#include "GL/RenderInterface.h"
+#include "Font/GlyphRenderer.h"
+#include "UI/UiSystem.h"
 
 //--------------------------------------------------------------
 int runQuasarBell(int argc, char* argv[])
@@ -12,7 +17,10 @@ int runQuasarBell(int argc, char* argv[])
     scene.add(&micro);
     scene.add(&sound);    
 
-    // user interface    
+    // user interface
+    unsigned win = RenderInterface::createTarget(1400, 560, true, "QuasarBell");
+    UiSystem::instance()->initialize();
+    // auto& gr = UiSystem::instance()->glyphRenderer;
     GuiRenderer gui;
     gui.open();
     App app;
@@ -21,21 +29,31 @@ int runQuasarBell(int argc, char* argv[])
     
     // workspace mode
     BasicEditorWorkSpace basicEditor;
+    NodalEditorWorkSpace nodalEditor;
     SynthWorkSpace synth;
     basicEditor.init(&app);
     synth.init(&app);
+    nodalEditor.init(&app);
     ToolWorkSpace* toolPtr = &basicEditor;
     
     // main loop
-    while(!gui.shouldClose())
+    RenderInterface::setTarget(win);
+    while(RenderInterface::begin())
+    // while(!gui.shouldClose())
     {
+        RenderInterface::setTarget(win);
+        RenderInterface::clear(0x1e1e1eFF);
+        
+        RenderInterface::updateTime();
+        UiSystem::instance()->draw();
+
         while(gui.hasEvent())
         {
             KeyEvent event = gui.popEvent();
             toolPtr->onEvent(event);
         }
         
-        toolPtr->update( gui.getTime() );
+        toolPtr->update( RenderInterface::getTime() );
         scene.update();
         gui.display();
     
@@ -43,6 +61,10 @@ int runQuasarBell(int argc, char* argv[])
             toolPtr = &basicEditor;
         else if( gui.appState.toolMode == ETool::Synth)
             toolPtr = &synth;
+        else if( gui.appState.toolMode == ETool::NodalEditor)
+            toolPtr = &nodalEditor;
+        UiSystem::instance()->setActivated(gui.appState.toolMode == ETool::NodalEditor);
+        RenderInterface::end();
     }
     gui.close();
     return 0;

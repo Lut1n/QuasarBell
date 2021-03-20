@@ -14,6 +14,7 @@ add_executable(
     ${PROJECT_NAME}
     src/App.hpp
     src/SFXBasicEditor.hpp
+    src/NodalEditor.hpp
     src/Synth.hpp
     src/gui/Gui.hpp
     src/gui/UserFileInput.hpp
@@ -40,9 +41,35 @@ add_executable(
     src/signal/PcmData.hpp
     src/signal/Signal.hpp
     src/signal/WavExporter.hpp
+    src/Core/Vec2.h
+    src/Font/DefaultFontMaker.h
+    src/Font/FontMaker.h
+    src/Font/GlyphRenderer.h
+    src/GL/GlError.h
+    src/GL/GlQuadShader.h
+    src/GL/GlSpriteShader.h
+    src/GL/GlQuad.h
+    src/GL/GlSprite.h
+    src/GL/RenderableTexture.h
+    src/GL/RenderInterface.h
+    src/UI/UiEvent.h
+    src/UI/UiSystem.h
+    src/UI/UiRect.h
+    src/UI/UiNode.h
+    src/UI/UiText.h
+    src/UI/UiInput.h
+    src/UI/UiContainer.h
+    src/UI/UiList.h
+    src/UI/UiButton.h
+    src/UI/UiSlider.h
+    src/UI/UiFrame.h
+    src/UI/UiForm.h
+    src/UI/UiPin.h
+    src/UI/UiConnections.h
     
     src/main.cpp
     src/SFXBasicEditor.cpp
+    src/NodalEditor.cpp
     src/Synth.cpp
     src/gui/Gui.cpp
     src/gui/UserFileInput.cpp
@@ -66,6 +93,29 @@ add_executable(
     src/signal/PcmData.cpp
     src/signal/Signal.cpp
     src/signal/WavExporter.cpp
+    src/Core/Vec2.cpp
+    src/Font/DefaultFontMaker.cpp
+    src/Font/FontMaker.cpp
+    src/Font/GlyphRenderer.cpp
+    src/GL/GlQuadShader.cpp
+    src/GL/GlSpriteShader.cpp
+    src/GL/GlQuad.cpp
+    src/GL/GlSprite.cpp
+    src/GL/RenderableTexture.cpp
+    src/GL/RenderInterfaceGlfw.cpp
+    src/UI/UiSystem.cpp
+    src/UI/UiRect.cpp
+    src/UI/UiNode.cpp
+    src/UI/UiText.cpp
+    src/UI/UiInput.cpp
+    src/UI/UiContainer.cpp
+    src/UI/UiList.cpp
+    src/UI/UiButton.cpp
+    src/UI/UiSlider.cpp
+    src/UI/UiFrame.cpp
+    src/UI/UiForm.cpp
+    src/UI/UiPin.cpp
+    src/UI/UiConnections.cpp
     
     thirdparty/imgui/imconfig.h
     thirdparty/imgui/imgui_demo.cpp
