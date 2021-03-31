@@ -50,6 +50,8 @@ struct UiSystem
     
 public:
     GlyphRenderer glyphRenderer;
+    bool requestContextMenu = false;
+    vec2 contextMenuPosition;
 private:
     std::vector<UiElement*> _listeners;
     std::vector<UiElement*> _elements;

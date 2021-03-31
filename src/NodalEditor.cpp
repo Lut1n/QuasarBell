@@ -1,13 +1,21 @@
 #include "NodalEditor.hpp"
 
+#include "gui/nodal/AddSignalNode.hpp"
+#include "gui/nodal/FloatSignalNode.hpp"
 
 //--------------------------------------------------------------
 NodalEditorComponentGroup::NodalEditorComponentGroup()
 {
+    nodeProperties = new NodePropertiesEdit();
+    nodeContextMenu = new NodeContextMenu();
+    add(nodeProperties);
+    add(nodeContextMenu);
 }
 //--------------------------------------------------------------
 NodalEditorComponentGroup::~NodalEditorComponentGroup()
 {
+    delete nodeProperties;
+    delete nodeContextMenu;
 }
 
 //--------------------------------------------------------------
@@ -24,37 +32,47 @@ void NodalEditorWorkSpace::update(double t)
 {
     if(!_ready)
     {
-        nodes.resize(5);
-        nodes[0] = std::make_unique<UiNode>("time", vec2(500, 50), vec2(100, 100));
-        nodes[0]->addPin(0, "seconds", true);
-
-        nodes[1] = std::make_unique<UiNode>("freq-edit", vec2(530, 270), vec2(100, 100));
-        nodes[1]->addPin(0, "time", false);
-        nodes[1]->addPin(0, "freq", true);
-        
-        nodes[2] = std::make_unique<UiNode>("ampl-edit", vec2(540, 290), vec2(100, 100));
-        nodes[2]->addPin(0, "time", false);
-        nodes[2]->addPin(0, "ampl", true);
-
-        nodes[3] = std::make_unique<UiNode>("signal", vec2(520, 200), vec2(100, 100));
-        nodes[3]->addPin(0, "frequency", false);
-        nodes[3]->addPin(1, "amplitude", false);
-        nodes[3]->addPin(0, "pcm", true);
-
-        nodes[4] = std::make_unique<UiNode>("output", vec2(540, 440), vec2(100, 100));
-        nodes[4]->addPin(0, "pcm", false);
+        nodes.resize(3);
+        nodes[0] = std::make_unique<FloatSignalNode>(vec2(400, 50));
+        nodes[1] = std::make_unique<FloatSignalNode>(vec2(410, 200));
+        nodes[2] = std::make_unique<AddSignalNode>(vec2(740, 100));
 
         for(auto& n : nodes)
             UiSystem::instance()->add(n.get(), true, true);
             
         cons = std::make_unique<UiConnections>();
-        UiSystem::instance()->add(cons.get(), true, true);
+        cons->createLink(nodes[0]->outputs[0].get(), nodes[2]->inputs[1].get());
+        cons->createLink(nodes[1]->outputs[0].get(), nodes[2]->inputs[0].get());
         
+        UiSystem::instance()->add(cons.get(), true, true);
         _ready = true;
     }
 
     auto& gui = *(_app->gui);
     gui.makeCurrent(&_components);
+
+    if (_components.nodeContextMenu->which != NodeContextMenu::NodeName_None)
+    {
+        auto name = _components.nodeContextMenu->which;
+        switch(name)
+        {
+            case NodeContextMenu::NodeName_Add:
+            {
+                auto node = std::make_unique<AddSignalNode>(UiSystem::instance()->contextMenuPosition);
+                UiSystem::instance()->add(node.get(), true, true);
+                nodes.emplace_back(std::move(node));
+                break;
+            }
+            case NodeContextMenu::NodeName_Float:
+            {
+                auto node = std::make_unique<FloatSignalNode>(UiSystem::instance()->contextMenuPosition);
+                UiSystem::instance()->add(node.get(), true, true);
+                nodes.emplace_back(std::move(node));
+                break;
+            }
+        };
+        _components.nodeContextMenu->which = NodeContextMenu::NodeName_None;
+    }
 
     // while(node1->nextClicked()) selected->text = node1->title->text;
 }

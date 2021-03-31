@@ -23,6 +23,10 @@ add_executable(
     src/gui/Math.hpp
     src/gui/PostEffect.hpp
     src/gui/SignalEdit.hpp
+    src/gui/NodeContextMenu.hpp
+    src/gui/NodePropertiesEdit.hpp
+    src/gui/nodal/AddSignalNode.hpp
+    src/gui/nodal/FloatSignalNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
     src/io/json/json.hpp
@@ -41,6 +45,8 @@ add_executable(
     src/signal/PcmData.hpp
     src/signal/Signal.hpp
     src/signal/WavExporter.hpp
+    src/signal/SignalOperation.hpp
+    src/signal/Operations.hpp
     src/Core/Vec2.h
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
@@ -77,6 +83,10 @@ add_executable(
     src/gui/Keyboard.cpp
     src/gui/PostEffect.cpp
     src/gui/SignalEdit.cpp
+    src/gui/nodal/AddSignalNode.cpp
+    src/gui/nodal/FloatSignalNode.cpp
+    src/gui/NodeContextMenu.cpp
+    src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
     src/gui/imgui_impl_opengl3.cpp
     src/io/json/json.cpp
@@ -93,6 +103,8 @@ add_executable(
     src/signal/PcmData.cpp
     src/signal/Signal.cpp
     src/signal/WavExporter.cpp
+    src/signal/SignalOperation.cpp
+    src/signal/Operations.cpp
     src/Core/Vec2.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp

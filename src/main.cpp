@@ -34,7 +34,7 @@ int runQuasarBell(int argc, char* argv[])
     basicEditor.init(&app);
     synth.init(&app);
     nodalEditor.init(&app);
-    ToolWorkSpace* toolPtr = &basicEditor;
+    ToolWorkSpace* toolPtr = &nodalEditor;
     
     // main loop
     RenderInterface::setTarget(win);

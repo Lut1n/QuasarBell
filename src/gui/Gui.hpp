@@ -56,7 +56,7 @@ enum class ETool
 //--------------------------------------------------------------
 struct AppState
 {
-    ETool toolMode = ETool::BasicEditor;
+    ETool toolMode = ETool::NodalEditor;
 };
 
 //--------------------------------------------------------------

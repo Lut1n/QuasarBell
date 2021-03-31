@@ -19,12 +19,17 @@ struct UiNode : public UiFrame
 
     void addPin(int id, const std::string& label, bool isOutput);
     UiNode* getSourceNode(int id);
+
+    virtual void displayProperties();
     
 public:
     std::unique_ptr<UiText> title;
 
     std::unordered_map<int, std::unique_ptr<UiPin>> inputs;
     std::unordered_map<int, std::unique_ptr<UiPin>> outputs;
+
+    bool clicking = false;
+    static UiNode* focused;
 };
 
 #endif // UI_NODE_H

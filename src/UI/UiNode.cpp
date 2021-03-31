@@ -2,6 +2,8 @@
 
 #include "UI/UiConnections.h"
 
+UiNode* UiNode::focused = nullptr;
+
 UiNode::UiNode(const std::string& title, const vec2& position, const vec2& size)
     : UiFrame(position, size)
 {
@@ -33,7 +35,11 @@ bool UiNode::onEvent(const UiEvent& event)
         ret = pin.second->onEvent(event) || ret;
         y += step_y;
     }
-    return UiFrame::onEvent(event) || ret;
+
+    ret = UiFrame::onEvent(event) || ret;
+    while(nextClicked()) focused = this;
+
+    return ret;
 }
 
 void UiNode::draw()
@@ -88,4 +94,8 @@ UiNode* UiNode::getSourceNode(int id)
         return other->parentNode;
     else
         return nullptr;
+}
+
+void UiNode::displayProperties()
+{
 }

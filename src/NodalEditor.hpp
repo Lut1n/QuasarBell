@@ -16,6 +16,9 @@
 
 #include <unordered_map>
 
+#include "gui/NodePropertiesEdit.hpp"
+#include "gui/NodeContextMenu.hpp"
+
 //--------------------------------------------------------------
 class NodalEditorComponentGroup : public GuiComponentGroup
 {
@@ -24,6 +27,8 @@ public:
     virtual ~NodalEditorComponentGroup();
     
 public:
+    NodePropertiesEdit* nodeProperties;
+    NodeContextMenu* nodeContextMenu;
 };
 
 //--------------------------------------------------------------
