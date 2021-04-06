@@ -19,7 +19,7 @@ bool UiFrame::onEvent(const UiEvent& event)
     {
         bool mouseOver = surface.inside(event.position);
         
-        color = mouseOver ? 0x353536FF : 0x323233FF;
+        color = mouseOver ? 0x3A3A3BFF : 0x323233FF;
         if(pressed || moving)
         {
             moving = true;
@@ -29,7 +29,6 @@ bool UiFrame::onEvent(const UiEvent& event)
     }
     else if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_1)
     {
-        
         bool mouseOver = surface.inside(event.position);
         
         if(mouseOver && event.state == UiEvent::STATE_DOWN)
@@ -44,6 +43,28 @@ bool UiFrame::onEvent(const UiEvent& event)
             if(!moving && pressed && mouseOver && clicks<10) clicks++;
             pressed = false;
             moving = false;
+        }
+    }
+    else if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_2)
+    {
+        bool mouseOver = surface.inside(event.position);
+        
+        if(mouseOver && event.state == UiEvent::STATE_DOWN)
+        {
+            rpressed = true;
+            lastPosition = position;
+            lastMousePosition = event.position;
+            return true;
+        }
+        else if(event.state == UiEvent::STATE_RELEASED)
+        {
+            if(rpressed && mouseOver && rclicks<10)
+            {
+                rclicks++;    
+                rpressed = false;
+                return true;
+            }
+            rpressed = false;
         }
     }
     return false;
@@ -84,6 +105,16 @@ bool UiFrame::nextClicked()
     if(clicks > 0)
     {
         clicks--;
+        return true;
+    }
+    return false;
+}
+
+bool UiFrame::nextRClicked()
+{
+    if(rclicks > 0)
+    {
+        rclicks--;
         return true;
     }
     return false;

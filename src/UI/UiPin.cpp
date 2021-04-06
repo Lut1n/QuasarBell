@@ -21,30 +21,31 @@ UiPin::~UiPin()
 bool UiPin::onEvent(const UiEvent& event)
 {
     Rect surface = Rect::fromPosAndSize(parentPosition + position, size);
+    bool mouseOver = surface.inside(event.position);
+    if (!mouseOver) return false;
     if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_1)
     {
-        bool mouseOver = surface.inside(event.position);
         if(event.state == UiEvent::STATE_DOWN)
         {
-            if (mouseOver)
-            {
-                UiConnections::instance->startLink(this);
-                return true;
-            }
-            
+            UiConnections::instance->startLink(this);
+            return true;
         }
         else if(event.state == UiEvent::STATE_RELEASED)
         {
-            if (mouseOver)
-                UiConnections::instance->endLink(this);
+            UiConnections::instance->endLink(this);
+            return true;
         }
     }
     else if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_2)
     {
-        bool mouseOver = surface.inside(event.position);
         if(event.state == UiEvent::STATE_DOWN)
         {
-            if (mouseOver)
+            rightClicking = true;
+            return true;
+        }
+        else if(event.state == UiEvent::STATE_RELEASED)
+        {
+            if(rightClicking)
             {
                 for (auto id : connectionIds)
                     UiConnections::instance->deleteLink(id);

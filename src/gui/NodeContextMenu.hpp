@@ -11,7 +11,12 @@ public:
     enum NodeName
     {
         NodeName_Add = 0,
+        NodeName_Mult,
         NodeName_Float,
+        NodeName_LinearSampler,
+        NodeName_Oscillator,
+        NodeName_Quantizer,
+        NodeName_Debug,
 
         NodeName_Count,
 

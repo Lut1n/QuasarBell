@@ -12,6 +12,12 @@ struct UiPin;
 
 struct UiConnections : public UiElement
 {
+    struct Handler
+    {
+        virtual void onConnect(UiPin* a, UiPin* b) = 0;
+        virtual void onDisconnect(UiPin* a, UiPin* b) = 0;
+    };
+
     UiConnections();
     
     bool onEvent(const UiEvent& event) override;
@@ -39,6 +45,7 @@ public:
     std::uint64_t currentId = 0;
     std::uint64_t previousId = 1;
     std::unordered_map<std::uint64_t,Link> links;
+    Handler* handler = nullptr;
 };
 
 #endif // UI_CONNECTIONS_H

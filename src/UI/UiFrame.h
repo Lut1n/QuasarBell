@@ -17,6 +17,7 @@ struct UiFrame : public UiRect
     void draw() override;
 
     bool nextClicked();
+    bool nextRClicked();
 
     void add(UiElement* el, bool isRenderable = true, bool isListener = true);
     void rem(UiElement* el);
@@ -27,7 +28,9 @@ public:
     vec2 lastPosition;
     std::unique_ptr<UiContainer> children;
     bool pressed = false;
+    bool rpressed = false;
     int clicks = 0;
+    int rclicks = 0;
 };
 
 #endif // UI_FRAME_H

@@ -29,6 +29,7 @@ std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
     }
     a->addConnectionId(id);
     b->addConnectionId(id);
+    if(handler) handler->onConnect(a,b);
     return id;
 }
 
@@ -39,7 +40,11 @@ void UiConnections::updateLink(std::uint64_t id, UiPin* a, UiPin* b)
 
 void UiConnections::deleteLink(std::uint64_t id)
 {
+    if (links.find(id) == links.end()) return;
+
     auto& link = links[id];
+    std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << std::endl;
+    if(handler) handler->onDisconnect(link.first,link.second);
 
     link.first->remConnectionId(id);
     link.second->remConnectionId(id);

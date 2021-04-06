@@ -4,6 +4,8 @@
 
 #include "UI/UiSystem.h"
 
+#include <array>
+
 //--------------------------------------------------------------
 NodeContextMenu::NodeContextMenu()
 {
@@ -17,9 +19,12 @@ void NodeContextMenu::render()
         UiSystem::instance()->requestContextMenu = false;
     }
 
-    constexpr std::array<const char*, NodeName_Count> nameStr = {"Add", "Float"};
+    constexpr std::array<const char*, (size_t)NodeName_Count> nameStr = {"Add", "Mult", "Float", "LinearSampler", "Oscillator", "Quantizer", "DebugOutput"};
     if (ImGui::BeginPopup("New Node"))
     {
+        ImGui::Text("New Node");
+        ImGui::Separator();
+        ImGui::Spacing();
         for(size_t i=0; i<NodeName_Count; ++i)
         {
             if(ImGui::MenuItem(nameStr[i]))

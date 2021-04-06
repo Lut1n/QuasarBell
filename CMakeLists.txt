@@ -25,8 +25,13 @@ add_executable(
     src/gui/SignalEdit.hpp
     src/gui/NodeContextMenu.hpp
     src/gui/NodePropertiesEdit.hpp
+    src/gui/nodal/SignalOperationNode.hpp
     src/gui/nodal/AddSignalNode.hpp
     src/gui/nodal/FloatSignalNode.hpp
+    src/gui/nodal/LinearSamplerNode.hpp
+    src/gui/nodal/OscillatorNode.hpp
+    src/gui/nodal/DebuggerNode.hpp
+    src/gui/nodal/QuantizerNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
     src/io/json/json.hpp
@@ -37,6 +42,7 @@ add_executable(
     src/io/PostRW.hpp
     src/io/RwHelpers.hpp
     src/io/FileExplorer.hpp
+    src/io/SignalOperationsRW.hpp
     src/render/AudioRenderer.hpp
     src/render/Error.hpp
     src/render/Format.hpp
@@ -45,8 +51,10 @@ add_executable(
     src/signal/PcmData.hpp
     src/signal/Signal.hpp
     src/signal/WavExporter.hpp
-    src/signal/SignalOperation.hpp
-    src/signal/Operations.hpp
+    src/signal/operations/SignalOperation.hpp
+    src/signal/operations/Operations.hpp
+    src/signal/operations/Oscillator.hpp
+    src/signal/operations/Quantizer.hpp
     src/Core/Vec2.h
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
@@ -83,8 +91,13 @@ add_executable(
     src/gui/Keyboard.cpp
     src/gui/PostEffect.cpp
     src/gui/SignalEdit.cpp
+    src/gui/nodal/SignalOperationNode.cpp
     src/gui/nodal/AddSignalNode.cpp
     src/gui/nodal/FloatSignalNode.cpp
+    src/gui/nodal/LinearSamplerNode.cpp
+    src/gui/nodal/OscillatorNode.cpp
+    src/gui/nodal/DebuggerNode.cpp
+    src/gui/nodal/QuantizerNode.cpp
     src/gui/NodeContextMenu.cpp
     src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
@@ -97,14 +110,17 @@ add_executable(
     src/io/PostRW.cpp
     src/io/RwHelpers.cpp
     src/io/FileExplorer.cpp
+    src/io/SignalOperationsRW.cpp
     src/render/AudioRenderer.cpp
     src/signal/LinearSamplers.cpp
     src/signal/Modulator.cpp
     src/signal/PcmData.cpp
     src/signal/Signal.cpp
     src/signal/WavExporter.cpp
-    src/signal/SignalOperation.cpp
-    src/signal/Operations.cpp
+    src/signal/operations/SignalOperation.cpp
+    src/signal/operations/Operations.cpp
+    src/signal/operations/Oscillator.cpp
+    src/signal/operations/Quantizer.cpp
     src/Core/Vec2.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp

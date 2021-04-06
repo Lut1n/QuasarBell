@@ -1,5 +1,5 @@
 #ifndef JSON_POSTFX_H
-#define JSON_POST_H
+#define JSON_POSTFX_H
 
 #include "io/json/json.hpp"
 #include "gui/PostEffect.hpp"

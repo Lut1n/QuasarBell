@@ -13,6 +13,7 @@
 struct UiNode : public UiFrame
 {
     UiNode(const std::string& title, const vec2& position, const vec2& size);
+    virtual ~UiNode();
     
     bool onEvent(const UiEvent& event) override;
     void draw() override;
@@ -21,14 +22,17 @@ struct UiNode : public UiFrame
     UiNode* getSourceNode(int id);
 
     virtual void displayProperties();
+
+    size_t getIndex(UiPin* pin) const;
     
 public:
     std::unique_ptr<UiText> title;
 
-    std::unordered_map<int, std::unique_ptr<UiPin>> inputs;
-    std::unordered_map<int, std::unique_ptr<UiPin>> outputs;
+    std::vector<std::unique_ptr<UiPin>> inputs;
+    std::vector<std::unique_ptr<UiPin>> outputs;
 
     bool clicking = false;
+    bool toDelete = false;
     static UiNode* focused;
 };
 

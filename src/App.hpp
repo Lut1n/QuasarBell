@@ -10,6 +10,8 @@ class App
 public:
     GuiRenderer* gui;
     SoundNode* sound;
+
+    static App* s_instance;
 };
 
 //--------------------------------------------------------------

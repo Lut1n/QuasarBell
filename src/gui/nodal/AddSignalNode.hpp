@@ -4,17 +4,27 @@
 #include <memory>
 #include <unordered_map>
 
-#include "UI/UiNode.h"
-#include "signal/Operations.hpp"
+#include "gui/nodal/SignalOperationNode.hpp"
+#include "signal/operations/Operations.hpp"
 
-struct AddSignalNode : public UiNode
+struct AddSignalNode : public SignalOperationNode
 {
     AddSignalNode(const vec2& position);
 
     void displayProperties() override;
     
 public:
-    AddOperation operation;
+    AddOperation add;
+};
+
+struct MultSignalNode : public SignalOperationNode
+{
+    MultSignalNode(const vec2& position);
+
+    void displayProperties() override;
+    
+public:
+    MultOperation mult;
 };
 
 #endif // GUI_ADD_SIGNAL_NODE_H

@@ -28,6 +28,7 @@ public:
     std::vector<std::uint64_t> connectionIds;
     bool multipleConnections = false;
     bool textOnLeft = false;
+    bool rightClicking = false;
 
     enum Type
     {

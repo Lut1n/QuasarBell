@@ -1,32 +1,6 @@
-#include "signal/SignalOperation.hpp"
+#include "signal/operations/SignalOperation.hpp"
 
-/*OperationData::~OperationData()
-{
-    _desalloc();
-}
-
-void OperationData::alloc(OperationDataType t, size_t c)
-{
-    if (type != t || count != c)
-    {
-        _desalloc();
-        type = t;
-        count = c;)
-        if (type == DataType_Bool) bvec = new bool[count];
-        if (type == DataType_Int) ivec = new int[count];
-        if (type == DataType_Float) fvec = new float[count];
-    }
-}
-
-void OperationData::_desalloc()
-{
-    if (type == DataType_Bool) delete [] bvec;
-    if (type == DataType_Int) delete [] ivec;
-    if (type == DataType_Float) delete [] fvec;
-
-    type = DataType_Undefined;
-    count = 0;
-}*/
+#include <algorithm>
 
 
 //--------------------------------------------------------------
@@ -56,6 +30,12 @@ void SignalOperation::setOuput(size_t index, SignalOperation* dst, size_t dstInd
 }
 
 //--------------------------------------------------------------
+SignalOperation* SignalOperation::getInputOperation(size_t index)
+{
+    return inputs[index].operation;
+}
+
+//--------------------------------------------------------------
 SignalOperationConnection* SignalOperation::getInput(size_t index)
 {
     if (index < inputs.size())
@@ -72,13 +52,26 @@ SignalOperationConnection* SignalOperation::getOutput(size_t index)
 }
 
 //--------------------------------------------------------------
-OperationData SignalOperation::getInputData(size_t index)
+void SignalOperation::validateGraph()
+{ 
+    for (auto input : inputs)
+    {
+        if (input.operation)
+            input.operation->validateGraph();
+    }
+    validate();
+}
+
+//--------------------------------------------------------------
+OperationData SignalOperation::sampleInput(size_t index, const Time& t)
 {
-    SignalOperationConnection* co = getInput(index);
+    auto* co = getInput(index);
     if (co->operation)
-        return co->operation->getOutputData(inputs[index].index);
+    {
+        return co->operation->sample(inputs[index].index, t);
+    }
     else
-        return OperationData{DataType_Undefined};
+        return OperationData{DataType_Error};
 }
 
 //--------------------------------------------------------------
@@ -101,36 +94,13 @@ void SignalOperation::initialize(const std::vector<OperationDataType>& input, co
 }
 
 //--------------------------------------------------------------
-void SignalOperation::update()
-{
-    updateData();
-    updateAllChildren();
-}
-
-//--------------------------------------------------------------
-OperationData SignalOperation::getOutputData(size_t index) const
-{
-    return OperationData(); //getData(index);
-}
-
-//--------------------------------------------------------------
-void SignalOperation::updateAllChildren()
-{
-    for (int i=0; i<outputs.size(); ++i)
-    {
-        if(outputs[i].operation)
-            outputs[i].operation->update();
-    }
-}
-
-//--------------------------------------------------------------
 void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx)
 {
-    remConnection(src, srcIdx, nullptr, 0);
-    remConnection(nullptr, 0, dst, dstIdx);
+    remConnection(/*nullptr, 0, */dst, dstIdx);
     
-    if (src && dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size() && dst->inputs[dstIdx].type == src->outputs[srcIdx].type)
+    if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
     {
+        std::cout << "create connection " << std::hex << src << "#" << srcIdx << " - " << std::hex << dst << "#" << dstIdx << std::endl;
         src->outputs[srcIdx].operation = dst;
         src->outputs[srcIdx].index = dstIdx;
         
@@ -140,9 +110,9 @@ void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalO
 }
 
 //--------------------------------------------------------------
-void SignalOperation::remConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx)
+void SignalOperation::remConnection(/*SignalOperation* src, size_t srcIdx, */SignalOperation* dst, size_t dstIdx)
 {
-    if(src && srcIdx < src->outputs.size())
+    /*if(src && srcIdx < src->outputs.size())
     {
         auto op = src->outputs[srcIdx].operation;
         auto index = src->outputs[srcIdx].index;
@@ -153,7 +123,7 @@ void SignalOperation::remConnection(SignalOperation* src, size_t srcIdx, SignalO
         }
         src->outputs[srcIdx].operation = nullptr;
         src->outputs[srcIdx].index = 0;
-    }
+    }*/
     if (dst && dstIdx < dst->inputs.size())
     {
         auto op = dst->inputs[dstIdx].operation;
@@ -167,14 +137,71 @@ void SignalOperation::remConnection(SignalOperation* src, size_t srcIdx, SignalO
         dst->inputs[dstIdx].index = 0;
     }
 }
+
 //--------------------------------------------------------------
-void SignalOperation::updateData()
+std::string SignalOperation::name() const
+{
+    return "None";
+}
+
+//--------------------------------------------------------------
+void SignalOperation::validate()
 {
     // to implement by children
 }
 
 //--------------------------------------------------------------
-OperationData SignalOperation::getData(size_t index, float t)
+OperationData SignalOperation::sample(size_t index, const Time& t)
 {
     // to implement by children
+    return OperationData{DataType_Error};
+}
+
+//--------------------------------------------------------------
+size_t SignalOperation::getInputCount() const
+{
+    return inputs.size();
+}
+
+//--------------------------------------------------------------
+size_t SignalOperation::getOutputCount() const
+{
+    return outputs.size();
+}
+
+size_t SignalOperation::getPropertyCount() const
+{
+    return 0;
+}
+OperationDataType SignalOperation::getPropertyType(size_t i) const
+{
+    return DataType_Error;
+}
+std::string SignalOperation::getPropertyName(size_t i) const
+{
+    return "None";
+}
+void SignalOperation::getProperty(size_t i, std::string& value) const
+{
+}
+void SignalOperation::getProperty(size_t i, float& value) const
+{
+}
+void SignalOperation::getProperty(size_t i, int& value) const
+{
+}
+void SignalOperation::getProperty(size_t i, bool& value) const
+{
+}
+void SignalOperation::setProperty(size_t i, const std::string& value)
+{
+}
+void SignalOperation::setProperty(size_t i, float value)
+{
+}
+void SignalOperation::setProperty(size_t i, int value)
+{
+}
+void SignalOperation::setProperty(size_t i, bool value)
+{
 }

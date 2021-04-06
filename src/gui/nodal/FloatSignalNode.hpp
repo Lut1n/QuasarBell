@@ -4,17 +4,17 @@
 #include <memory>
 #include <unordered_map>
 
-#include "UI/UiNode.h"
-#include "signal/Operations.hpp"
+#include "gui/nodal/SignalOperationNode.hpp"
+#include "signal/operations/Operations.hpp"
 
-struct FloatSignalNode : public UiNode
+struct FloatSignalNode : public SignalOperationNode
 {
     FloatSignalNode(const vec2& position);
 
     void displayProperties() override;
     
 public:
-    FloatInput operation;
+    FloatInput floatInput;
 };
 
 #endif // GUI_FLOAT_SIGNAL_NODE_H

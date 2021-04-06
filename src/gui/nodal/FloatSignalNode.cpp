@@ -4,12 +4,13 @@
 
 //--------------------------------------------------------------
 FloatSignalNode::FloatSignalNode(const vec2& position)
-    : UiNode("Float Input", position, vec2(100, 100))
+    : SignalOperationNode("Float Input", position)
 {
     addPin(0, "value", true);
+    setOperation(&floatInput);
 }
 //--------------------------------------------------------------
 void FloatSignalNode::displayProperties()
 {
-    ImGui::InputFloat("value", &operation.value);
+    ImGui::InputFloat("value", &floatInput.value);
 }
