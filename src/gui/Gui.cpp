@@ -146,6 +146,7 @@ void GuiRenderer::display()
     {
         if(ImGui::BeginMenu("Project"))
         {
+            if( ImGui::MenuItem("New") ) appState.resetProject = true;
             ioMenuItem("Load", "./save/my_project.json", fileInput, UserFileInput::Load_Prj);
             ioMenuItem("Save", "./save/my_project.json", fileInput, UserFileInput::Save_Prj);
             ImGui::Separator();

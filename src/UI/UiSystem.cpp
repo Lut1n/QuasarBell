@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "UI/UiConnections.h"
+#include "UI/UiNode.h"
 
 static UiSystem s_uiSystemSingleton;
 
@@ -35,6 +36,14 @@ bool UiSystem::onEvent(const UiEvent& event)
 {
     if(!_activated) return false;
 
+    static const int SHIFT_KEY = 340;
+    if (event.type == UiEvent::TYPE_KEY && event.input == SHIFT_KEY)
+    {
+        if (event.state == UiEvent::STATE_DOWN) _shiftKey = true;
+        else if (event.state == UiEvent::STATE_RELEASED) _shiftKey = false;
+        return false;
+    }
+
     Rect clippingRect = {vec2(), vec2(10000.0, 10000.0)};
     bool captured = false;
     for(auto it = _listeners.rbegin(); it != _listeners.rend(); it++)
@@ -49,6 +58,8 @@ bool UiSystem::onEvent(const UiEvent& event)
     {
         if(UiConnections::instance)
             UiConnections::instance->abortLink();
+        /*if(event.state == UiEvent::STATE_DOWN)
+            UiNode::selected.clear();*/
         if(event.input == UiEvent::INPUT_MOUSE_2)
         {
             requestContextMenu = true;
@@ -57,6 +68,11 @@ bool UiSystem::onEvent(const UiEvent& event)
 
     }
     return captured;
+}
+
+bool UiSystem::multiselectionEnabled() const
+{
+    return _shiftKey;
 }
 
 void UiSystem::update(const UiTime& time)

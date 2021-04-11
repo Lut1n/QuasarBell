@@ -18,4 +18,5 @@ void LinearSamplerNode::displayProperties()
     ImGui::InputFloat("value", &linInput.value);
     ImGui::InputFloat("speed", &linInput.speed);
     ImGui::InputFloat("acc", &linInput.acc);
+    displayPreview();
 }

@@ -13,4 +13,5 @@ FloatSignalNode::FloatSignalNode(const vec2& position)
 void FloatSignalNode::displayProperties()
 {
     ImGui::InputFloat("value", &floatInput.value);
+    displayPreview();
 }

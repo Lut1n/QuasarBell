@@ -20,7 +20,6 @@ add_executable(
     src/gui/UserFileInput.hpp
     src/gui/InputEffect.hpp
     src/gui/Keyboard.hpp
-    src/gui/Math.hpp
     src/gui/PostEffect.hpp
     src/gui/SignalEdit.hpp
     src/gui/NodeContextMenu.hpp
@@ -56,6 +55,7 @@ add_executable(
     src/signal/operations/Oscillator.hpp
     src/signal/operations/Quantizer.hpp
     src/Core/Vec2.h
+    src/Core/Math.hpp
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
     src/Font/GlyphRenderer.h

@@ -1,6 +1,6 @@
 #include "PcmData.hpp"
 
-#include "gui/Math.hpp"
+#include "Core/Math.hpp"
 
 //--------------------------------------------------------------
 void PcmData::copy(const PcmData& other, size_t oft)

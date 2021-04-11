@@ -93,7 +93,7 @@ struct SignalOperation
     virtual void setProperty(size_t i, bool value);
 
     static void setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx);
-    static void remConnection(/*SignalOperation* src, size_t srcIdx, */SignalOperation* op, size_t index);
+    static void remConnection(SignalOperation* op, size_t index);
 
 private:
     

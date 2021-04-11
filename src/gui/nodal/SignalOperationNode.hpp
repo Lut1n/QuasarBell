@@ -13,7 +13,10 @@ struct SignalOperationNode : public UiNode
 
     void setOperation(SignalOperation* op);
     SignalOperation* getOperation();
-    
+
+protected:
+    void displayPreview();
+    static float s_imgui_sampler(void* data, int idx);
 private:
     SignalOperation* operation = nullptr;
 };

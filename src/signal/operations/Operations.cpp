@@ -18,7 +18,6 @@ OperationData FloatInput::sample(size_t index, const Time& t)
     data.type = DataType_Float;
     data.count = 1;
     data.fvec[0] = value;
-    // if (t.t > 0.5) data.fvec[0] *= 2.0;
     return data;
 }
 
@@ -141,7 +140,7 @@ OperationData AddOperation::sample(size_t index, const Time& t)
     OperationData b = sampleInput(1, t);
 
     float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type != DataType_Float ? b.fvec[0] : input2;
+    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
 
     data.type = output->type;
     data.count = output->count;
@@ -210,7 +209,7 @@ OperationData MultOperation::sample(size_t index, const Time& t)
     OperationData b = sampleInput(1, t);
 
     float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type != DataType_Float ? b.fvec[0] : input2;
+    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
 
     data.type = output->type;
     data.count = output->count;
@@ -263,4 +262,35 @@ void OutputOperation::validate()
 OperationData OutputOperation::sample(size_t index, const Time& t)
 {
     return sampleInput(index, t);
+}
+
+size_t OutputOperation::getPropertyCount() const
+{
+    return 2;
+}
+std::string OutputOperation::getPropertyName(size_t i) const
+{
+    if (i == 0)
+        return "range";
+    else if (i==1)
+        return "duration";
+    return "None";
+}
+OperationDataType OutputOperation::getPropertyType(size_t i) const
+{
+    return DataType_Float;
+}
+void OutputOperation::getProperty(size_t i, float& value) const
+{
+    if (i==0)
+        value = range;
+    if (i==1)
+        value = duration;
+}
+void OutputOperation::setProperty(size_t i, float value)
+{
+    if (i==0)
+        range = value;
+    if (i==1)
+        duration = value;
 }

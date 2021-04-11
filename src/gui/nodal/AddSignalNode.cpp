@@ -17,6 +17,7 @@ void AddSignalNode::displayProperties()
 {
     ImGui::InputFloat("input1", &add.input1);
     ImGui::InputFloat("input2", &add.input2);
+    displayPreview();
 }
 
 
@@ -35,4 +36,5 @@ void MultSignalNode::displayProperties()
 {
     ImGui::InputFloat("input1", &mult.input1);
     ImGui::InputFloat("input2", &mult.input2);
+    displayPreview();
 }

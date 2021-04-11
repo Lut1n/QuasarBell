@@ -20,8 +20,8 @@ struct DebuggerNode : public SignalOperationNode
 public:
     OutputOperation debug;
     float value = 0.0f;
-    float range = 1.0f;
-    float duration = 2.0;
+    /*float range = 1.0f;
+    float duration = 2.0;*/
 };
 
 #endif // GUI_DEBUG_SIGNAL_NODE_H

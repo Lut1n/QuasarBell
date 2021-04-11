@@ -96,7 +96,7 @@ void SignalOperation::initialize(const std::vector<OperationDataType>& input, co
 //--------------------------------------------------------------
 void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx)
 {
-    remConnection(/*nullptr, 0, */dst, dstIdx);
+    remConnection(dst, dstIdx);
     
     if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
     {
@@ -110,25 +110,13 @@ void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalO
 }
 
 //--------------------------------------------------------------
-void SignalOperation::remConnection(/*SignalOperation* src, size_t srcIdx, */SignalOperation* dst, size_t dstIdx)
+void SignalOperation::remConnection(SignalOperation* dst, size_t dstIdx)
 {
-    /*if(src && srcIdx < src->outputs.size())
-    {
-        auto op = src->outputs[srcIdx].operation;
-        auto index = src->outputs[srcIdx].index;
-        if(op)
-        {
-            op->inputs[index].operation = nullptr;
-            op->inputs[index].index = 0;
-        }
-        src->outputs[srcIdx].operation = nullptr;
-        src->outputs[srcIdx].index = 0;
-    }*/
     if (dst && dstIdx < dst->inputs.size())
     {
         auto op = dst->inputs[dstIdx].operation;
         auto index = dst->inputs[dstIdx].index;
-        if(op)
+        if(op && index < op->outputs.size())
         {
             op->outputs[index].operation = nullptr;
             op->outputs[index].index = 0;

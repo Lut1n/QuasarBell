@@ -13,3 +13,16 @@ void stringTo(const std::string& str, WaveEdit::Wave& e)
     for(int i=0; i<7; ++i)
         if(str == items[i]) e = (WaveEdit::Wave)i;
 }
+
+//--------------------------------------------------------------
+void toJson(JsonValue& json, const vec2& v)
+{
+    json.setPath(0).set(v.x);
+    json.setPath(1).set(v.y);
+}
+//--------------------------------------------------------------
+void jsonTo(JsonValue& json, vec2& v)
+{
+    v.x = json.setPath(0).getNumeric();
+    v.y = json.setPath(1).getNumeric();
+}

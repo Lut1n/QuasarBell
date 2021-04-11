@@ -15,7 +15,5 @@ QuantizerNode::QuantizerNode(const vec2& position)
 void QuantizerNode::displayProperties()
 {
     ImGui::InputInt("quantity", &quantizer.quantity);
-
-    
-    // ImGui::Text();
+    displayPreview();
 }

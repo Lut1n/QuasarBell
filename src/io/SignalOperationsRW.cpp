@@ -28,8 +28,8 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
         if (dynamic_cast<OscillatorNode*>(it->second.get())) jNode.setPath("type").set(std::string("oscillator"));
         if (dynamic_cast<QuantizerNode*>(it->second.get())) jNode.setPath("type").set(std::string("quantizer"));
         jNode.setPath("id").set((float)it->first);
-        jNode.setPath("position", 0).set(it->second->position.x);
-        jNode.setPath("position", 1).set(it->second->position.y);
+        toJson(jNode.setPath("position"), it->second->position);
+        
         auto op = it->second->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)
         {
@@ -58,10 +58,10 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
     int coIndex = 0;
     for (auto entry : co.entries)
     {
-        jsonCo.setPath(coIndex, "src").set((float)entry.src);
-        jsonCo.setPath(coIndex, "src-pin").set((float)entry.src_index);
-        jsonCo.setPath(coIndex, "dst").set((float)entry.dst);
-        jsonCo.setPath(coIndex, "dst-pin").set((float)entry.dst_index);
+        jsonCo.setPath(coIndex, "src").set(entry.src);
+        jsonCo.setPath(coIndex, "src-pin").set(entry.src_index);
+        jsonCo.setPath(coIndex, "dst").set(entry.dst);
+        jsonCo.setPath(coIndex, "dst-pin").set(entry.dst_index);
         coIndex++;
     }
 }
@@ -76,8 +76,7 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
         int id = jNode.setPath("id").getNumeric();
         std::string type = jNode.setPath("type").getString();
         vec2 position;
-        position.x = jNode.setPath("position", 0).getNumeric();
-        position.y = jNode.setPath("position", 1).getNumeric();
+        jsonTo(jNode.setPath("position"), position);
         std::unique_ptr<SignalOperationNode> ptr;
         if (type == "add")
             ptr = std::make_unique<AddSignalNode>(position);

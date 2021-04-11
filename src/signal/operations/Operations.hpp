@@ -77,6 +77,15 @@ struct OutputOperation : SignalOperation
     OutputOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
+    
+    size_t getPropertyCount() const override;
+    std::string getPropertyName(size_t i) const override;
+    OperationDataType getPropertyType(size_t i) const override;
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float range = 1.0;
+    float duration = 1.0;
 };
 
 

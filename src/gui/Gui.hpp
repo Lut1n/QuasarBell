@@ -57,6 +57,7 @@ enum class ETool
 struct AppState
 {
     ETool toolMode = ETool::NodalEditor;
+    bool resetProject = false;
 };
 
 //--------------------------------------------------------------

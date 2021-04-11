@@ -2,7 +2,14 @@
 
 #include "UI/UiConnections.h"
 
-UiNode* UiNode::focused = nullptr;
+std::list<UiNode*> UiNode::selected;
+
+bool UiNode::isSelected(UiNode* node)
+{
+    for (auto n : selected)
+        if (n == node) return true;
+    return false;
+}
 
 UiNode::UiNode(const std::string& title, const vec2& position, const vec2& size)
     : UiFrame(position, size)
@@ -24,7 +31,29 @@ UiNode::~UiNode()
         for (auto id : pin->connectionIds)
             UiConnections::instance->deleteLink(id);
     }*/
-    if (focused == this) focused = nullptr;
+    for (auto it = selected.begin(); it != selected.end();)
+    {
+        if (*it == this)
+        {
+            it = selected.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+}
+
+void UiNode::onMove(const vec2& delta)
+{
+    if (UiNode::isSelected(this))
+    {
+        for(auto n : selected) n->position += delta;
+    }
+    else
+    {
+        UiFrame::onMove(delta);
+    }
 }
 
 bool UiNode::onEvent(const UiEvent& event)
@@ -53,7 +82,15 @@ bool UiNode::onEvent(const UiEvent& event)
 
     ret = UiFrame::onEvent(event) || ret;
 
-    while(nextClicked()) focused = this;
+    while(nextClicked())
+    {
+        if (!UiNode::isSelected(this))
+        {
+            if (!UiSystem::instance()->multiselectionEnabled() && !UiNode::selected.empty())
+                UiNode::selected.clear();
+            selected.push_back(this);
+        }
+    }
     while(nextRClicked()) toDelete = true;
 
     return ret;
@@ -62,7 +99,7 @@ bool UiNode::onEvent(const UiEvent& event)
 void UiNode::draw()
 {
     int prev_color = color;
-    if( focused == this ) color = 0x3E3E3FFF;
+    if( UiNode::isSelected(this) ) color = 0x7E7E7FFF;
     UiFrame::draw();
     color = prev_color;
     float step_y = size.y / (1+inputs.size());

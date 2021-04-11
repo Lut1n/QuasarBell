@@ -47,6 +47,8 @@ struct UiSystem
 
     void setActivated(bool activated);
     bool isActivated() const;
+
+    bool multiselectionEnabled() const;
     
 public:
     GlyphRenderer glyphRenderer;
@@ -57,6 +59,7 @@ private:
     std::vector<UiElement*> _elements;
     std::vector<UiElement*> _renderables;
     bool _activated = false;
+    bool _shiftKey = false;
 };
 
 #endif // UI_SYSTEM_H

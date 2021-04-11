@@ -63,26 +63,23 @@ void NodalEditorWorkSpace::update(double t)
 {
     if(!_ready)
     {
-        std::unique_ptr<SignalOperationNode> u = std::make_unique<FloatSignalNode>(vec2(400, 50));
-        operations.setOperation(0, u);
-        u = std::make_unique<FloatSignalNode>(vec2(410, 200));
-        operations.setOperation(1, u);
-        u = std::make_unique<AddSignalNode>(vec2(740, 100));
-        operations.setOperation(2, u);
-        u = std::make_unique<DebuggerNode>(vec2(1000, 200));
-        operations.setOperation(3, u);
-
-        UiSystem::instance()->add(operations.getOperation(0), true, true);
-        UiSystem::instance()->add(operations.getOperation(1), true, true);
-        UiSystem::instance()->add(operations.getOperation(2), true, true);
-        UiSystem::instance()->add(operations.getOperation(3), true, true);
-            
         cons = std::make_unique<UiConnections>();
         cons->handler = this;
-        cons->createLink(operations.getOperation(0)->outputs[0].get(), operations.getOperation(2)->inputs[0].get());
-        cons->createLink(operations.getOperation(1)->outputs[0].get(), operations.getOperation(2)->inputs[1].get());
-        
         UiSystem::instance()->add(cons.get(), true, true);
+
+        if (std::filesystem::exists("./default.json"))
+        {
+            for(auto& op : operations.operations) UiSystem::instance()->rem(op.second.get());
+            operations.operations.clear();
+            OperationConnections connections;
+            JsonValue root = loadJsonFile("./default.json");
+            loadFrom(root, operations, connections);
+            for(auto& op : operations.operations) UiSystem::instance()->add(op.second.get(), true, true);
+            for(auto co : connections.entries)
+            {
+                cons->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
+            }
+        }
         _ready = true;
     }
 
@@ -90,6 +87,13 @@ void NodalEditorWorkSpace::update(double t)
     gui.makeCurrent(&_components);
 
     
+    if(gui.appState.resetProject)
+    {
+        for(auto& op : operations.operations) UiSystem::instance()->rem(op.second.get());
+        operations.operations.clear();
+        gui.appState.resetProject = false;
+    }
+
     if(gui.fileInput.confirmed)
     {
         if(gui.fileInput.request == UserFileInput::Load_Prj)
@@ -227,14 +231,14 @@ void NodalEditorWorkSpace::onDisconnect(UiPin* a, UiPin* b)
         int node2_index = node2->getIndex(b);
         auto* opnode = dynamic_cast<SignalOperationNode*>(node2);
         if (opnode)
-            SignalOperation::remConnection(/*nullptr, 0, */opnode->getOperation(), node2_index);
+            SignalOperation::remConnection(opnode->getOperation(), node2_index);
     }
     if(!node1_is_src && node1)
     {
         int node1_index = node1->getIndex(a);
         auto* opnode = dynamic_cast<SignalOperationNode*>(node1);
         if (opnode)
-            SignalOperation::remConnection(/*nullptr, 0, */opnode->getOperation(), node1_index);
+            SignalOperation::remConnection(opnode->getOperation(), node1_index);
     }
     
 }

@@ -22,6 +22,10 @@ struct UiFrame : public UiRect
     void add(UiElement* el, bool isRenderable = true, bool isListener = true);
     void rem(UiElement* el);
     
+protected:
+
+    virtual void onMove(const vec2& delta);
+
 public:
     bool moving = false;
     vec2 lastMousePosition;

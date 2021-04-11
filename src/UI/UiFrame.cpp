@@ -6,6 +6,11 @@ UiFrame::UiFrame(const vec2& position, const vec2& size)
     this->children = std::make_unique<UiContainer>(Rect::fromPosAndSize(vec2(),size));
 }
 
+void UiFrame::onMove(const vec2& delta)
+{
+    position += delta;
+}
+
 bool UiFrame::onEvent(const UiEvent& event)
 {
     children->contentPosition = vec2();
@@ -24,7 +29,8 @@ bool UiFrame::onEvent(const UiEvent& event)
         {
             moving = true;
             vec2 delta = event.position - lastMousePosition;
-            position = lastPosition + delta;
+            vec2 newPosition = lastPosition + delta;
+            onMove(newPosition - position);
         }
     }
     else if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_1)

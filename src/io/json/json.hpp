@@ -44,6 +44,8 @@ public:
     
     Type type = Type::Undefined;
 
+    size_t count() const;
+
     bool has(int i) const;
     bool has(const std::string& key) const;
     
@@ -61,6 +63,8 @@ public:
     void clear();
     void set(bool b);
     void set(double d);
+    void set(float f);
+    void set(int i);
     void set(const std::string& s);
     JsonValue& setEntry(int i);
     JsonValue& setEntry(const std::string& key);

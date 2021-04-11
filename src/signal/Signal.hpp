@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "gui/Math.hpp"
+#include "Core/Math.hpp"
 
 //--------------------------------------------------------------
 #define La440 440.0f

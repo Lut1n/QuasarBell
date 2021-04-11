@@ -37,6 +37,10 @@ void JsonValue::ArrMap::add(const std::string& k, const JsonValue& v)
     keys_indexes.push_back(std::make_pair(k, values.size()));
     values.emplace_back(v);
 }
+size_t JsonValue::count() const
+{
+    return array.values.size();
+}
 //--------------------------------------------------------------
 bool JsonValue::has(int i) const
 {
@@ -138,6 +142,16 @@ void JsonValue::set(double d)
     array.keys_indexes.clear();
     type = Type::Numeric;
     numeric = d;
+}
+//--------------------------------------------------------------
+void JsonValue::set(float f)
+{
+    set((double)f);
+}
+//--------------------------------------------------------------
+void JsonValue::set(int i)
+{
+    set((double)i);
 }
 //--------------------------------------------------------------
 void JsonValue::set(const std::string& s)

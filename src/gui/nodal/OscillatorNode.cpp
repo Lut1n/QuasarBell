@@ -17,7 +17,5 @@ void OscillatorNode::displayProperties()
 {
     ImGui::InputFloat("freq", &oscillator.freq);
     ImGui::InputFloat("ampl", &oscillator.ampl);
-
-    
-    // ImGui::Text();
+    displayPreview();
 }

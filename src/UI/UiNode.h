@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <list>
 
 #include "UI/UiSystem.h"
 #include "UI/UiFrame.h"
@@ -24,8 +25,14 @@ struct UiNode : public UiFrame
     virtual void displayProperties();
 
     size_t getIndex(UiPin* pin) const;
+
+protected:
+    void onMove(const vec2& delta) override;
     
 public:
+
+    static bool isSelected(UiNode* node);
+
     std::unique_ptr<UiText> title;
 
     std::vector<std::unique_ptr<UiPin>> inputs;
@@ -33,7 +40,7 @@ public:
 
     bool clicking = false;
     bool toDelete = false;
-    static UiNode* focused;
+    static std::list<UiNode*> selected;
 };
 
 #endif // UI_NODE_H

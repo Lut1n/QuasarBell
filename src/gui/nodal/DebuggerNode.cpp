@@ -25,30 +25,16 @@ void DebuggerNode::draw()
     UiNode::draw();
 }
 
-
-//--------------------------------------------------------------
-static float s_imgui_sampler(void* data, int idx)
-{
-    SignalOperation& op = *(SignalOperation*)data;
-    SignalOperation::Time time;
-    time.duration = 1.0;
-    time.t = (float)idx/100.0f;
-    time.sec = (float)idx/100.0f;
-    time.elapsed = 0.01;
-    return op.sample(0, time).fvec[0];
-}
-
 //--------------------------------------------------------------
 void DebuggerNode::displayProperties()
 {
     getOperation()->validateGraph();
-    
-    ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, -range, range, ImVec2(0, 60.0f));
+    ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, -debug.range, debug.range, ImVec2(0, 60.0f));
     std::string s = std::to_string(value);
     ImGui::Text(s.c_str());
 
-    ImGui::InputFloat("range", &range);
-    ImGui::InputFloat("duration scale", &duration);
+    ImGui::InputFloat("range", &debug.range);
+    ImGui::InputFloat("duration scale", &debug.duration);
     if (ImGui::Button("Play") && App::s_instance)
     {
         auto& sound = *(App::s_instance->sound);
@@ -70,14 +56,14 @@ PcmData DebuggerNode::generate()
     operations->validateGraph();
 
     PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
+    output.samples.resize(debug.duration * settings.sampleRate);
     
     short quantizer = std::numeric_limits<short>::max();
     
     float sample_t = 1.0 / settings.sampleRate;
     
     SignalOperation::Time time;
-    time.duration = duration;
+    time.duration = debug.duration;
     time.elapsed = sample_t;
     for(unsigned i=0;i<output.samples.size();++i)
     {
