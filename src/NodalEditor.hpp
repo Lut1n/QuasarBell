@@ -12,7 +12,7 @@
 #include "UI/UiText.h"
 #include "UI/UiInput.h"
 #include "UI/UiButton.h"
-#include "UI/UiConnections.h"
+#include "UI/UiNodeBoard.h"
 
 #include <unordered_map>
 
@@ -78,11 +78,9 @@ private:
     App* _app = nullptr;
     bool _ready = false;
 
-    // std::vector<std::unique_ptr<UiNode>> nodes;
+    std::unique_ptr<UiNodeBoard> nodeboard;
     OperationCollection operations; 
-    std::unique_ptr<UiText> selected;
-    std::unique_ptr<UiButton> test;
-    std::unique_ptr<UiConnections> cons;
+    UiConnections* uiConnections;
 };
 
 #endif // QUASAR_BELL_NODAL_EDITOR

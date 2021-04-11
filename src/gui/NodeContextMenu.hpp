@@ -3,6 +3,8 @@
 
 #include "gui/Gui.hpp"
 
+#include "UI/UiNodeBoard.h"
+
 //--------------------------------------------------------------
 class NodeContextMenu : public GuiComponent
 {
@@ -29,6 +31,7 @@ public:
 
     float x,y;
     NodeName which = NodeName_None;
+    UiNodeBoard* nodeboard = nullptr;
 };
 
 #endif // QUASAR_BELL_NODE_CONTEXT_MENU_HPP

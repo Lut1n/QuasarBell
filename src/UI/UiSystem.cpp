@@ -58,14 +58,6 @@ bool UiSystem::onEvent(const UiEvent& event)
     {
         if(UiConnections::instance)
             UiConnections::instance->abortLink();
-        /*if(event.state == UiEvent::STATE_DOWN)
-            UiNode::selected.clear();*/
-        if(event.input == UiEvent::INPUT_MOUSE_2)
-        {
-            requestContextMenu = true;
-            contextMenuPosition = event.position;
-        }
-
     }
     return captured;
 }

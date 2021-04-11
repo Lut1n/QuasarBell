@@ -13,10 +13,10 @@ NodeContextMenu::NodeContextMenu()
 //--------------------------------------------------------------
 void NodeContextMenu::render()
 {
-    if (UiSystem::instance()->requestContextMenu)
+    if (nodeboard && nodeboard->requestContextMenu)
     {
         ImGui::OpenPopup("New Node");
-        UiSystem::instance()->requestContextMenu = false;
+        nodeboard->requestContextMenu = false;
     }
 
     constexpr std::array<const char*, (size_t)NodeName_Count> nameStr = {"Add", "Mult", "Float", "LinearSampler", "Oscillator", "Quantizer", "DebugOutput"};

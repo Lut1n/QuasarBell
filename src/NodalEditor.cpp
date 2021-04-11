@@ -63,21 +63,24 @@ void NodalEditorWorkSpace::update(double t)
 {
     if(!_ready)
     {
-        cons = std::make_unique<UiConnections>();
-        cons->handler = this;
-        UiSystem::instance()->add(cons.get(), true, true);
+        nodeboard = std::make_unique<UiNodeBoard>(vec2(320, 30), vec2(1070, 520));
+        uiConnections = nodeboard->connections.get();
+        uiConnections->handler = this;
+        UiSystem::instance()->add(nodeboard.get(), true, true);
+        // UiSystem::instance()->add(cons.get(), true, true);
+        _components.nodeContextMenu->nodeboard = nodeboard.get();
 
         if (std::filesystem::exists("./default.json"))
         {
-            for(auto& op : operations.operations) UiSystem::instance()->rem(op.second.get());
+            for(auto& op : operations.operations) nodeboard->rem(op.second.get());
             operations.operations.clear();
             OperationConnections connections;
             JsonValue root = loadJsonFile("./default.json");
             loadFrom(root, operations, connections);
-            for(auto& op : operations.operations) UiSystem::instance()->add(op.second.get(), true, true);
+            for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
             for(auto co : connections.entries)
             {
-                cons->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
+                uiConnections->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
             }
         }
         _ready = true;
@@ -89,7 +92,7 @@ void NodalEditorWorkSpace::update(double t)
     
     if(gui.appState.resetProject)
     {
-        for(auto& op : operations.operations) UiSystem::instance()->rem(op.second.get());
+        for(auto& op : operations.operations) nodeboard->rem(op.second.get());
         operations.operations.clear();
         gui.appState.resetProject = false;
     }
@@ -98,21 +101,21 @@ void NodalEditorWorkSpace::update(double t)
     {
         if(gui.fileInput.request == UserFileInput::Load_Prj)
         {
-            for(auto& op : operations.operations) UiSystem::instance()->rem(op.second.get());
+            for(auto& op : operations.operations) nodeboard->rem(op.second.get());
             operations.operations.clear();
             OperationConnections connections;
             JsonValue root = loadJsonFile(gui.fileInput.filepath);
             loadFrom(root, operations, connections);
-            for(auto& op : operations.operations) UiSystem::instance()->add(op.second.get(), true, true);
+            for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
             for(auto co : connections.entries)
             {
-                cons->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
+                uiConnections->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
             }
         }
         else if(gui.fileInput.request == UserFileInput::Save_Prj)
         {
             OperationConnections connections;
-            connections.fill(cons.get(), operations);
+            connections.fill(uiConnections, operations);
             JsonValue root;
             writeInfo(root);
             saveInto(root, operations, connections);
@@ -136,7 +139,7 @@ void NodalEditorWorkSpace::update(double t)
     {
         if (it->second.get() && it->second->toDelete)
         {
-            UiSystem::instance()->rem(it->second.get());
+            nodeboard->rem(it->second.get());
             it = col.erase(it);
         }
         else if (!it->second)
@@ -152,7 +155,7 @@ void NodalEditorWorkSpace::update(double t)
     if (_components.nodeContextMenu->which != NodeContextMenu::NodeName_None)
     {
         auto name = _components.nodeContextMenu->which;
-        auto p = UiSystem::instance()->contextMenuPosition;
+        auto p = nodeboard->contextMenuPosition;
 
         std::unique_ptr<SignalOperationNode> u;
 
@@ -184,7 +187,7 @@ void NodalEditorWorkSpace::update(double t)
         if(u)
         {
             size_t id = operations.addOperation(u);
-            UiSystem::instance()->add(operations.getOperation(id), true, true);
+            nodeboard->add(operations.getOperation(id), true, true);
         }
         _components.nodeContextMenu->which = NodeContextMenu::NodeName_None;
     }

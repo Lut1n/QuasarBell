@@ -70,6 +70,7 @@ add_executable(
     src/UI/UiSystem.h
     src/UI/UiRect.h
     src/UI/UiNode.h
+    src/UI/UiNodeBoard.h
     src/UI/UiText.h
     src/UI/UiInput.h
     src/UI/UiContainer.h
@@ -134,6 +135,7 @@ add_executable(
     src/UI/UiSystem.cpp
     src/UI/UiRect.cpp
     src/UI/UiNode.cpp
+    src/UI/UiNodeBoard.cpp
     src/UI/UiText.cpp
     src/UI/UiInput.cpp
     src/UI/UiContainer.cpp
