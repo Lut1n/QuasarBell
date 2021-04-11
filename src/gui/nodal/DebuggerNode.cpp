@@ -50,20 +50,27 @@ void DebuggerNode::displayProperties()
 //--------------------------------------------------------------
 PcmData DebuggerNode::generate()
 {
+    float duration = debug.duration;
+    if (duration == 0.0f)
+    {
+        std::cout << "error: duration = 0; 1s is used" << std::endl;
+        duration = 1.0;
+    }
+
     auto& settings = AudioSettings::defaultSettings;
     auto* operations = getOperation();
 
     operations->validateGraph();
 
     PcmData output;
-    output.samples.resize(debug.duration * settings.sampleRate);
+    output.samples.resize(duration * settings.sampleRate);
     
     short quantizer = std::numeric_limits<short>::max();
     
     float sample_t = 1.0 / settings.sampleRate;
     
     SignalOperation::Time time;
-    time.duration = debug.duration;
+    time.duration = duration;
     time.elapsed = sample_t;
     for(unsigned i=0;i<output.samples.size();++i)
     {

@@ -1,0 +1,26 @@
+#ifndef QUASAR_BELL_MIX_OPERATION_HPP
+#define QUASAR_BELL_MIX_OPERATION_HPP
+
+#include "signal/operations/SignalOperation.hpp"
+
+
+//--------------------------------------------------------------
+struct MixOperation : public SignalOperation
+{
+    MixOperation();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
+    size_t getPropertyCount() const override;
+    std::string getPropertyName(size_t i) const override;
+    OperationDataType getPropertyType(size_t i) const override;
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float input1 = 0.0f;
+    float input2 = 0.0f;
+    float delta = 0.0;
+};
+
+
+#endif // QUASAR_BELL_MIX_OPERATION_HPP

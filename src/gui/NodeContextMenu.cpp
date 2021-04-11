@@ -19,7 +19,7 @@ void NodeContextMenu::render()
         nodeboard->requestContextMenu = false;
     }
 
-    constexpr std::array<const char*, (size_t)NodeName_Count> nameStr = {"Add", "Mult", "Float", "LinearSampler", "Oscillator", "Quantizer", "DebugOutput"};
+    constexpr std::array<const char*, (size_t)NodeName_Count> nameStr = {"Add", "Mult", "Float", "LinearSampler", "Oscillator", "Quantizer", "Mix", "Envelop", "DebugOutput"};
     if (ImGui::BeginPopup("New Node"))
     {
         ImGui::Text("New Node");

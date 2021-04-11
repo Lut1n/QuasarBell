@@ -8,6 +8,8 @@
 #include "gui/nodal/LinearSamplerNode.hpp"
 #include "gui/nodal/OscillatorNode.hpp"
 #include "gui/nodal/QuantizerNode.hpp"
+#include "gui/nodal/MixNode.hpp"
+#include "gui/nodal/EnvelopNode.hpp"
 
 #include "NodalEditor.hpp"
 
@@ -27,6 +29,8 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
         if (dynamic_cast<LinearSamplerNode*>(it->second.get())) jNode.setPath("type").set(std::string("sampler"));
         if (dynamic_cast<OscillatorNode*>(it->second.get())) jNode.setPath("type").set(std::string("oscillator"));
         if (dynamic_cast<QuantizerNode*>(it->second.get())) jNode.setPath("type").set(std::string("quantizer"));
+        if (dynamic_cast<MixNode*>(it->second.get())) jNode.setPath("type").set(std::string("mix"));
+        if (dynamic_cast<EnvelopNode*>(it->second.get())) jNode.setPath("type").set(std::string("envelop"));
         jNode.setPath("id").set((float)it->first);
         toJson(jNode.setPath("position"), it->second->position);
         
@@ -92,6 +96,10 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
             ptr = std::make_unique<OscillatorNode>(position);
         else if (type == "quantizer")
             ptr = std::make_unique<QuantizerNode>(position);
+        else if (type == "mix")
+            ptr = std::make_unique<MixNode>(position);
+        else if (type == "envelop")
+            ptr = std::make_unique<EnvelopNode>(position);
             
         auto op = ptr->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)

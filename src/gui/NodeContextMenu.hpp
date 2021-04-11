@@ -18,6 +18,8 @@ public:
         NodeName_LinearSampler,
         NodeName_Oscillator,
         NodeName_Quantizer,
+        NodeName_Mix,
+        NodeName_Envelop,
         NodeName_Debug,
 
         NodeName_Count,

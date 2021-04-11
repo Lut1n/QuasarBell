@@ -31,6 +31,8 @@ add_executable(
     src/gui/nodal/OscillatorNode.hpp
     src/gui/nodal/DebuggerNode.hpp
     src/gui/nodal/QuantizerNode.hpp
+    src/gui/nodal/MixNode.hpp
+    src/gui/nodal/EnvelopNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
     src/io/json/json.hpp
@@ -54,6 +56,8 @@ add_executable(
     src/signal/operations/Operations.hpp
     src/signal/operations/Oscillator.hpp
     src/signal/operations/Quantizer.hpp
+    src/signal/operations/MixOperation.hpp
+    src/signal/operations/EnvelopOperation.hpp
     src/Core/Vec2.h
     src/Core/Math.hpp
     src/Font/DefaultFontMaker.h
@@ -99,6 +103,8 @@ add_executable(
     src/gui/nodal/OscillatorNode.cpp
     src/gui/nodal/DebuggerNode.cpp
     src/gui/nodal/QuantizerNode.cpp
+    src/gui/nodal/MixNode.cpp
+    src/gui/nodal/EnvelopNode.cpp
     src/gui/NodeContextMenu.cpp
     src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
@@ -122,6 +128,8 @@ add_executable(
     src/signal/operations/Operations.cpp
     src/signal/operations/Oscillator.cpp
     src/signal/operations/Quantizer.cpp
+    src/signal/operations/MixOperation.cpp
+    src/signal/operations/EnvelopOperation.cpp
     src/Core/Vec2.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp

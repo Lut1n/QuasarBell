@@ -6,6 +6,8 @@
 #include "gui/nodal/DebuggerNode.hpp"
 #include "gui/nodal/OscillatorNode.hpp"
 #include "gui/nodal/QuantizerNode.hpp"
+#include "gui/nodal/MixNode.hpp"
+#include "gui/nodal/EnvelopNode.hpp"
 
 
 #include "io/FileIO.hpp"
@@ -181,6 +183,12 @@ void NodalEditorWorkSpace::update(double t)
                 break;
             case NodeContextMenu::NodeName_Quantizer:
                 u = std::make_unique<QuantizerNode>(p);
+                break;
+            case NodeContextMenu::NodeName_Mix:
+                u = std::make_unique<MixNode>(p);
+                break;
+            case NodeContextMenu::NodeName_Envelop:
+                u = std::make_unique<EnvelopNode>(p);
                 break;
         };
 
