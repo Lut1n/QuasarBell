@@ -3,21 +3,28 @@
 #include "imgui.h"
 
 //--------------------------------------------------------------
-SignalOperationNode::SignalOperationNode(const std::string& title, const vec2& position)
-    : UiNode(title, position, vec2(60,60))
+SignalOperationNode::SignalOperationNode(const std::string& title, size_t nodeTypeId)
+    : UiNode(title, vec2(0.0,0.0), vec2(60,60))
+    , _nodetypeId(nodeTypeId)
 {
 }
 
 //--------------------------------------------------------------
 void SignalOperationNode::setOperation(SignalOperation* op)
 {
-    operation = op;
+    _operation = op;
+}
+
+//--------------------------------------------------------------
+size_t SignalOperationNode::nodeTypeId() const
+{
+    return _nodetypeId;
 }
 
 //--------------------------------------------------------------
 SignalOperation* SignalOperationNode::getOperation()
 {
-    return operation;
+    return _operation;
 }
 
 void SignalOperationNode::displayPreview()
@@ -25,7 +32,10 @@ void SignalOperationNode::displayPreview()
     ImGui::Separator();
     ImGui::Text("Preview");
     getOperation()->validateGraph();
-    ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
+    std::array<float, 100> buf;
+    for(size_t i=0; i<100; ++i) buf[i] = s_imgui_sampler(getOperation(), i);
+    ImGui::PlotLines("##preview", buf.data(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
+    // ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
 }
 
 //--------------------------------------------------------------

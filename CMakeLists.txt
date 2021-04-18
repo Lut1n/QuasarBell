@@ -27,7 +27,7 @@ add_executable(
     src/gui/nodal/SignalOperationNode.hpp
     src/gui/nodal/AddSignalNode.hpp
     src/gui/nodal/FloatSignalNode.hpp
-    src/gui/nodal/LinearSamplerNode.hpp
+    src/gui/nodal/CubicSamplerNode.hpp
     src/gui/nodal/OscillatorNode.hpp
     src/gui/nodal/DebuggerNode.hpp
     src/gui/nodal/QuantizerNode.hpp
@@ -52,6 +52,7 @@ add_executable(
     src/signal/PcmData.hpp
     src/signal/Signal.hpp
     src/signal/WavExporter.hpp
+    src/signal/operations/OperationType.hpp
     src/signal/operations/SignalOperation.hpp
     src/signal/operations/Operations.hpp
     src/signal/operations/Oscillator.hpp
@@ -59,6 +60,7 @@ add_executable(
     src/signal/operations/MixOperation.hpp
     src/signal/operations/EnvelopOperation.hpp
     src/Core/Vec2.h
+    src/Core/Factory.h
     src/Core/Math.hpp
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
@@ -99,7 +101,7 @@ add_executable(
     src/gui/nodal/SignalOperationNode.cpp
     src/gui/nodal/AddSignalNode.cpp
     src/gui/nodal/FloatSignalNode.cpp
-    src/gui/nodal/LinearSamplerNode.cpp
+    src/gui/nodal/CubicSamplerNode.cpp
     src/gui/nodal/OscillatorNode.cpp
     src/gui/nodal/DebuggerNode.cpp
     src/gui/nodal/QuantizerNode.cpp
@@ -124,6 +126,7 @@ add_executable(
     src/signal/PcmData.cpp
     src/signal/Signal.cpp
     src/signal/WavExporter.cpp
+    src/signal/operations/OperationType.cpp
     src/signal/operations/SignalOperation.cpp
     src/signal/operations/Operations.cpp
     src/signal/operations/Oscillator.cpp
@@ -131,6 +134,7 @@ add_executable(
     src/signal/operations/MixOperation.cpp
     src/signal/operations/EnvelopOperation.cpp
     src/Core/Vec2.cpp
+    src/Core/Factory.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp
     src/Font/GlyphRenderer.cpp

@@ -6,7 +6,7 @@
 
 struct EnvelopNode : public SignalOperationNode
 {
-    EnvelopNode(const vec2& position);
+    EnvelopNode();
 
     void displayProperties() override;
     

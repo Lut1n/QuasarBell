@@ -9,16 +9,19 @@
 
 struct SignalOperationNode : public UiNode
 {
-    SignalOperationNode(const std::string& title, const vec2& position);
+    SignalOperationNode(const std::string& title, size_t nodetypeId);
 
     void setOperation(SignalOperation* op);
     SignalOperation* getOperation();
+
+    size_t nodeTypeId() const;
 
 protected:
     void displayPreview();
     static float s_imgui_sampler(void* data, int idx);
 private:
-    SignalOperation* operation = nullptr;
+    SignalOperation* _operation = nullptr;
+    size_t _nodetypeId;
 };
 
 #endif // GUI_SIGNAL_OP_NODE_H

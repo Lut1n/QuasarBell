@@ -20,9 +20,9 @@ struct FloatInput : public SignalOperation
 };
 
 //--------------------------------------------------------------
-struct LinearInput : public SignalOperation
+struct CubicSampler : public SignalOperation
 {
-    LinearInput();
+    CubicSampler();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
@@ -35,6 +35,8 @@ struct LinearInput : public SignalOperation
     float value = 0.0;
     float speed = 0.0;
     float acc = 0.0;
+    float jerk = 0.0;
+    float reset = 0.0;
 };
 
 //--------------------------------------------------------------

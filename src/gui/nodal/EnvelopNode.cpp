@@ -1,10 +1,15 @@
 #include "gui/nodal/EnvelopNode.hpp"
+#include "signal/operations/OperationType.hpp"
 
 #include "imgui.h"
 
+#include "Core/Factory.h"
+
+static TypedFactory<SignalOperationNode, EnvelopNode> envelop_node_factory("envelop");
+
 //--------------------------------------------------------------
-EnvelopNode::EnvelopNode(const vec2& position)
-    : SignalOperationNode("ADSR", position)
+EnvelopNode::EnvelopNode()
+    : SignalOperationNode("ADSR", qb::OperationType_Envelop)
 {
     addPin(0, "value", true);
     setOperation(&envelop);

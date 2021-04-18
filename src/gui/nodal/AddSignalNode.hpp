@@ -9,7 +9,7 @@
 
 struct AddSignalNode : public SignalOperationNode
 {
-    AddSignalNode(const vec2& position);
+    AddSignalNode();
 
     void displayProperties() override;
     
@@ -19,7 +19,7 @@ public:
 
 struct MultSignalNode : public SignalOperationNode
 {
-    MultSignalNode(const vec2& position);
+    MultSignalNode();
 
     void displayProperties() override;
     

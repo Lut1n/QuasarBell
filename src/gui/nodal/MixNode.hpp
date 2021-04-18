@@ -6,7 +6,7 @@
 
 struct MixNode : public SignalOperationNode
 {
-    MixNode(const vec2& position);
+    MixNode();
 
     void displayProperties() override;
     

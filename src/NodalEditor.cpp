@@ -2,7 +2,7 @@
 
 #include "gui/nodal/AddSignalNode.hpp"
 #include "gui/nodal/FloatSignalNode.hpp"
-#include "gui/nodal/LinearSamplerNode.hpp"
+#include "gui/nodal/CubicSamplerNode.hpp"
 #include "gui/nodal/DebuggerNode.hpp"
 #include "gui/nodal/OscillatorNode.hpp"
 #include "gui/nodal/QuantizerNode.hpp"
@@ -14,6 +14,8 @@
 #include "io/SignalRW.hpp"
 #include "signal/WavExporter.hpp"
 #include "io/SignalOperationsRW.hpp"
+
+#include "Core/Factory.h"
 
 App* App::s_instance = nullptr;
 
@@ -164,36 +166,37 @@ void NodalEditorWorkSpace::update(double t)
         switch(name)
         {
             case NodeContextMenu::NodeName_Add:
-                u = std::make_unique<AddSignalNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("add") );
                 break;
             case NodeContextMenu::NodeName_Mult:
-                u = std::make_unique<MultSignalNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("mult") );
                 break;
             case NodeContextMenu::NodeName_Float:
-                u = std::make_unique<FloatSignalNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("float") );
                 break;
             case NodeContextMenu::NodeName_Debug:
-                u = std::make_unique<DebuggerNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("debugger") );
                 break;
-            case NodeContextMenu::NodeName_LinearSampler:
-                u = std::make_unique<LinearSamplerNode>(p);
+            case NodeContextMenu::NodeName_CubicSampler:
+                u.reset( Factory<SignalOperationNode>::create("sampler") );
                 break;
             case NodeContextMenu::NodeName_Oscillator:
-                u = std::make_unique<OscillatorNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("oscillator") );
                 break;
             case NodeContextMenu::NodeName_Quantizer:
-                u = std::make_unique<QuantizerNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("quantizer") );
                 break;
             case NodeContextMenu::NodeName_Mix:
-                u = std::make_unique<MixNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("mix") );
                 break;
             case NodeContextMenu::NodeName_Envelop:
-                u = std::make_unique<EnvelopNode>(p);
+                u.reset( Factory<SignalOperationNode>::create("envelop") );
                 break;
         };
 
         if(u)
         {
+            u->position = p;
             size_t id = operations.addOperation(u);
             nodeboard->add(operations.getOperation(id), true, true);
         }

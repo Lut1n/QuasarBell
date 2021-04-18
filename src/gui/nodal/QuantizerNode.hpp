@@ -6,7 +6,7 @@
 
 struct QuantizerNode : public SignalOperationNode
 {
-    QuantizerNode(const vec2& position);
+    QuantizerNode();
 
     void displayProperties() override;
     

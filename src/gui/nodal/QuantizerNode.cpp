@@ -1,10 +1,15 @@
 #include "gui/nodal/QuantizerNode.hpp"
+#include "signal/operations/OperationType.hpp"
 
 #include "imgui.h"
 
+#include "Core/Factory.h"
+
+static TypedFactory<SignalOperationNode, QuantizerNode> quantizer_node_factory("quantizer");
+
 //--------------------------------------------------------------
-QuantizerNode::QuantizerNode(const vec2& position)
-    : SignalOperationNode("Quantizer", position)
+QuantizerNode::QuantizerNode()
+    : SignalOperationNode("Quantizer", qb::OperationType_Quantizer)
 {
     addPin(0, "signal", true);
     addPin(0, "signal", false);

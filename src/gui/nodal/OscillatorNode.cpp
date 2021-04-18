@@ -1,10 +1,15 @@
 #include "gui/nodal/OscillatorNode.hpp"
+#include "signal/operations/OperationType.hpp"
 
 #include "imgui.h"
 
+#include "Core/Factory.h"
+
+static TypedFactory<SignalOperationNode, OscillatorNode> oscillator_node_factory("oscillator");
+
 //--------------------------------------------------------------
-OscillatorNode::OscillatorNode(const vec2& position)
-    : SignalOperationNode("Oscillator", position)
+OscillatorNode::OscillatorNode()
+    : SignalOperationNode("Oscillator", qb::OperationType_Oscillator)
 {
     addPin(0, "signal", true);
     addPin(0, "freq", false);

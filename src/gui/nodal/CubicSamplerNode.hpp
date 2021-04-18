@@ -1,5 +1,5 @@
-#ifndef GUI_FLOAT_SIGNAL_NODE_H
-#define GUI_FLOAT_SIGNAL_NODE_H
+#ifndef GUI_FLOAT_CUBIC_NODE_H
+#define GUI_FLOAT_CUBIC_NODE_H
 
 #include <memory>
 #include <unordered_map>
@@ -7,14 +7,14 @@
 #include "gui/nodal/SignalOperationNode.hpp"
 #include "signal/operations/Operations.hpp"
 
-struct FloatSignalNode : public SignalOperationNode
+struct CubicSamplerNode : public SignalOperationNode
 {
-    FloatSignalNode();
+    CubicSamplerNode();
 
     void displayProperties() override;
     
 public:
-    FloatInput floatInput;
+    CubicSampler sampler;
 };
 
-#endif // GUI_FLOAT_SIGNAL_NODE_H
+#endif // GUI_FLOAT_CUBIC_NODE_H

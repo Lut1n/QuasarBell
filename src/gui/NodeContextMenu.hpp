@@ -15,7 +15,7 @@ public:
         NodeName_Add = 0,
         NodeName_Mult,
         NodeName_Float,
-        NodeName_LinearSampler,
+        NodeName_CubicSampler,
         NodeName_Oscillator,
         NodeName_Quantizer,
         NodeName_Mix,

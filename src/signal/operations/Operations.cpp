@@ -45,38 +45,51 @@ void FloatInput::setProperty(size_t i, float value)
 }
 
 //--------------------------------------------------------------
-LinearInput::LinearInput()
+CubicSampler::CubicSampler()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
 }
 //--------------------------------------------------------------
-void LinearInput::validate()
+void CubicSampler::validate()
 {
 }
 //--------------------------------------------------------------
-OperationData LinearInput::sample(size_t index, const Time& t)
+OperationData CubicSampler::sample(size_t index, const Time& t)
 {
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
     OperationData b = sampleInput(1, t);
     OperationData c = sampleInput(2, t);
+    OperationData d = sampleInput(3, t);
+    OperationData e = sampleInput(4, t);
 
     float va = a.type != DataType_Error ? a.fvec[0] : value;
     float sp = b.type != DataType_Error ? b.fvec[0] : speed;
     float ac = c.type != DataType_Error ? c.fvec[0] : acc;
+    float je = d.type != DataType_Error ? d.fvec[0] : jerk;
+    float rs = e.type != DataType_Error ? e.fvec[0] : reset;
+
+    auto sampler = [va,sp,ac,je,rs](float t)
+    {
+        if(rs != 0.0f)
+        {
+            while(t>=rs) t -= rs;
+        }
+        return va + (sp + (ac + je * t) * t) * t;
+    };
 
     data.type = output->type;
     data.count = output->count;
-    data.fvec[0] = va + t.t*sp + t.t*t.t*ac;
+    data.fvec[0] = sampler(t.t);
     return data;
 }
 
-size_t LinearInput::getPropertyCount() const
+size_t CubicSampler::getPropertyCount() const
 {
-    return 3;
+    return 5;
 }
-std::string LinearInput::getPropertyName(size_t i) const
+std::string CubicSampler::getPropertyName(size_t i) const
 {
     if (i==0)
         return "value";
@@ -84,13 +97,17 @@ std::string LinearInput::getPropertyName(size_t i) const
         return "speed";
     if (i==2)
         return "acc";
+    if (i==3)
+        return "jerk";
+    if (i==4)
+        return "reset";
     return "None";
 }
-OperationDataType LinearInput::getPropertyType(size_t i) const
+OperationDataType CubicSampler::getPropertyType(size_t i) const
 {
     return DataType_Float;
 }
-void LinearInput::getProperty(size_t i, float& value) const
+void CubicSampler::getProperty(size_t i, float& value) const
 {
     if (i == 0)
         value = this->value;
@@ -98,8 +115,12 @@ void LinearInput::getProperty(size_t i, float& value) const
         value = this->speed;
     else if (i == 2)
         value = this->acc;
+    else if (i == 3)
+        value = this->jerk;
+    else if (i == 4)
+        value = this->reset;
 }
-void LinearInput::setProperty(size_t i, float value)
+void CubicSampler::setProperty(size_t i, float value)
 {
     if (i == 0)
         this->value = value;
@@ -107,6 +128,10 @@ void LinearInput::setProperty(size_t i, float value)
         this->speed = value;
     else if (i == 2)
         this->acc = value;
+    else if (i == 3)
+        this->jerk = value;
+    else if (i == 4)
+        this->reset = value;
 }
 
 //--------------------------------------------------------------

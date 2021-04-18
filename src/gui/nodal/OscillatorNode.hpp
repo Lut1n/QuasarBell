@@ -6,7 +6,7 @@
 
 struct OscillatorNode : public SignalOperationNode
 {
-    OscillatorNode(const vec2& position);
+    OscillatorNode();
 
     void displayProperties() override;
     

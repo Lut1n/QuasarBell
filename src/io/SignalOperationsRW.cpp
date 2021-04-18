@@ -5,13 +5,16 @@
 #include "gui/nodal/AddSignalNode.hpp"
 #include "gui/nodal/DebuggerNode.hpp"
 #include "gui/nodal/FloatSignalNode.hpp"
-#include "gui/nodal/LinearSamplerNode.hpp"
+#include "gui/nodal/CubicSamplerNode.hpp"
 #include "gui/nodal/OscillatorNode.hpp"
 #include "gui/nodal/QuantizerNode.hpp"
 #include "gui/nodal/MixNode.hpp"
 #include "gui/nodal/EnvelopNode.hpp"
 
+#include "signal/operations/OperationType.hpp"
 #include "NodalEditor.hpp"
+
+#include "Core/Factory.h"
 
 //--------------------------------------------------------------
 void saveInto(JsonValue& root, OperationCollection& collection, const OperationConnections& co)
@@ -22,15 +25,8 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
     for(auto it = ops.begin(); it != ops.end(); ++it)
     {
         auto& jNode = jsonOp.setPath(index++);
-        if (dynamic_cast<AddSignalNode*>(it->second.get())) jNode.setPath("type").set(std::string("add"));
-        if (dynamic_cast<MultSignalNode*>(it->second.get())) jNode.setPath("type").set(std::string("mult"));
-        if (dynamic_cast<DebuggerNode*>(it->second.get())) jNode.setPath("type").set(std::string("debugger"));
-        if (dynamic_cast<FloatSignalNode*>(it->second.get())) jNode.setPath("type").set(std::string("float"));
-        if (dynamic_cast<LinearSamplerNode*>(it->second.get())) jNode.setPath("type").set(std::string("sampler"));
-        if (dynamic_cast<OscillatorNode*>(it->second.get())) jNode.setPath("type").set(std::string("oscillator"));
-        if (dynamic_cast<QuantizerNode*>(it->second.get())) jNode.setPath("type").set(std::string("quantizer"));
-        if (dynamic_cast<MixNode*>(it->second.get())) jNode.setPath("type").set(std::string("mix"));
-        if (dynamic_cast<EnvelopNode*>(it->second.get())) jNode.setPath("type").set(std::string("envelop"));
+        std::string typeName = qb::getOperationName(static_cast<qb::OperationType>(it->second->nodeTypeId()));
+        jNode.setPath("type").set(typeName);
         jNode.setPath("id").set((float)it->first);
         toJson(jNode.setPath("position"), it->second->position);
         
@@ -82,25 +78,8 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
         vec2 position;
         jsonTo(jNode.setPath("position"), position);
         std::unique_ptr<SignalOperationNode> ptr;
-        if (type == "add")
-            ptr = std::make_unique<AddSignalNode>(position);
-        else if (type == "mult")
-            ptr = std::make_unique<MultSignalNode>(position);
-        else if (type == "debugger")
-            ptr = std::make_unique<DebuggerNode>(position);
-        else if (type == "float")
-            ptr = std::make_unique<FloatSignalNode>(position);
-        else if (type == "sampler")
-            ptr = std::make_unique<LinearSamplerNode>(position);
-        else if (type == "oscillator")
-            ptr = std::make_unique<OscillatorNode>(position);
-        else if (type == "quantizer")
-            ptr = std::make_unique<QuantizerNode>(position);
-        else if (type == "mix")
-            ptr = std::make_unique<MixNode>(position);
-        else if (type == "envelop")
-            ptr = std::make_unique<EnvelopNode>(position);
-            
+        ptr.reset( Factory<SignalOperationNode>::create(type) );
+        
         auto op = ptr->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)
         {
@@ -123,6 +102,7 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
                 op->setProperty(i, b);
             }
         }
+        ptr->position = position;
         ops[id] = std::move(ptr);
     }
 

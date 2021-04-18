@@ -1,10 +1,15 @@
 #include "gui/nodal/AddSignalNode.hpp"
+#include "signal/operations/OperationType.hpp"
 
 #include "imgui.h"
+#include "Core/Factory.h"
+
+static TypedFactory<SignalOperationNode, AddSignalNode> add_node_factory("add");
+static TypedFactory<SignalOperationNode, MultSignalNode> mult_node_factory("mult");
 
 //--------------------------------------------------------------
-AddSignalNode::AddSignalNode(const vec2& position)
-    : SignalOperationNode("Add", position)
+AddSignalNode::AddSignalNode()
+    : SignalOperationNode("Add", qb::OperationType_Add)
 {
     addPin(0, "in 1", false);
     addPin(1, "in 2", false);
@@ -22,8 +27,8 @@ void AddSignalNode::displayProperties()
 
 
 //--------------------------------------------------------------
-MultSignalNode::MultSignalNode(const vec2& position)
-    : SignalOperationNode("Mult", position)
+MultSignalNode::MultSignalNode()
+    : SignalOperationNode("Mult", qb::OperationType_Mult)
 {
     addPin(0, "in 1", false);
     addPin(1, "in 2", false);

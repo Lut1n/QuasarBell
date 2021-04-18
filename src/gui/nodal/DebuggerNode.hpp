@@ -10,7 +10,7 @@
 
 struct DebuggerNode : public SignalOperationNode
 {
-    DebuggerNode(const vec2& position);
+    DebuggerNode();
 
     void draw() override;
     void displayProperties() override;

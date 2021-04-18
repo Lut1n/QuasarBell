@@ -1,4 +1,5 @@
 #include "gui/nodal/DebuggerNode.hpp"
+#include "signal/operations/OperationType.hpp"
 
 #include "signal/Signal.hpp"
 
@@ -8,9 +9,13 @@
 
 #include <string>
 
+#include "Core/Factory.h"
+
+static TypedFactory<SignalOperationNode, DebuggerNode> debugger_node_factory("debugger");
+
 //--------------------------------------------------------------
-DebuggerNode::DebuggerNode(const vec2& position)
-    : SignalOperationNode("Debugger", position)
+DebuggerNode::DebuggerNode()
+    : SignalOperationNode("Debugger", qb::OperationType_Debug)
 {
     addPin(0, "in 1", false);
     setOperation(&debug);
