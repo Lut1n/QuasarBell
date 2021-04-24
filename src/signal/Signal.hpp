@@ -58,18 +58,24 @@ public:
     
     enum Format
     {
-        Format_Mono8,
-        Format_Stereo8,
-        Format_Mono16,
-        Format_Stereo16
+        Format_Mono8 = 8,
+        Format_Mono16 = 16,
+        Format_Stereo8 = 88,
+        Format_Stereo16 = 1616
     };
-    
+
 public:
     int sampleRate = SampleRate_44kHz;
     Format sampleFormat = Format_Mono16;
 
     static AudioSettings defaultSettings;
 };
+
+template<AudioSettings::Format Fmt> struct FormatTraits;
+template<> struct FormatTraits<AudioSettings::Format_Mono8> { using Type = char; static const size_t Bits = 8; static const size_t Channels = 1; };
+template<> struct FormatTraits<AudioSettings::Format_Stereo8> { using Type = char; static const size_t Bits = 8; static const size_t Channels = 2; };
+template<> struct FormatTraits<AudioSettings::Format_Mono16> { using Type = short; static const size_t Bits = 16; static const size_t Channels = 1; };
+template<> struct FormatTraits<AudioSettings::Format_Stereo16> { using Type = short; static const size_t Bits = 16; static const size_t Channels = 2; };
 
 //--------------------------------------------------------------
 class SignalSampler

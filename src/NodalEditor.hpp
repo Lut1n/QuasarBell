@@ -71,9 +71,6 @@ public:
     void onDisconnect(UiPin* a, UiPin* b) override;
 
 private:
-    PcmData generate();
-
-private:
     NodalEditorComponentGroup _components;
     App* _app = nullptr;
     bool _ready = false;

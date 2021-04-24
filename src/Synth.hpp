@@ -7,7 +7,7 @@
 #include "App.hpp"
 #include "gui/Keyboard.hpp"
 
-PcmData mix(const std::list<PcmData>& inputStream, float duration);
+#include "signal/Signal.hpp"
 
 //--------------------------------------------------------------
 class SynthComponentGroup : public GuiComponentGroup
@@ -43,7 +43,7 @@ private:
 private:
     std::array<KeyState, 88> _keyStates;
     std::map<char, int> _keyMap;
-    std::list<PcmData> _toQueue;
+    std::list<qb::Pcm16> _toQueue;
 
     SynthComponentGroup _components;
     App* _app = nullptr;

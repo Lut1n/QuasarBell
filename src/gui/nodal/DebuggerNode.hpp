@@ -11,17 +11,20 @@
 struct DebuggerNode : public SignalOperationNode
 {
     DebuggerNode();
+    virtual ~DebuggerNode();
 
     void draw() override;
     void displayProperties() override;
 
-    PcmData generate();
+    void generate(PcmDataBase& pcm);
     
 public:
     OutputOperation debug;
     float value = 0.0f;
-    /*float range = 1.0f;
-    float duration = 2.0;*/
+    int sampleRateIndex = -1;
+    int sampleFormatIndex = -1;
+    
+    static DebuggerNode* defaultOutput;
 };
 
 #endif // GUI_DEBUG_SIGNAL_NODE_H

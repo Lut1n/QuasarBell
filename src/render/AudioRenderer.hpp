@@ -2,6 +2,7 @@
 #define QUASAR_BELL_RENDERER_HPP
 
 #include <vector>
+#include <memory>
 
 #include <al.h>
 #include <alc.h>
@@ -109,8 +110,8 @@ public:
     
     State getState() const;
     
-    void load(const PcmData& pcm);
-    void queue(const PcmData& pcm);
+    void load(const PcmDataBase& pcm);
+    void queue(const PcmDataBase& pcm);
     void play();
     
     virtual void update() override;
@@ -124,7 +125,7 @@ public:
     ALuint _bufferID = 0;
     ALuint _streamBufferID[4] = {0,0,0,0};
     std::vector<ALuint> _bufferReady;
-    std::vector<PcmData> _PcmDatas;
+    std::vector<std::unique_ptr<PcmDataBase>> _PcmDatas;
     
     float _pitch = 1.0f;
     float _gain = 1.0f;

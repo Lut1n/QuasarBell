@@ -111,7 +111,7 @@ public:
     static float sample(void* data, int t);
 
 public:
-    PcmData pcm;
+    qb::Pcm16 pcm;
 
     float oft = 0.0f;
     bool autoPlay = true;

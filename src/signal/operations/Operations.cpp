@@ -428,7 +428,9 @@ OutputOperation::OutputOperation()
 {
     initialize({DataType_Float},{}, {
             {"range",DataType_Float},
-            {"duration",DataType_Float}});
+            {"duration",DataType_Float},
+            {"sample-rate",DataType_Float},
+            {"sample-bits",DataType_Float}});
 }
 //--------------------------------------------------------------
 void OutputOperation::validate()
@@ -447,6 +449,10 @@ void OutputOperation::getProperty(size_t i, float& value) const
         value = range;
     if (i==1)
         value = duration;
+    if (i==2)
+        value = sampleRate;
+    if (i==3)
+        value = sampleBits;
 }
 void OutputOperation::setProperty(size_t i, float value)
 {
@@ -454,4 +460,8 @@ void OutputOperation::setProperty(size_t i, float value)
         range = value;
     if (i==1)
         duration = value;
+    if (i==2)
+        sampleRate = value;
+    if (i==3)
+        sampleBits = value;
 }

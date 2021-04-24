@@ -3,26 +3,80 @@
 
 #include <vector>
 
+#include "signal/Signal.hpp"
+
 //--------------------------------------------------------------
 // PCM: Pulse Code Modulation
 //--------------------------------------------------------------
-class PcmData
+
+//--------------------------------------------------------------
+class PcmDataBase
 {
 public:
-    void copy(const PcmData& other, size_t oft = 0);
-    
-    PcmData operator<<(const PcmData& other) const;
-    PcmData operator+(const PcmData& other) const;
-    PcmData operator*(float aFactor) const;
-    
-    const void* pcmData() const;
-    size_t pcmSize() const;
-    
-    PcmData subData(size_t oft, size_t size);
 
-public:
-    // 16 Mono
-    std::vector<short> samples;
+    PcmDataBase(AudioSettings::Format fmt, AudioSettings::SampleRate rate)
+        : format(fmt), sampleRate(rate) {}
+
+    virtual size_t count() const = 0;
+    virtual void resize(size_t count) = 0;
+    virtual float get(size_t i) const = 0;
+    virtual void set(size_t i, float s) = 0;
+    virtual size_t size() const = 0;
+    virtual const void* data() const = 0;
+
+    void copyTo(PcmDataBase& dst) const;
+
+    AudioSettings::Format format;
+    AudioSettings::SampleRate sampleRate;
 };
+
+//--------------------------------------------------------------
+template<AudioSettings::Format Fmt>
+class PcmData : public PcmDataBase
+{
+public:
+    using Type = typename FormatTraits<Fmt>::Type;
+    static constexpr float Max = std::numeric_limits<Type>::max();
+
+    PcmData() : PcmDataBase(Fmt, AudioSettings::SampleRate_44kHz) {}
+
+    size_t count() const override
+    {
+        return samples.size();
+    }
+    
+    void resize(size_t count) override
+    {
+        samples.resize(count);
+    }
+
+    float get(size_t i) const override
+    {
+        return (float)samples[i] / Max;
+    }
+
+    void set(size_t i, float s) override
+    {
+        samples[i] = s * Max;
+    }
+
+    size_t size() const override
+    {
+        return count() * sizeof(Type);
+    }
+
+    const void* data() const override
+    {
+        return (void*) samples.data();
+    }
+
+    std::vector<Type> samples;
+};
+
+//--------------------------------------------------------------
+namespace qb
+{
+    using Pcm16 = PcmData<AudioSettings::Format_Mono16>;
+}
 
 #endif // QUASAR_BELL_PCMDATA_HPP

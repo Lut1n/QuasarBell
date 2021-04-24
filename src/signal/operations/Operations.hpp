@@ -142,6 +142,8 @@ struct OutputOperation : SignalOperation
 
     float range = 1.0;
     float duration = 1.0;
+    int sampleRate = 44100;
+    int sampleBits = 16;
 };
 
 

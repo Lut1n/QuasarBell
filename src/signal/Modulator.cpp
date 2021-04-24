@@ -6,22 +6,18 @@
 #include "signal/Signal.hpp"
 
 //--------------------------------------------------------------
-PcmData Modulator::silent(float duration)
+qb::Pcm16 Modulator::silent(float duration)
 {
     auto& settings = AudioSettings::defaultSettings;
     
-    PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
-    
-    for(unsigned i=0;i<output.samples.size();++i)
-    {
-        output.samples[i] = 0.0;
-    }
+    qb::Pcm16 output;
+    output.resize(duration * settings.sampleRate);
+    for(unsigned i=0;i<output.count();++i) output.set(i, 0.0);
     return output;
 }
 
 //--------------------------------------------------------------
-PcmData Modulator::generate(float freq, float duration, float ampl, float slope_time, float oft_t)
+qb::Pcm16 Modulator::generate(float freq, float duration, float ampl, float slope_time, float oft_t)
 {
     auto& settings = AudioSettings::defaultSettings;
     
@@ -29,68 +25,64 @@ PcmData Modulator::generate(float freq, float duration, float ampl, float slope_
     SinSampler instrument(30.0f, 1.0);
     LinearGate gate(duration, slope_time);
     
-    PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
+    qb::Pcm16 output;
+    output.resize(duration * settings.sampleRate);
     
-    short quantizer = std::numeric_limits<short>::max();
-    
-    for(unsigned i=0;i<output.samples.size();++i)
+    for(unsigned i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
-        output.samples[i] = signal(oft_t + t) * /*instrument(t) **/ gate(t) * quantizer;
+        output.set(i, signal(oft_t + t) * /*instrument(t) **/ gate(t));
     }
     return output;
 }
 //--------------------------------------------------------------
-PcmData Modulator::attack(float freq, float duration, float ampl, float ampl2, float oft_t)
+qb::Pcm16 Modulator::attack(float freq, float duration, float ampl, float ampl2, float oft_t)
 {
     auto& settings = AudioSettings::defaultSettings;
     
     SinSampler signal(freq, ampl);
     
-    PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
-    
-    short quantizer = std::numeric_limits<short>::max();
+    qb::Pcm16 output;
+    output.resize(duration * settings.sampleRate);
     
     float mid = 0.5 * duration;
     
-    for(unsigned i=0;i<output.samples.size();++i)
+    for(unsigned i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
         float gate = t<mid ? (t/mid) : (1.0-(t-mid/mid))*ampl2;
-        output.samples[i] = signal(oft_t + t) * gate * quantizer;
+        output.set(i, signal(oft_t + t) * gate);
     }
     return output;
 }
 //--------------------------------------------------------------
-PcmData Modulator::release(float freq, float duration, float ampl, float oft_t)
+qb::Pcm16 Modulator::release(float freq, float duration, float ampl, float oft_t)
 {
     auto& settings = AudioSettings::defaultSettings;
     
     SinSampler signal(freq, ampl);
     
-    PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
+    qb::Pcm16 output;
+    output.resize(duration * settings.sampleRate);
     
-    short quantizer = std::numeric_limits<short>::max();
-    
-    for(unsigned i=0;i<output.samples.size();++i)
+    for(unsigned i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
-        output.samples[i] = signal(oft_t + t) * (1.0-t/duration) * quantizer;
+        output.set(i, signal(oft_t + t) * (1.0-t/duration));
     }
     return output;
 }
 //--------------------------------------------------------------
-PcmData Modulator::mix(const std::list<PcmData>& inputStream, float duration)
+qb::Pcm16 Modulator::mix(const std::list<qb::Pcm16>& inputStream, float duration)
 {
     float ratio = 1.0f / (float)inputStream.size();
     
-    PcmData output = Modulator::silent(duration);
-    for(auto& pcm : inputStream)
+    qb::Pcm16 output = Modulator::silent(duration);
+    for(size_t i=0; i<output.count(); ++i)
     {
-        output = output + (pcm * ratio);
+        float res = 0.0;
+        for(auto& pcm : inputStream) res += pcm.get(i);
+        output.set(i, res * ratio);
     }
     return output;
 }

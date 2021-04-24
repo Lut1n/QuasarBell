@@ -99,12 +99,10 @@ SoundNode::State SoundNode::getState() const
     return Initial;
 }
 //--------------------------------------------------------------
-void SoundNode::load(const PcmData& pcm)
+void SoundNode::load(const PcmDataBase& pcm)
 {
     if(_stream) return;
     
-    auto& settings = AudioSettings::defaultSettings;
-        
     alGetError(); // clear error code
 
     // detach from source
@@ -127,7 +125,7 @@ void SoundNode::load(const PcmData& pcm)
     alGenBuffers(1, &_bufferID);
     ackErr("alGenBuffers");
     
-    alBufferData(_bufferID, getFormatAL(settings.sampleFormat), pcm.pcmData(), pcm.pcmSize(), settings.sampleRate);
+    alBufferData(_bufferID, getFormatAL(pcm.format), pcm.data(), pcm.size(), pcm.sampleRate);
     ackErr("alBufferData buffer 0");
     // Attach buffer 0 to source
     alSourcei(_sourceID, AL_BUFFER, _bufferID);
@@ -136,9 +134,17 @@ void SoundNode::load(const PcmData& pcm)
     update();
 }
 //--------------------------------------------------------------
-void SoundNode::queue(const PcmData& pcm)
+void SoundNode::queue(const PcmDataBase& pcm)
 {
-    _PcmDatas.push_back(pcm);
+    std::unique_ptr<PcmDataBase> dst;
+    if (pcm.format == AudioSettings::Format_Mono8 || pcm.format == AudioSettings::Format_Stereo8)
+        dst = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
+    if (pcm.format == AudioSettings::Format_Mono16 || pcm.format == AudioSettings::Format_Stereo16)
+        dst = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
+    if (dst.get() == nullptr) return;
+    
+    pcm.copyTo(*dst);
+    _PcmDatas.emplace_back(std::move(dst));
 }
 //--------------------------------------------------------------
 void SoundNode::play()
@@ -164,7 +170,7 @@ void SoundNode::updateStream()
 {
     if(!_stream) return;
     
-    auto& settings = AudioSettings::defaultSettings;
+    // auto& settings = AudioSettings::defaultSettings;
     
     ALint iBuffersProcessed;
     alGetSourcei(_sourceID, AL_BUFFERS_PROCESSED, &iBuffersProcessed);
@@ -183,7 +189,7 @@ void SoundNode::updateStream()
         unsigned count = std::min(_bufferReady.size(), _PcmDatas.size());
         for(unsigned i=0;i<count;++i)
         {
-            alBufferData(_bufferReady[i], getFormatAL(settings.sampleFormat), _PcmDatas[i].pcmData(), _PcmDatas[i].pcmSize(), settings.sampleRate);
+            alBufferData(_bufferReady[i], getFormatAL(_PcmDatas[i]->format), _PcmDatas[i]->data(), _PcmDatas[i]->size(), _PcmDatas[i]->sampleRate);
             ackErr("alBufferData");
             alSourceQueueBuffers(_sourceID, 1, &_bufferReady[i]);
             ackErr("alSourceQueueBuffers");

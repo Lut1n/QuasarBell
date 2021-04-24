@@ -27,13 +27,12 @@ void PitchNode::displayProperties()
     auto generator = [](float f){
         float duration = 0.3;
         auto& settings = AudioSettings::defaultSettings;
-        PcmData output;
-        output.samples.resize(duration * settings.sampleRate);
-        short quantizer = std::numeric_limits<short>::max();
-        for(unsigned i=0;i<output.samples.size();++i)
+        qb::Pcm16 output;
+        output.resize(duration * settings.sampleRate);
+        for(unsigned i=0;i<output.count();++i)
         {
             float t = (float)i / (float)settings.sampleRate;
-            output.samples[i] = std::sin(f * t * 2.0*3.141592) * quantizer;
+            output.set(i, std::sin(f * t * 2.0*3.141592));
         }
         return output;
     };
@@ -46,7 +45,7 @@ void PitchNode::displayProperties()
         auto& sound = *(App::s_instance->sound);
         if(sound.getState() != SoundNode::Playing)
         {
-            PcmData pcm = generator(pitch.getFreq());
+            qb::Pcm16 pcm = generator(pitch.getFreq());
             sound.queue(pcm);
             sound.play();
         }

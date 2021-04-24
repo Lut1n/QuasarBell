@@ -143,7 +143,7 @@ void BasicEditorWorkSpace::render()
 {
 }
 //--------------------------------------------------------------
-PcmData BasicEditorWorkSpace::generate()
+qb::Pcm16 BasicEditorWorkSpace::generate()
 {
     auto& ampl = *_components.amplitudeEdit;
     auto& freq = *_components.frequencyEdit;
@@ -156,15 +156,13 @@ PcmData BasicEditorWorkSpace::generate()
     auto& settings = AudioSettings::defaultSettings;
     float duration = ampl.duration + ampl.release;
     
-    PcmData output;
-    output.samples.resize(duration * settings.sampleRate);
-    
-    short quantizer = std::numeric_limits<short>::max();
+    qb::Pcm16 output;
+    output.resize(duration * settings.sampleRate);
     
     float phase = 0.0f;
     float sample_t = 1.0 / settings.sampleRate;
     
-    for(unsigned i=0;i<output.samples.size();++i)
+    for(unsigned i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
         
@@ -178,7 +176,7 @@ PcmData BasicEditorWorkSpace::generate()
         float r = wave.sample(phase) * a;
         if(tremolo.isEnabled) r *= tremolo.sample(t);
         if(ringmod.isEnabled) r *= ringmod.sample(t);
-        output.samples[i] = r * quantizer;
+        output.set(i, r);
         
     }
     return output;

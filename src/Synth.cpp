@@ -100,19 +100,19 @@ void SynthWorkSpace::update(double t)
         if(_keyStates[keyIndex] == KeyState::Pressed)
         {
             _components.keyboard->setPressed(keyID);
-            PcmData pcm = Modulator::attack(pitchToFreq(keyID), fracTime, 1.0f, 0.5f, _genTime);
+            qb::Pcm16 pcm = Modulator::attack(pitchToFreq(keyID), fracTime, 1.0f, 0.5f, _genTime);
             _toQueue.push_back(pcm);
             _keyStates[keyIndex] = KeyState::Maintained;
         }
         else if(_keyStates[keyIndex] == KeyState::Maintained)
         {
             _components.keyboard->setPressed(keyID);
-            PcmData pcm = Modulator::generate(pitchToFreq(keyID), fracTime, 0.5f, 0.0f, _genTime);
+            qb::Pcm16 pcm = Modulator::generate(pitchToFreq(keyID), fracTime, 0.5f, 0.0f, _genTime);
             _toQueue.push_back(pcm);
         }
         else if(_keyStates[keyIndex] == KeyState::Released)
         {
-            PcmData pcm = Modulator::release(pitchToFreq(keyID), fracTime, 0.5f, _genTime);
+            qb::Pcm16 pcm = Modulator::release(pitchToFreq(keyID), fracTime, 0.5f, _genTime);
             _toQueue.push_back(pcm);
             _keyStates[keyIndex] = KeyState::None;
         }
@@ -120,7 +120,7 @@ void SynthWorkSpace::update(double t)
     
     if(sound._PcmDatas.size() < 1)
     {
-        PcmData pcm;
+        qb::Pcm16 pcm;
         if(_toQueue.size() == 0)
             pcm = Modulator::silent(fracTime);
         else

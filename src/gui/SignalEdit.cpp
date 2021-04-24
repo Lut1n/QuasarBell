@@ -326,20 +326,19 @@ void MainEdit::render()
 float PcmPlayer::sample(void* data, int t)
 {
     PcmPlayer* that = static_cast<PcmPlayer*>(data);
-    float q= std::numeric_limits<short>::max();
     
     float rate = AudioSettings::defaultSettings.sampleRate;
     float displayCount = 10000.0;
     float start_pos  = displayCount - that->oft * rate;
     
     unsigned i = t - start_pos;
-    if( i < 0 || i>= that->pcm.samples.size() )
+    if( i < 0 || i>= that->pcm.count() )
     {
         return 0.0f;
     }
     else
     {
-        return that->pcm.samples[i] / q;
+        return that->pcm.get(i);
     }
 }
 //--------------------------------------------------------------

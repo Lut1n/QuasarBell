@@ -9,7 +9,7 @@
 class WavExporter
 {
 public:
-    static bool exportAsWAV(const std::string& filename, const PcmData& pcm);
+    static bool exportAsWAV(const std::string& filename, const PcmDataBase& pcm);
 };
 
 #endif // QUASAR_BELL_WAVEXPORTER_HPP

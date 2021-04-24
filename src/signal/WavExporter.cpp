@@ -112,18 +112,21 @@ struct fmt_ck_t : public ck_data_t
     DECLARE_RIFF_CK_ID("fmt ")
     DECLARE_RIFF_CK_SZ(16)
     
+    u32 freq = 44100;
+    u16 chanel = 1;
+    u16 bitsPerSample = 16;
+
+    void setup(u32 frequency = 44100, u16 sampleSize = 16)
+    {
+        freq = frequency;
+        bitsPerSample = sampleSize;
+    }
+
     virtual void write(Output& output)
     {
         u16 audio_fmt = 1; // PCM
-        u16 chanel = 1;
-        u32 freq = 44100;
-        u32 bytePerSec;
-        u16 bytePerBloc;
-        u16 bitsPerSample;
-        
-        bitsPerSample = 16;
-        bytePerBloc = chanel * bitsPerSample/8;
-        bytePerSec = freq * bytePerBloc;
+        u16 bytePerBloc = chanel * bitsPerSample/8;
+        u32 bytePerSec = freq * bytePerBloc;
         
         owrite(output, audio_fmt);
         owrite(output, chanel);
@@ -139,28 +142,36 @@ struct wave_data_t : public ck_data_t
 {
     DECLARE_RIFF_CK_ID("data")
     
-    const PcmData* wave_data;
+    const PcmDataBase* wave_data;
     
-    wave_data_t(const PcmData& wav)
+    wave_data_t(const PcmDataBase& wav)
     {
         wave_data = &wav;
     }
     
     virtual u32 size()
     {
-        return wave_data->pcmSize();
+        return wave_data->size();
     }
     
     virtual void write(Output& output)
     {
-        output.write(reinterpret_cast<const char*>(wave_data->pcmData()), wave_data->pcmSize());
+        output.write(reinterpret_cast<const char*>(wave_data->data()), wave_data->size());
     }
 };
 //--------------------------------------------------------------
-bool WavExporter::exportAsWAV(const std::string& filename, const PcmData& pcm)
+bool WavExporter::exportAsWAV(const std::string& filename, const PcmDataBase& pcm)
 {
     fmt_ck_t* fmt = new fmt_ck_t();
     wave_data_t* data = new wave_data_t(pcm);
+
+    unsigned bitsPerSample = 0;
+    if (pcm.format == AudioSettings::Format_Mono8 || pcm.format == AudioSettings::Format_Stereo8)
+        bitsPerSample = 8;
+    if (pcm.format == AudioSettings::Format_Mono16 || pcm.format == AudioSettings::Format_Stereo16)
+        bitsPerSample = 16;
+
+    fmt->setup((unsigned)pcm.sampleRate, bitsPerSample);
 
     riff_ck_t fmt_ck(fmt);
     riff_ck_t data_ck(data);

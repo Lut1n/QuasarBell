@@ -132,9 +132,16 @@ void NodalEditorWorkSpace::update(double t)
     }
     if(gui.waveInput.confirmed)
     {
-        if(gui.waveInput.request == UserFileInput::Export_Wav)
+        if(gui.waveInput.request == UserFileInput::Export_Wav && DebuggerNode::defaultOutput != nullptr)
         {
-            //WavExporter::exportAsWAV(gui.waveInput.filepath, generate());
+            auto& output = DebuggerNode::defaultOutput->debug;
+            std::unique_ptr<PcmDataBase> pcm;
+            if (output.sampleBits == AudioSettings::Format_Mono8 || output.sampleBits == AudioSettings::Format_Stereo8)
+                pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
+            if (output.sampleBits == AudioSettings::Format_Mono16 || output.sampleBits == AudioSettings::Format_Stereo16)
+                pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
+            DebuggerNode::defaultOutput->generate(*pcm);
+            WavExporter::exportAsWAV(gui.waveInput.filepath, *pcm);
         }
         gui.waveInput.request = UserFileInput::Nothing;
         gui.waveInput.confirmed = false;
@@ -172,12 +179,6 @@ void NodalEditorWorkSpace::update(double t)
 //--------------------------------------------------------------
 void NodalEditorWorkSpace::render()
 {
-}
-//--------------------------------------------------------------
-PcmData NodalEditorWorkSpace::generate()
-{
-    PcmData output;
-    return output;
 }
 
 void NodalEditorWorkSpace::onConnect(UiPin* a, UiPin* b)

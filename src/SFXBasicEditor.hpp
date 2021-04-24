@@ -38,7 +38,7 @@ public:
     void render() override;
 
 private:
-    PcmData generate();
+    qb::Pcm16 generate();
 
 private:
     SFXEditorComponentGroup _components;
