@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, QuantizerNode> quantizer_node_factory("quantizer");
+static TypedFactory<SignalOperationNode, QuantizerNode> quantizer_node_factory(qb::OperationType_Quantizer);
 
 //--------------------------------------------------------------
 QuantizerNode::QuantizerNode()

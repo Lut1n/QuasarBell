@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, FloatSignalNode> float_node_factory("float");
+static TypedFactory<SignalOperationNode, FloatSignalNode> float_node_factory(qb::OperationType_Float);
 
 //--------------------------------------------------------------
 FloatSignalNode::FloatSignalNode()

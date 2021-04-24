@@ -3,7 +3,10 @@
 //--------------------------------------------------------------
 MixOperation::MixOperation()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float}, {
+            {"input1",DataType_Float},
+            {"input2",DataType_Float},
+            {"delta",DataType_Float}});
 }
 //--------------------------------------------------------------
 void MixOperation::validate()
@@ -29,30 +32,6 @@ OperationData MixOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-size_t MixOperation::getPropertyCount() const
-{
-    return 3;
-}
-std::string MixOperation::getPropertyName(size_t i) const
-{
-    if (i==0)
-        return "input1";
-    if (i==1)
-        return "input2";
-    if (i==2)
-        return "delta";
-    return "None";
-}
-OperationDataType MixOperation::getPropertyType(size_t i) const
-{
-    if (i==0)
-        return DataType_Float;
-    if (i==1)
-        return DataType_Float;
-    if (i==2)
-        return DataType_Float;
-    return DataType_Error;
-}
 void MixOperation::getProperty(size_t i, float& value) const
 {
     if (i==0)

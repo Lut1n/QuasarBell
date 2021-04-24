@@ -1,25 +1,25 @@
-#ifndef QUASAR_BELL_OSCILLATOR_HPP
-#define QUASAR_BELL_OSCILLATOR_HPP
+#ifndef QUASAR_BELL_PITCH_HPP
+#define QUASAR_BELL_PITCH_HPP
 
 #include "signal/operations/SignalOperation.hpp"
 
 
 //--------------------------------------------------------------
-struct Oscillator : public SignalOperation
+struct PitchSelector : public SignalOperation
 {
-    Oscillator();
+    PitchSelector();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
-    float freq = 440.0f;
-    float ampl = 1.0f;
+    int getMidiIndex() const;
+    float getFreq() const;
 
-private:
-    float phase = 0.0f;
+    int octave = 4;
+    int semitone = 9;
 };
 
 
-#endif // QUASAR_BELL_OSCILLATOR_HPP
+#endif // QUASAR_BELL_PITCH_HPP

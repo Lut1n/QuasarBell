@@ -75,7 +75,7 @@ OperationData SignalOperation::sampleInput(size_t index, const Time& t)
 }
 
 //--------------------------------------------------------------
-void SignalOperation::initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output)
+void SignalOperation::initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output, const std::vector<PropDesc>& props)
 {
     inputs.resize(input.size());
     for (int i=0; i<inputs.size(); ++i)
@@ -91,6 +91,7 @@ void SignalOperation::initialize(const std::vector<OperationDataType>& input, co
         outputs[i].index = 0;
         outputs[i].operation = nullptr;
     }
+    propDescs = props;
 }
 
 //--------------------------------------------------------------
@@ -159,14 +160,18 @@ size_t SignalOperation::getOutputCount() const
 
 size_t SignalOperation::getPropertyCount() const
 {
-    return 0;
+    return propDescs.size();
 }
 OperationDataType SignalOperation::getPropertyType(size_t i) const
 {
+    if(i >= 0 && i < propDescs.size())
+        return propDescs[i].second;
     return DataType_Error;
 }
 std::string SignalOperation::getPropertyName(size_t i) const
 {
+    if(i >= 0 && i < propDescs.size())
+        return propDescs[i].first;
     return "None";
 }
 void SignalOperation::getProperty(size_t i, std::string& value) const
@@ -192,4 +197,15 @@ void SignalOperation::setProperty(size_t i, int value)
 }
 void SignalOperation::setProperty(size_t i, bool value)
 {
+}
+void SignalOperation::saveCustomData(JsonValue& json)
+{
+}
+void SignalOperation::loadCustomData(JsonValue& json)
+{
+}
+
+bool SignalOperation::hasCustomData() const
+{
+    return _hasCustomData;
 }

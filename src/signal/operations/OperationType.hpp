@@ -17,6 +17,17 @@ namespace qb
         OperationType_Mix,
         OperationType_Envelop,
         OperationType_Debug,
+        OperationType_Step,
+        OperationType_Filter,
+        OperationType_Pitch,
+        OperationType_Sub,
+        OperationType_Div,
+        OperationType_Clamp,
+        OperationType_Abs,
+        OperationType_Waveform,
+        OperationType_KeySampler,
+        OperationType_Harmonics,
+        OperationType_Polynomial,
 
         OperationType_Count,
 
@@ -24,6 +35,8 @@ namespace qb
     };
 
     std::string getOperationName(OperationType type);
+    OperationType getOperationType(const std::string& name);
+    std::vector<std::string> getOperationNames();
 };
 
 

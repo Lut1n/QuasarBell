@@ -52,6 +52,11 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
                 jNode.setPath("properties", op->getPropertyName(i)).set(b);
             }
         }
+
+        if(op->hasCustomData())
+        {
+            op->saveCustomData(jNode.setPath("data"));
+        }
     }
 
     auto& jsonCo = root.setPath("sfx-nodal","connections");
@@ -78,7 +83,7 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
         vec2 position;
         jsonTo(jNode.setPath("position"), position);
         std::unique_ptr<SignalOperationNode> ptr;
-        ptr.reset( Factory<SignalOperationNode>::create(type) );
+        ptr.reset( Factory<SignalOperationNode>::create(qb::getOperationType(type)) );
         
         auto op = ptr->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)
@@ -86,6 +91,7 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
             float f = 0.0f;
             int k = 0;
             bool b = false;
+            // std::cout << "from node " << type << " load prop " << op->getPropertyName(i) << std::endl;
             if (op->getPropertyType(i) == DataType_Float)
             {
                 f = jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
@@ -101,6 +107,11 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
                 b = jNode.setPath("properties", op->getPropertyName(i)).getBoolean();
                 op->setProperty(i, b);
             }
+        }
+
+        if(op->hasCustomData())
+        {
+            op->loadCustomData(jNode.setPath("data"));
         }
         ptr->position = position;
         ops[id] = std::move(ptr);

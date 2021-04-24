@@ -1,28 +1,60 @@
 #include "signal/operations/OperationType.hpp"
 
+#include <unordered_map>
+
+//--------------------------------------------------------------
+namespace qb
+{
+    const static std::unordered_map<OperationType, std::string> s_operationNames = 
+    {
+        {OperationType_Add, "add"},
+        {OperationType_CubicSampler, "cubic"},
+        {OperationType_Debug, "debugger"},
+        {OperationType_Envelop, "envelop"},
+        {OperationType_Float, "float"},
+        {OperationType_Mix, "mix"},
+        {OperationType_Mult, "mult"},
+        {OperationType_Oscillator, "oscillator"},
+        {OperationType_Quantizer, "quantizer"},
+        {OperationType_Step, "step"},
+        {OperationType_Filter, "filter"},
+        {OperationType_Pitch, "pitch"},
+        {OperationType_Sub, "sub"},
+        {OperationType_Div, "div"},
+        {OperationType_Clamp, "clamp"},
+        {OperationType_Abs, "abs"},
+        {OperationType_Waveform, "waveform"},
+        {OperationType_KeySampler, "key-sampler"},
+        {OperationType_Harmonics, "harmonics"},
+        {OperationType_Polynomial, "polynomial"}
+    };
+}
+
 //--------------------------------------------------------------
 std::string qb::getOperationName(OperationType type)
 {
-    switch(type)
-    {
-        case OperationType_Add:
-        return "add";
-        case OperationType_CubicSampler:
-        return "sampler";
-        case OperationType_Debug:
-        return "debugger";
-        case OperationType_Envelop:
-        return "envelop";
-        case OperationType_Float:
-        return "float";
-        case OperationType_Mix:
-        return "mix";
-        case OperationType_Mult:
-        return "mult";
-        case OperationType_Oscillator:
-        return "oscillator";
-        case OperationType_Quantizer:
-        return "quantizer";
-    }
+    auto it = s_operationNames.find(type);
+    if (it != s_operationNames.end())
+        return it->second;
     return "None";
+}
+
+//--------------------------------------------------------------
+qb::OperationType qb::getOperationType(const std::string& name)
+{
+    if(name == "sampler") return OperationType_CubicSampler;
+
+    for(auto& pair : s_operationNames)
+    {
+        if (pair.second == name) return pair.first;
+    }
+    return OperationType_None;
+}
+
+//--------------------------------------------------------------
+std::vector<std::string> qb::getOperationNames()
+{
+    std::vector<std::string> ret(OperationType_Count);
+    for(size_t i=0; i<(size_t)OperationType_Count; ++i) ret[i] = getOperationName((OperationType)i);
+    return ret;
 }

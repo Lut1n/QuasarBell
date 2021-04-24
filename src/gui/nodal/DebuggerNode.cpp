@@ -11,7 +11,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, DebuggerNode> debugger_node_factory("debugger");
+static TypedFactory<SignalOperationNode, DebuggerNode> debugger_node_factory(qb::OperationType_Debug);
 
 //--------------------------------------------------------------
 DebuggerNode::DebuggerNode()

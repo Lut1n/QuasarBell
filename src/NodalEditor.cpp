@@ -15,6 +15,8 @@
 #include "signal/WavExporter.hpp"
 #include "io/SignalOperationsRW.hpp"
 
+#include "signal/operations/OperationType.hpp"
+
 #include "Core/Factory.h"
 
 App* App::s_instance = nullptr;
@@ -156,52 +158,16 @@ void NodalEditorWorkSpace::update(double t)
         }
     }
 
-    if (_components.nodeContextMenu->which != NodeContextMenu::NodeName_None)
+    auto type = _components.nodeContextMenu->which;
+    if (type != qb::OperationType_None && type < qb::OperationType_Count)
     {
-        auto name = _components.nodeContextMenu->which;
-        auto p = nodeboard->contextMenuPosition;
-
         std::unique_ptr<SignalOperationNode> u;
-
-        switch(name)
-        {
-            case NodeContextMenu::NodeName_Add:
-                u.reset( Factory<SignalOperationNode>::create("add") );
-                break;
-            case NodeContextMenu::NodeName_Mult:
-                u.reset( Factory<SignalOperationNode>::create("mult") );
-                break;
-            case NodeContextMenu::NodeName_Float:
-                u.reset( Factory<SignalOperationNode>::create("float") );
-                break;
-            case NodeContextMenu::NodeName_Debug:
-                u.reset( Factory<SignalOperationNode>::create("debugger") );
-                break;
-            case NodeContextMenu::NodeName_CubicSampler:
-                u.reset( Factory<SignalOperationNode>::create("sampler") );
-                break;
-            case NodeContextMenu::NodeName_Oscillator:
-                u.reset( Factory<SignalOperationNode>::create("oscillator") );
-                break;
-            case NodeContextMenu::NodeName_Quantizer:
-                u.reset( Factory<SignalOperationNode>::create("quantizer") );
-                break;
-            case NodeContextMenu::NodeName_Mix:
-                u.reset( Factory<SignalOperationNode>::create("mix") );
-                break;
-            case NodeContextMenu::NodeName_Envelop:
-                u.reset( Factory<SignalOperationNode>::create("envelop") );
-                break;
-        };
-
-        if(u)
-        {
-            u->position = p;
-            size_t id = operations.addOperation(u);
-            nodeboard->add(operations.getOperation(id), true, true);
-        }
-        _components.nodeContextMenu->which = NodeContextMenu::NodeName_None;
+        u.reset( Factory<SignalOperationNode>::create(type) );
+        u->position = nodeboard->contextMenuPosition;
+        size_t id = operations.addOperation(u);
+        nodeboard->add(operations.getOperation(id), true, true);
     }
+    _components.nodeContextMenu->which = qb::OperationType_None;
 }
 //--------------------------------------------------------------
 void NodalEditorWorkSpace::render()

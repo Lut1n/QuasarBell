@@ -10,9 +10,6 @@ struct FloatInput : public SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
-    size_t getPropertyCount() const override;
-    std::string getPropertyName(size_t i) const override;
-    OperationDataType getPropertyType(size_t i) const override;
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
@@ -26,9 +23,6 @@ struct CubicSampler : public SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
-    size_t getPropertyCount() const override;
-    std::string getPropertyName(size_t i) const override;
-    OperationDataType getPropertyType(size_t i) const override;
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
@@ -40,15 +34,44 @@ struct CubicSampler : public SignalOperation
 };
 
 //--------------------------------------------------------------
+struct PolynomialSampler : public SignalOperation
+{
+    PolynomialSampler();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+    
+    void saveCustomData(JsonValue& json) override;
+    void loadCustomData(JsonValue& json) override;
+
+    int count = 1;
+    std::vector<float> coefs;
+    float reset = 0.0;
+};
+
+//--------------------------------------------------------------
 struct AddOperation : public SignalOperation
 {
     AddOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
-    size_t getPropertyCount() const override;
-    std::string getPropertyName(size_t i) const override;
-    OperationDataType getPropertyType(size_t i) const override;
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float input1 = 0.0f;
+    float input2 = 0.0f;
+};
+
+//--------------------------------------------------------------
+struct SubOperation : public SignalOperation
+{
+    SubOperation();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
@@ -63,14 +86,48 @@ struct MultOperation : SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
-    size_t getPropertyCount() const override;
-    std::string getPropertyName(size_t i) const override;
-    OperationDataType getPropertyType(size_t i) const override;
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
+};
+
+//--------------------------------------------------------------
+struct DivOperation : SignalOperation
+{
+    DivOperation();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float input1 = 0.0f;
+    float input2 = 0.0f;
+};
+
+//--------------------------------------------------------------
+struct ClampOperation : SignalOperation
+{
+    ClampOperation();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float input1 = 0.0f;
+    float minVal = 0.0f;
+    float maxVal = 1.0f;
+};
+
+//--------------------------------------------------------------
+struct AbsOperation : SignalOperation
+{
+    AbsOperation();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
 };
 
 //--------------------------------------------------------------
@@ -80,9 +137,6 @@ struct OutputOperation : SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
-    size_t getPropertyCount() const override;
-    std::string getPropertyName(size_t i) const override;
-    OperationDataType getPropertyType(size_t i) const override;
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 

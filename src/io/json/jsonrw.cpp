@@ -363,6 +363,7 @@ void serializeImpl(std::stringstream& ss, const JsonValue& json)
         bool first = true;
         for(auto& item : json.array.values)
         {
+			if (item.type == JsonValue::Type::Undefined) continue;
             if(!first) ss << ",";
             first = false;
             serializeImpl(ss, item);
@@ -381,6 +382,7 @@ void serializeImpl(std::stringstream& ss, const JsonValue& json)
         bool first = true;
         for(auto& item : json.array.keys_indexes)
         {
+			if (json.array.values[item.second].type == JsonValue::Type::Undefined) continue;
             if(!first)
             {
                 ss << ",";

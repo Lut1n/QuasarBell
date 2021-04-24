@@ -3,7 +3,11 @@
 //--------------------------------------------------------------
 EnvelopOperation::EnvelopOperation()
 {
-    initialize({},{DataType_Float});
+    initialize({}, {DataType_Float}, {
+            {"attack",DataType_Float},
+            {"decay",DataType_Float},
+            {"sustain",DataType_Float},
+            {"release",DataType_Float}});
 }
 //--------------------------------------------------------------
 void EnvelopOperation::validate()
@@ -20,34 +24,6 @@ OperationData EnvelopOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-size_t EnvelopOperation::getPropertyCount() const
-{
-    return 4;
-}
-std::string EnvelopOperation::getPropertyName(size_t i) const
-{
-    if (i==0)
-        return "attack";
-    if (i==1)
-        return "decay";
-    if (i==2)
-        return "sustain";
-    if (i==3)
-        return "release";
-    return "None";
-}
-OperationDataType EnvelopOperation::getPropertyType(size_t i) const
-{
-    if (i==0)
-        return DataType_Float;
-    if (i==1)
-        return DataType_Float;
-    if (i==2)
-        return DataType_Float;
-    if (i==3)
-        return DataType_Float;
-    return DataType_Error;
-}
 void EnvelopOperation::getProperty(size_t i, float& value) const
 {
     if (i==0)

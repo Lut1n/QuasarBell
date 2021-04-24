@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, CubicSamplerNode> linear_node_factory("sampler");
+static TypedFactory<SignalOperationNode, CubicSamplerNode> linear_node_factory(qb::OperationType_CubicSampler);
 
 //--------------------------------------------------------------
 CubicSamplerNode::CubicSamplerNode()

@@ -5,7 +5,8 @@
 //--------------------------------------------------------------
 Quantizer::Quantizer()
 {
-    initialize({DataType_Float,DataType_Int},{DataType_Float});
+    initialize({DataType_Float,DataType_Int},{DataType_Float}, {
+            {"quantity",DataType_Float}});
 }
 //--------------------------------------------------------------
 void Quantizer::validate()
@@ -44,20 +45,6 @@ OperationData Quantizer::sample(size_t index, const Time& t)
     return data;
 }
 
-size_t Quantizer::getPropertyCount() const
-{
-    return 1;
-}
-std::string Quantizer::getPropertyName(size_t i) const
-{
-    if (i==0)
-        return "quantity";
-    return "None";
-}
-OperationDataType Quantizer::getPropertyType(size_t i) const
-{
-    return DataType_Float;
-}
 void Quantizer::getProperty(size_t i, float& value) const
 {
     if(i==0)

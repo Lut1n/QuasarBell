@@ -33,6 +33,13 @@ add_executable(
     src/gui/nodal/QuantizerNode.hpp
     src/gui/nodal/MixNode.hpp
     src/gui/nodal/EnvelopNode.hpp
+    src/gui/nodal/StepNode.hpp
+    src/gui/nodal/FilterNode.hpp
+    src/gui/nodal/PitchNode.hpp
+    src/gui/nodal/WaveformNode.hpp
+    src/gui/nodal/KeySamplerNode.hpp
+    src/gui/nodal/HarmonicsNode.hpp
+    src/gui/nodal/PolynomialNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
     src/io/json/json.hpp
@@ -59,9 +66,16 @@ add_executable(
     src/signal/operations/Quantizer.hpp
     src/signal/operations/MixOperation.hpp
     src/signal/operations/EnvelopOperation.hpp
+    src/signal/operations/StepOperation.hpp
+    src/signal/operations/FilterOperation.hpp
+    src/signal/operations/PitchSelector.hpp
+    src/signal/operations/Waveform.hpp
+    src/signal/operations/KeySampler.hpp
+    src/signal/operations/Harmonics.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
     src/Core/Math.hpp
+    src/Core/PseudoRand.hpp
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
     src/Font/GlyphRenderer.h
@@ -107,6 +121,13 @@ add_executable(
     src/gui/nodal/QuantizerNode.cpp
     src/gui/nodal/MixNode.cpp
     src/gui/nodal/EnvelopNode.cpp
+    src/gui/nodal/StepNode.cpp
+    src/gui/nodal/FilterNode.cpp
+    src/gui/nodal/PitchNode.cpp
+    src/gui/nodal/WaveformNode.cpp
+    src/gui/nodal/KeySamplerNode.cpp
+    src/gui/nodal/HarmonicsNode.cpp
+    src/gui/nodal/PolynomialNode.cpp
     src/gui/NodeContextMenu.cpp
     src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
@@ -133,8 +154,15 @@ add_executable(
     src/signal/operations/Quantizer.cpp
     src/signal/operations/MixOperation.cpp
     src/signal/operations/EnvelopOperation.cpp
+    src/signal/operations/StepOperation.cpp
+    src/signal/operations/FilterOperation.cpp
+    src/signal/operations/PitchSelector.cpp
+    src/signal/operations/Waveform.cpp
+    src/signal/operations/KeySampler.cpp
+    src/signal/operations/Harmonics.cpp
     src/Core/Vec2.cpp
     src/Core/Factory.cpp
+    src/Core/PseudoRand.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp
     src/Font/GlyphRenderer.cpp

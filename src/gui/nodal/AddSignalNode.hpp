@@ -10,21 +10,55 @@
 struct AddSignalNode : public SignalOperationNode
 {
     AddSignalNode();
-
     void displayProperties() override;
     
 public:
     AddOperation add;
 };
 
+struct SubSignalNode : public SignalOperationNode
+{
+    SubSignalNode();
+    void displayProperties() override;
+    
+public:
+    SubOperation sub;
+};
+
 struct MultSignalNode : public SignalOperationNode
 {
     MultSignalNode();
-
     void displayProperties() override;
     
 public:
     MultOperation mult;
+};
+
+struct DivSignalNode : public SignalOperationNode
+{
+    DivSignalNode();
+    void displayProperties() override;
+    
+public:
+    DivOperation div;
+};
+
+struct ClampSignalNode : public SignalOperationNode
+{
+    ClampSignalNode();
+    void displayProperties() override;
+    
+public:
+    ClampOperation clamp;
+};
+
+struct AbsSignalNode : public SignalOperationNode
+{
+    AbsSignalNode();
+    void displayProperties() override;
+    
+public:
+    AbsOperation abs;
 };
 
 #endif // GUI_ADD_SIGNAL_NODE_H

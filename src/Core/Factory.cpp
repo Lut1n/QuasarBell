@@ -1,8 +1,8 @@
 #include "Core/Factory.h"
 
-std::unordered_map<std::string, BaseFactory*> BaseFactory::factories;
+std::unordered_map<size_t, BaseFactory*> BaseFactory::factories;
 
-void BaseFactory::regFactory(const std::string& key, BaseFactory* factory)
+void BaseFactory::regFactory(size_t typeId, BaseFactory* factory)
 {
-    factories[key] = factory;
+    factories[typeId] = factory;
 }

@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, EnvelopNode> envelop_node_factory("envelop");
+static TypedFactory<SignalOperationNode, EnvelopNode> envelop_node_factory(qb::OperationType_Envelop);
 
 //--------------------------------------------------------------
 EnvelopNode::EnvelopNode()

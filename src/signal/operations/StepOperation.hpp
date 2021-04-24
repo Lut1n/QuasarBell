@@ -1,25 +1,23 @@
-#ifndef QUASAR_BELL_OSCILLATOR_HPP
-#define QUASAR_BELL_OSCILLATOR_HPP
+#ifndef QUASAR_BELL_STEP_OP_HPP
+#define QUASAR_BELL_STEP_OP_HPP
 
 #include "signal/operations/SignalOperation.hpp"
 
 
 //--------------------------------------------------------------
-struct Oscillator : public SignalOperation
+struct StepOperation : public SignalOperation
 {
-    Oscillator();
+    StepOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
-    float freq = 440.0f;
-    float ampl = 1.0f;
-
-private:
-    float phase = 0.0f;
+    float edge = 0.5f;
+    float thenValue = 0.0f;
+    float elseValue = 0.0f;
 };
 
 
-#endif // QUASAR_BELL_OSCILLATOR_HPP
+#endif // QUASAR_BELL_STEP_OP_HPP

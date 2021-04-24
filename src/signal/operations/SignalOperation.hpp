@@ -32,6 +32,7 @@ struct OperationData
 
 //--------------------------------------------------------------
 struct SignalOperation;
+class JsonValue;
 
 //--------------------------------------------------------------
 struct SignalOperationConnection
@@ -53,6 +54,8 @@ struct SignalOperation
         float duration = 1.0f;
     };
 
+    using PropDesc = std::pair<std::string,OperationDataType>;
+
     SignalOperation() = default;
     virtual ~SignalOperation() = default;
 
@@ -67,7 +70,7 @@ struct SignalOperation
 
     SignalOperation* getInputOperation(size_t index);
 
-    void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output);
+    void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output, const std::vector<PropDesc>& props);
     void update();
     OperationData sampleInput(size_t index, const Time& t);
 
@@ -80,9 +83,12 @@ struct SignalOperation
     size_t getInputCount() const;
     size_t getOutputCount() const;
 
-    virtual size_t getPropertyCount() const;
-    virtual OperationDataType getPropertyType(size_t i) const;
-    virtual std::string getPropertyName(size_t i) const;
+    size_t getPropertyCount() const;
+    OperationDataType getPropertyType(size_t i) const;
+    std::string getPropertyName(size_t i) const;
+
+    bool hasCustomData() const;
+    
     virtual void getProperty(size_t i, std::string& value) const;
     virtual void getProperty(size_t i, float& value) const;
     virtual void getProperty(size_t i, int& value) const;
@@ -92,8 +98,14 @@ struct SignalOperation
     virtual void setProperty(size_t i, int value);
     virtual void setProperty(size_t i, bool value);
 
+    virtual void saveCustomData(JsonValue& json);
+    virtual void loadCustomData(JsonValue& json);
+
     static void setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx);
     static void remConnection(SignalOperation* op, size_t index);
+
+protected:
+    bool _hasCustomData = false;
 
 private:
     
@@ -101,6 +113,7 @@ private:
 
     std::vector<SignalOperationConnection> inputs;
     std::vector<SignalOperationConnection> outputs;
+    std::vector<PropDesc> propDescs;
 };
 
 #endif // QUASAR_BELL_SIGNAL_OPERATION_HPP

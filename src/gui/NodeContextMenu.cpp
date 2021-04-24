@@ -9,6 +9,7 @@
 //--------------------------------------------------------------
 NodeContextMenu::NodeContextMenu()
 {
+    operationNames = qb::getOperationNames();
 }
 //--------------------------------------------------------------
 void NodeContextMenu::render()
@@ -18,18 +19,16 @@ void NodeContextMenu::render()
         ImGui::OpenPopup("New Node");
         nodeboard->requestContextMenu = false;
     }
-
-    constexpr std::array<const char*, (size_t)NodeName_Count> nameStr = {"Add", "Mult", "Float", "Sampler", "Oscillator", "Quantizer", "Mix", "Envelop", "Output"};
     if (ImGui::BeginPopup("New Node"))
     {
         ImGui::Text("New Node");
         ImGui::Separator();
         ImGui::Spacing();
-        for(size_t i=0; i<NodeName_Count; ++i)
+        for(size_t i=0; i<operationNames.size(); ++i)
         {
-            if(ImGui::MenuItem(nameStr[i]))
+            if(ImGui::MenuItem(operationNames[i].c_str()))
             {
-                which = (NodeName)i;
+                which = (qb::OperationType)i;
             }
         }
         ImGui::EndPopup();

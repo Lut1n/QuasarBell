@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, MixNode> mix_node_factory("mix");
+static TypedFactory<SignalOperationNode, MixNode> mix_node_factory(qb::OperationType_Mix);
 
 //--------------------------------------------------------------
 MixNode::MixNode()

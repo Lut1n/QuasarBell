@@ -9,9 +9,9 @@ struct BaseFactory
     BaseFactory() = default;
     virtual ~BaseFactory() = default;
 
-    void regFactory(const std::string& key, BaseFactory* factory);
+    void regFactory(size_t typeId, BaseFactory* factory);
     
-    static std::unordered_map<std::string, BaseFactory*> factories;
+    static std::unordered_map<size_t, BaseFactory*> factories;
 };
 
 template<typename Base>
@@ -19,11 +19,11 @@ struct Factory : public BaseFactory
 {
     virtual Base* create() = 0;
 
-    static Base* create(const std::string& key)
+    static Base* create(size_t typeId)
     {
-        if (factories.find(key) != factories.end())
+        if (factories.find(typeId) != factories.end())
         {
-            return static_cast<Factory<Base>*>(factories[key])->create();
+            return static_cast<Factory<Base>*>(factories[typeId])->create();
         }
         return nullptr;
     }
@@ -32,9 +32,9 @@ struct Factory : public BaseFactory
 template<typename Base, typename Type>
 struct TypedFactory : public Factory<Base>
 {
-    TypedFactory(const std::string& key)
+    TypedFactory(size_t typeId)
     {
-        this->regFactory(key, this);
+        this->regFactory(typeId, this);
     }
     Base* create() override
     {

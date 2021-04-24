@@ -1,25 +1,25 @@
-#ifndef QUASAR_BELL_OSCILLATOR_HPP
-#define QUASAR_BELL_OSCILLATOR_HPP
+#ifndef QUASAR_BELL_HARMONICS_HPP
+#define QUASAR_BELL_HARMONICS_HPP
 
 #include "signal/operations/SignalOperation.hpp"
 
 
 //--------------------------------------------------------------
-struct Oscillator : public SignalOperation
+struct Harmonics : public SignalOperation
 {
-    Oscillator();
+    Harmonics();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
     void getProperty(size_t i, float& value) const override;
     void setProperty(size_t i, float value) override;
 
-    float freq = 440.0f;
-    float ampl = 1.0f;
+    void saveCustomData(JsonValue& json) override;
+    void loadCustomData(JsonValue& json) override;
 
-private:
-    float phase = 0.0f;
+    int count = 1;
+    std::vector<std::pair<float,float>> freqs;
 };
 
 
-#endif // QUASAR_BELL_OSCILLATOR_HPP
+#endif // QUASAR_BELL_HARMONICS_HPP

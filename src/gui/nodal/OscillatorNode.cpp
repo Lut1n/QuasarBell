@@ -5,7 +5,7 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, OscillatorNode> oscillator_node_factory("oscillator");
+static TypedFactory<SignalOperationNode, OscillatorNode> oscillator_node_factory(qb::OperationType_Oscillator);
 
 //--------------------------------------------------------------
 OscillatorNode::OscillatorNode()
