@@ -6,9 +6,18 @@ UiFrame::UiFrame(const vec2& position, const vec2& size)
     this->children = std::make_unique<UiContainer>(Rect::fromPosAndSize(vec2(),size));
 }
 
+void UiFrame::startMove(const vec2& mousePos)
+{
+    startMovePosition = position;
+}
+
+void UiFrame::endMove(const vec2& mousePos)
+{
+}
+
 void UiFrame::onMove(const vec2& delta)
 {
-    position += delta;
+    position = startMovePosition + delta;
 }
 
 bool UiFrame::onEvent(const UiEvent& event)
@@ -19,18 +28,25 @@ bool UiFrame::onEvent(const UiEvent& event)
     children->clippingRect = Rect::fromPosAndSize(vec2(),size);
     if(children->onEvent(event)) return true;
 
+    if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.state == UiEvent::STATE_RELEASED)
+    {
+        endMove(event.position);
+    }
+
     Rect surface = Rect::fromPosAndSize(parentPosition + position, size);
     if(event.type == UiEvent::TYPE_MOUSE_MOVE)
     {
         bool mouseOver = surface.inside(event.position);
         
         color = mouseOver ? 0x3A3A3BFF : 0x323233FF;
-        if(pressed || moving)
+        if(moving || pressed)
         {
-            moving = true;
-            vec2 delta = event.position - lastMousePosition;
-            vec2 newPosition = lastPosition + delta;
-            onMove(newPosition - position);
+            if (!moving && (event.position - lastMousePosition).length() > 5.0)
+            {
+                startMove(lastMousePosition);
+                moving = true;
+            }
+            if (moving) onMove(event.position - lastMousePosition);
         }
     }
     else if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_1)

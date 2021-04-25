@@ -15,6 +15,7 @@ struct vec2
     const vec2& operator=(const vec2& v);
     
     const vec2& operator+=(const vec2& v);
+    const vec2& operator-=(const vec2& v);
     
     vec2 operator+(const vec2& v) const;
     vec2 operator-(const vec2& v) const;

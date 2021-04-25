@@ -3,6 +3,8 @@
 
 #include "UI/UiSystem.h"
 
+#include <functional>
+
 struct UiContainer : public UiElement
 {
     UiContainer(const Rect& clippingRect);
@@ -13,6 +15,8 @@ struct UiContainer : public UiElement
 
     void add(UiElement* el, bool isRenderable = true, bool isListener = true);
     void rem(UiElement* el);
+
+    void foreachElement(std::function<void(UiElement*)> visitor);
     
     Rect computeBounds() const override;
     

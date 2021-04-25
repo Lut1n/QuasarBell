@@ -14,9 +14,12 @@ struct UiNodeBoard : public UiFrame
     virtual ~UiNodeBoard();
 
     bool onEvent(const UiEvent& event) override;
+    void draw() override;
 
 protected:
-    // void onMove(const vec2& delta) override;
+    void startMove(const vec2& mousePos) override;
+    void endMove(const vec2& mousePos) override;
+    void onMove(const vec2& delta) override;
     
 public:
     // static bool isSelected(UiNode* node);
@@ -25,6 +28,9 @@ public:
     std::unique_ptr<UiConnections> connections;
     bool requestContextMenu = false;
     vec2 contextMenuPosition;
+
+    bool areaSelection = false;
+    Rect selectRect;
 };
 
 #endif // UI_NODEBOARD_H

@@ -86,3 +86,8 @@ Rect UiContainer::computeBounds() const
     }
     return bounds;
 }
+
+void UiContainer::foreachElement(std::function<void(UiElement*)> visitor)
+{
+    for(auto el : _elements) visitor(el);
+}

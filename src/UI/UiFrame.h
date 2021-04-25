@@ -24,12 +24,15 @@ struct UiFrame : public UiRect
     
 protected:
 
+    virtual void startMove(const vec2& mousePos);
+    virtual void endMove(const vec2& mousePos);
     virtual void onMove(const vec2& delta);
 
 public:
     bool moving = false;
     vec2 lastMousePosition;
     vec2 lastPosition;
+    vec2 startMovePosition;
     std::unique_ptr<UiContainer> children;
     bool pressed = false;
     bool rpressed = false;

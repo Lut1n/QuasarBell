@@ -44,11 +44,31 @@ UiNode::~UiNode()
     }
 }
 
+void UiNode::startMove(const vec2& mousePos)
+{
+    if (UiNode::isSelected(this))
+    {
+        for(auto n : selected) n->startMovePosition = n->position;
+    }
+    else
+    {
+        UiFrame::startMove(mousePos);
+    }
+}
+
+void UiNode::endMove(const vec2& mousePos)
+{
+    if (!UiNode::isSelected(this))
+    {
+        UiFrame::endMove(mousePos);
+    }
+}
+
 void UiNode::onMove(const vec2& delta)
 {
     if (UiNode::isSelected(this))
     {
-        for(auto n : selected) n->position += delta;
+        for(auto n : selected) n->position = n->startMovePosition + delta;
     }
     else
     {
