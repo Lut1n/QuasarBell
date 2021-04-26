@@ -19,6 +19,6 @@ QuantizerNode::QuantizerNode()
 //--------------------------------------------------------------
 void QuantizerNode::displayProperties()
 {
-    ImGui::InputInt("quantity", &quantizer.quantity);
+    if (ImGui::InputInt("quantity", &quantizer.quantity)) dirtyPreview();
     displayPreview();
 }

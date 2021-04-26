@@ -12,6 +12,11 @@
 UiNodeBoard::UiNodeBoard(const vec2& position, const vec2& size)
     : UiFrame(position, size)
 {
+    unsigned boardcolor = 0x010810FF;
+    color = boardcolor;
+    colorOnOver = boardcolor;
+    colorOnIdle = boardcolor;
+    borderEnabled = false;
     connections = std::make_unique<UiConnections>();
     add(connections.get());
 }
@@ -42,7 +47,7 @@ void UiNodeBoard::endMove(const vec2& mousePos)
     {
         if (selectRect.p1.x < selectRect.p0.x) swapf(selectRect.p1.x, selectRect.p0.x);
         if (selectRect.p1.y < selectRect.p0.y) swapf(selectRect.p1.y, selectRect.p0.y);
-        
+
         UiNode::selected.clear();
         children->foreachElement([&](UiElement* el){
             UiNode* node = dynamic_cast<UiNode*>(el);

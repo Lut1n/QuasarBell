@@ -115,7 +115,7 @@ void UiConnections::draw()
 
         RenderInterface::setColor(0xFFFFFFFF);
         RenderInterface::setThickness(2.0f);
-        RenderInterface::line(p1, p2);
+        drawLink(p1, p2);
     }
 
     if (displayPartial)
@@ -124,6 +124,25 @@ void UiConnections::draw()
 
         RenderInterface::setColor(0xFFFFFFFF);
         RenderInterface::setThickness(2.0f);
-        RenderInterface::line(p1, partialLink.second);
+        drawLink(p1, partialLink.second);
+    }
+}
+
+void UiConnections::drawLink(vec2 p1, vec2 p2)
+{
+    const size_t pointCount = 8;
+    auto swapv = [](vec2& v1, vec2& v2) { vec2 t=v1; v1=v2; v2=t; };
+    if(p2.x < p1.x) swapv(p1, p2);
+
+    vec2 l1 = p1;
+    for(size_t i=0; i<=pointCount; ++i)
+    {
+        float x = (float)i / pointCount;
+        float y = x * x * (3.0 - 2.0 * x);
+        vec2 l2;
+        l2.x = (p2.x-p1.x) * x + p1.x;
+        l2.y = (p2.y-p1.y) * y + p1.y;
+        RenderInterface::line(l1, l2);
+        l1 = l2;
     }
 }

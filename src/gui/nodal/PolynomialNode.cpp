@@ -22,9 +22,10 @@ void PolynomialNode::displayProperties()
         if (sampler.count < 1) sampler.count = 1;
         if (sampler.count > 10) sampler.count = 10;
         sampler.coefs.resize(sampler.count);
+        dirtyPreview();
     }
 
-    ImGui::InputFloat("reset", &sampler.reset);
+    if (ImGui::InputFloat("reset", &sampler.reset)) dirtyPreview();
     
     ImGui::Text("Coefs");
     ImGui::Separator();
@@ -32,7 +33,7 @@ void PolynomialNode::displayProperties()
     for(auto& coef : sampler.coefs)
     {
         std::string textid = std::string("##") + std::to_string(index);
-        ImGui::InputFloat(textid.c_str(), &coef);
+        if (ImGui::InputFloat(textid.c_str(), &coef)) dirtyPreview();
         index++;
     }
     displayPreview();

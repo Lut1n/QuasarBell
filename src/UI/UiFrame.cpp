@@ -1,7 +1,7 @@
 #include "UI/UiFrame.h"
 
 UiFrame::UiFrame(const vec2& position, const vec2& size)
-    : UiRect(position, size, 0x323233FF)
+    : UiRect(position, size, colorOnIdle)
 {
     this->children = std::make_unique<UiContainer>(Rect::fromPosAndSize(vec2(),size));
 }
@@ -38,7 +38,7 @@ bool UiFrame::onEvent(const UiEvent& event)
     {
         bool mouseOver = surface.inside(event.position);
         
-        color = mouseOver ? 0x3A3A3BFF : 0x323233FF;
+        color = mouseOver ? colorOnOver : colorOnIdle;
         if(moving || pressed)
         {
             if (!moving && (event.position - lastMousePosition).length() > 5.0)

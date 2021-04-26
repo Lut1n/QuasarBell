@@ -20,8 +20,8 @@ MixNode::MixNode()
 //--------------------------------------------------------------
 void MixNode::displayProperties()
 {
-    ImGui::InputFloat("input1", &mixer.input1);
-    ImGui::InputFloat("input2", &mixer.input2);
-    ImGui::InputFloat("delta", &mixer.delta);
+    if (ImGui::InputFloat("input1", &mixer.input1)) dirtyPreview();
+    if (ImGui::InputFloat("input2", &mixer.input2)) dirtyPreview();
+    if (ImGui::InputFloat("delta", &mixer.delta)) dirtyPreview();
     displayPreview();
 }

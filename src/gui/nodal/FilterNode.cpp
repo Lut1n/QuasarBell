@@ -22,11 +22,11 @@ FilterNode::FilterNode()
 //--------------------------------------------------------------
 void FilterNode::displayProperties()
 {
-    ImGui::InputFloat("offset", &filter.offset);
-    ImGui::InputFloat("length", &filter.length);
-    ImGui::InputFloat("minGain", &filter.minGain);
-    ImGui::InputFloat("maxGain", &filter.maxGain);
-    ImGui::InputFloat("factor", &filter.factor);
+    if (ImGui::InputFloat("offset", &filter.offset)) dirtyPreview();
+    if (ImGui::InputFloat("length", &filter.length)) dirtyPreview();
+    if (ImGui::InputFloat("minGain", &filter.minGain)) dirtyPreview();
+    if (ImGui::InputFloat("maxGain", &filter.maxGain)) dirtyPreview();
+    if (ImGui::InputFloat("factor", &filter.factor)) dirtyPreview();
     
     ImGui::Separator();
     ImGui::Text("Preview");

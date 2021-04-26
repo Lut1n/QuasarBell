@@ -62,11 +62,12 @@ void DebuggerNode::displayProperties()
     }
 
     getOperation()->validateGraph();
+    s_imgui_sampler_set_count(100);
     ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, -debug.range, debug.range, ImVec2(0, 60.0f));
     std::string s = std::to_string(value);
     ImGui::Text(s.c_str());
 
-    ImGui::InputFloat("range", &debug.range);
+    if (ImGui::InputFloat("range", &debug.range)) dirtyPreview();
     ImGui::InputFloat("duration scale", &debug.duration);
 
     if (sampleRateIndex == -1)

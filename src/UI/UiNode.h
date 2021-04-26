@@ -19,6 +19,8 @@ struct UiNode : public UiFrame
     bool onEvent(const UiEvent& event) override;
     void draw() override;
 
+    virtual void drawPreview(const Rect& previewArea);
+
     void addPin(int id, const std::string& label, bool isOutput);
     UiNode* getSourceNode(int id);
 

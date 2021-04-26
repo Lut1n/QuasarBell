@@ -22,10 +22,10 @@ CubicSamplerNode::CubicSamplerNode()
 //--------------------------------------------------------------
 void CubicSamplerNode::displayProperties()
 {
-    ImGui::InputFloat("value", &sampler.value);
-    ImGui::InputFloat("speed", &sampler.speed);
-    ImGui::InputFloat("acc", &sampler.acc);
-    ImGui::InputFloat("jerk", &sampler.jerk);
-    ImGui::InputFloat("reset", &sampler.reset);
+    if (ImGui::InputFloat("value", &sampler.value)) dirtyPreview();
+    if (ImGui::InputFloat("speed", &sampler.speed)) dirtyPreview();
+    if (ImGui::InputFloat("acc", &sampler.acc)) dirtyPreview();
+    if (ImGui::InputFloat("jerk", &sampler.jerk)) dirtyPreview();
+    if (ImGui::InputFloat("reset", &sampler.reset)) dirtyPreview();
     displayPreview();
 }

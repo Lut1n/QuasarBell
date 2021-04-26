@@ -24,8 +24,8 @@ AddSignalNode::AddSignalNode()
 //--------------------------------------------------------------
 void AddSignalNode::displayProperties()
 {
-    ImGui::InputFloat("input1", &add.input1);
-    ImGui::InputFloat("input2", &add.input2);
+    if (ImGui::InputFloat("input1", &add.input1)) dirtyPreview();
+    if (ImGui::InputFloat("input2", &add.input2)) dirtyPreview();
     displayPreview();
 }
 
@@ -42,8 +42,8 @@ SubSignalNode::SubSignalNode()
 //--------------------------------------------------------------
 void SubSignalNode::displayProperties()
 {
-    ImGui::InputFloat("input1", &sub.input1);
-    ImGui::InputFloat("input2", &sub.input2);
+    if (ImGui::InputFloat("input1", &sub.input1)) dirtyPreview();
+    if (ImGui::InputFloat("input2", &sub.input2)) dirtyPreview();
     displayPreview();
 }
 
@@ -60,8 +60,8 @@ MultSignalNode::MultSignalNode()
 //--------------------------------------------------------------
 void MultSignalNode::displayProperties()
 {
-    ImGui::InputFloat("input1", &mult.input1);
-    ImGui::InputFloat("input2", &mult.input2);
+    if (ImGui::InputFloat("input1", &mult.input1)) dirtyPreview();
+    if (ImGui::InputFloat("input2", &mult.input2)) dirtyPreview();
     displayPreview();
 }
 
@@ -78,8 +78,8 @@ DivSignalNode::DivSignalNode()
 //--------------------------------------------------------------
 void DivSignalNode::displayProperties()
 {
-    ImGui::InputFloat("input1", &div.input1);
-    ImGui::InputFloat("input2", &div.input2);
+    if (ImGui::InputFloat("input1", &div.input1)) dirtyPreview();
+    if (ImGui::InputFloat("input2", &div.input2)) dirtyPreview();
     displayPreview();
 }
 
@@ -97,9 +97,9 @@ ClampSignalNode::ClampSignalNode()
 //--------------------------------------------------------------
 void ClampSignalNode::displayProperties()
 {
-    ImGui::InputFloat("value", &clamp.input1);
-    ImGui::InputFloat("min", &clamp.minVal);
-    ImGui::InputFloat("max", &clamp.maxVal);
+    if (ImGui::InputFloat("value", &clamp.input1)) dirtyPreview();
+    if (ImGui::InputFloat("min", &clamp.minVal)) dirtyPreview();
+    if (ImGui::InputFloat("max", &clamp.maxVal)) dirtyPreview();
     displayPreview();
 }
 

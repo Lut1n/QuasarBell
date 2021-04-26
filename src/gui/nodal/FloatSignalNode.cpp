@@ -17,6 +17,6 @@ FloatSignalNode::FloatSignalNode()
 //--------------------------------------------------------------
 void FloatSignalNode::displayProperties()
 {
-    ImGui::InputFloat("value", &floatInput.value);
+    if (ImGui::InputFloat("value", &floatInput.value)) dirtyPreview();
     displayPreview();
 }

@@ -33,6 +33,8 @@ struct UiConnections : public UiElement
     void updateCurrentLink(vec2 b);
     std::uint64_t endLink(UiPin* b);
     void abortLink();
+
+    void drawLink(vec2 p1, vec2 p2);
     
 public:
 

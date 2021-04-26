@@ -17,9 +17,9 @@ EnvelopNode::EnvelopNode()
 //--------------------------------------------------------------
 void EnvelopNode::displayProperties()
 {
-    ImGui::InputFloat("attack", &envelop.attack);
-    ImGui::InputFloat("decay", &envelop.decay);
-    ImGui::InputFloat("sustain", &envelop.sustain);
-    ImGui::InputFloat("release", &envelop.release);
+    if (ImGui::InputFloat("attack", &envelop.attack)) dirtyPreview();
+    if (ImGui::InputFloat("decay", &envelop.decay)) dirtyPreview();
+    if (ImGui::InputFloat("sustain", &envelop.sustain)) dirtyPreview();
+    if (ImGui::InputFloat("release", &envelop.release)) dirtyPreview();
     displayPreview();
 }

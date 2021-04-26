@@ -17,6 +17,8 @@ UiNode::UiNode(const std::string& title, const vec2& position, const vec2& size)
     this->title = std::make_unique<UiText>(title, vec2(5.0, 5.0), 6.0f, 0xAAAAFFFF);
     float yoft = this->title->position.y + this->title->getTextSize().y * 2.0;
     this->add(this->title.get());
+    borderEnabled = false;
+    color = colorOnIdle;
 }
 
 UiNode::~UiNode()
@@ -78,9 +80,10 @@ void UiNode::onMove(const vec2& delta)
 
 bool UiNode::onEvent(const UiEvent& event)
 {
+    static const float PinSize = 10.0;
     bool ret = false;
     float step_y = size.y / (1+inputs.size());
-    float y = step_y;
+    float y = step_y - PinSize * 0.5;
     for (auto& pin : inputs)
     {
         pin->parentPosition = parentPosition;
@@ -90,7 +93,7 @@ bool UiNode::onEvent(const UiEvent& event)
         y += step_y;
     }
     step_y = size.y / (1+outputs.size());
-    y = step_y;
+    y = step_y - PinSize * 0.5;
     for (auto& pin : outputs)
     {
         pin->parentPosition = parentPosition;
@@ -118,12 +121,18 @@ bool UiNode::onEvent(const UiEvent& event)
 
 void UiNode::draw()
 {
-    int prev_color = color;
-    if( UiNode::isSelected(this) ) color = 0x7E7E7FFF;
+    static const float PinSize = 10.0;
+    borderEnabled = UiNode::isSelected(this);
     UiFrame::draw();
-    color = prev_color;
+
+    Rect previewArea;
+    float padding = 5.0;
+    previewArea.p0 = vec2(padding, padding + title->position.y + title->getTextSize().y);
+    previewArea.p1 = size - vec2(padding, padding);
+    drawPreview(previewArea);
+
     float step_y = size.y / (1+inputs.size());
-    float y = step_y;
+    float y = step_y - PinSize * 0.5;
     for (auto& pin : inputs)
     {
         pin->parentPosition = parentPosition;
@@ -133,7 +142,7 @@ void UiNode::draw()
         y += step_y;
     }
     step_y = size.y / (1+outputs.size());
-    y = step_y;
+    y = step_y - PinSize * 0.5;
     for (auto& pin : outputs)
     {
         pin->parentPosition = parentPosition;
@@ -144,19 +153,24 @@ void UiNode::draw()
     }
 }
 
+void UiNode::drawPreview(const Rect& previewArea)
+{
+}
+
 void UiNode::addPin(int id, const std::string& label, bool isOutput)
 {
+    static const float PinSize = 10.0;
     if (isOutput)
     {
         if(outputs.size() <= id) outputs.resize(id+1);
-        outputs[id] = std::make_unique<UiPin>(this, label, vec2(size.x,0.0), vec2(10,10));
+        outputs[id] = std::make_unique<UiPin>(this, label, vec2(size.x,0.0), vec2(PinSize,PinSize));
         outputs[id]->multipleConnections = true;
         outputs[id]->textOnLeft = false;
     }
     else
     {
         if(inputs.size() <= id) inputs.resize(id+1);
-        inputs[id] = std::make_unique<UiPin>(this, label, vec2(-10,0.0), vec2(10,10));
+        inputs[id] = std::make_unique<UiPin>(this, label, vec2(-10,0.0), vec2(PinSize,PinSize));
         inputs[id]->multipleConnections = false;
         inputs[id]->textOnLeft = true;
     }

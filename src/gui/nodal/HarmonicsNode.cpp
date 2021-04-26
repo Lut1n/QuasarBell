@@ -22,6 +22,7 @@ void HarmonicsNode::displayProperties()
         if (sampler.count < 1) sampler.count = 1;
         if (sampler.count > 10) sampler.count = 10;
         sampler.freqs.resize(sampler.count);
+        dirtyPreview();
     }
     
     ImGui::Columns(2);
@@ -35,9 +36,9 @@ void HarmonicsNode::displayProperties()
     {
         std::string keytext = std::string("##key") + std::to_string(index);
         std::string valtext = std::string("##val") + std::to_string(index);
-        ImGui::InputFloat(keytext.c_str(), &kv.first);
+        if (ImGui::InputFloat(keytext.c_str(), &kv.first)) dirtyPreview();
         ImGui::NextColumn();
-        ImGui::InputFloat(valtext.c_str(), &kv.second);
+        if (ImGui::InputFloat(valtext.c_str(), &kv.second)) dirtyPreview();
         ImGui::NextColumn();
         index++;
     }

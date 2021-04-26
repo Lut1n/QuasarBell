@@ -2,9 +2,17 @@
 
 #include "imgui.h"
 
+namespace qb
+{
+    namespace imgui
+    {
+        static float s_sampler_count = 100;
+    }
+}
+
 //--------------------------------------------------------------
 SignalOperationNode::SignalOperationNode(const std::string& title, size_t nodeTypeId)
-    : UiNode(title, vec2(0.0,0.0), vec2(60,60))
+    : UiNode(title, vec2(0.0,0.0), vec2(70,70))
     , _nodetypeId(nodeTypeId)
 {
 }
@@ -33,9 +41,14 @@ void SignalOperationNode::displayPreview()
     ImGui::Text("Preview");
     getOperation()->validateGraph();
     std::array<float, 100> buf;
+    s_imgui_sampler_set_count(100);
     for(size_t i=0; i<100; ++i) buf[i] = s_imgui_sampler(getOperation(), i);
     ImGui::PlotLines("##preview", buf.data(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
-    // ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
+}
+
+void SignalOperationNode::s_imgui_sampler_set_count(int count)
+{
+    qb::imgui::s_sampler_count = count;
 }
 
 //--------------------------------------------------------------
@@ -44,8 +57,47 @@ float SignalOperationNode::s_imgui_sampler(void* data, int idx)
     SignalOperation& op = *(SignalOperation*)data;
     SignalOperation::Time time;
     time.duration = 1.0;
-    time.t = (float)idx/100.0f;
-    time.sec = (float)idx/100.0f;
+    time.t = (float)idx/qb::imgui::s_sampler_count;
+    time.sec = (float)idx/qb::imgui::s_sampler_count;
     time.elapsed = 0.01;
     return op.sample(0, time).fvec[0];
+}
+
+void SignalOperationNode::drawPreview(const Rect& previewArea)
+{
+    const float sample_count = _preview.size();
+    getOperation()->validate();
+    RenderInterface::setColor(0x777777FF);
+    Rect target = previewArea + parentPosition + position;
+    RenderInterface::fill(target.p0, target.p1);
+    vec2 barS(previewArea.size().x / sample_count, 0);
+    RenderInterface::setColor(0xEEEEEEFF);
+
+    if(_hasChange)
+    {
+        std::cout << "change" << std::endl;
+        float minVal = 100000.0; float maxVal = -100000.0;
+        s_imgui_sampler_set_count(sample_count);
+        for(size_t i=0; i<sample_count; ++i)
+        {
+            _preview[i] = s_imgui_sampler(getOperation(), i);
+            if (_preview[i] < minVal) minVal = _preview[i];
+            if (_preview[i] > maxVal) maxVal = _preview[i];
+        }
+        _previewMaxVal = abs(maxVal) > abs(minVal) ? abs(maxVal) : abs(minVal);
+        _hasChange = false;
+    }
+
+    for(int i=0; i< sample_count; ++i)
+    {
+        vec2 p = target.p0 + vec2(i*barS.x,previewArea.size().y*0.5);
+        float y = _preview[i] / _previewMaxVal;
+        float h = previewArea.size().y*0.5 * -y;
+        RenderInterface::fill(p, p+vec2(barS.x,h));
+    }
+}
+
+void SignalOperationNode::dirtyPreview()
+{
+    _hasChange = true;
 }

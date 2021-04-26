@@ -16,6 +16,7 @@ public:
     vec2 size;
     unsigned color = 0x000000FF;
     bool visible = true;
+    bool borderEnabled = true;
 };
 
 #endif // UI_RECT_H

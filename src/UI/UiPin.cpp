@@ -7,6 +7,7 @@
 UiPin::UiPin(UiNode* node, const std::string& label, const vec2& position, const vec2& size)
     : UiRect(position, size, 0x11AAAAFF)
 {
+    borderEnabled = false;
     parentNode = node;
     this->label = std::make_unique<UiText>(label, position, 6.0f, 0xFFFFFFFF);
 }
@@ -22,6 +23,7 @@ bool UiPin::onEvent(const UiEvent& event)
 {
     Rect surface = Rect::fromPosAndSize(parentPosition + position, size);
     bool mouseOver = surface.inside(event.position);
+    borderEnabled = mouseOver;
     if (!mouseOver) return false;
     if(event.type == UiEvent::TYPE_MOUSE_BUTTON && event.input == UiEvent::INPUT_MOUSE_1)
     {

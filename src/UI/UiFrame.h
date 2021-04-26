@@ -38,6 +38,8 @@ public:
     bool rpressed = false;
     int clicks = 0;
     int rclicks = 0;
+    unsigned colorOnIdle = 0x323233FF;
+    unsigned colorOnOver = 0x3C3C3DFF;
 };
 
 #endif // UI_FRAME_H

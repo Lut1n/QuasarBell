@@ -26,9 +26,12 @@ void UiRect::draw()
     
     RenderInterface::setColor(color);
     RenderInterface::fill(surface.p0, surface.p1);
-    RenderInterface::setColor(0xFFFFFFFF);
-    RenderInterface::setThickness(2.0f);
-    RenderInterface::rect(surface.p0, surface.p1);
+    if (borderEnabled)
+    {
+        RenderInterface::setColor(0xFFFFFFFF);
+        RenderInterface::setThickness(2.0f);
+        RenderInterface::rect(surface.p0, surface.p1);
+    }
 }
 
 

@@ -38,8 +38,8 @@ void PitchNode::displayProperties()
     };
 
 
-    ImGui::InputInt("octave", &pitch.octave);
-    ImGui::InputInt("semitone", &pitch.semitone);
+    if (ImGui::InputInt("octave", &pitch.octave)) dirtyPreview();
+    if (ImGui::InputInt("semitone", &pitch.semitone)) dirtyPreview();
     if (ImGui::Button("Play") && App::s_instance)
     {
         auto& sound = *(App::s_instance->sound);

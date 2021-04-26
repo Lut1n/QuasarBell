@@ -20,7 +20,7 @@ OscillatorNode::OscillatorNode()
 //--------------------------------------------------------------
 void OscillatorNode::displayProperties()
 {
-    ImGui::InputFloat("freq", &oscillator.freq);
-    ImGui::InputFloat("ampl", &oscillator.ampl);
+    if (ImGui::InputFloat("freq", &oscillator.freq)) dirtyPreview();
+    if (ImGui::InputFloat("ampl", &oscillator.ampl)) dirtyPreview();
     displayPreview();
 }
