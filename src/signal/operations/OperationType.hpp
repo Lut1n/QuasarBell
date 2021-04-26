@@ -28,6 +28,7 @@ namespace qb
         OperationType_KeySampler,
         OperationType_Harmonics,
         OperationType_Polynomial,
+        OperationType_TimeScale,
 
         OperationType_Count,
 

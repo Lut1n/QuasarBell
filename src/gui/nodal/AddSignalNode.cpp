@@ -10,6 +10,7 @@ static TypedFactory<SignalOperationNode, MultSignalNode> mult_node_factory(qb::O
 static TypedFactory<SignalOperationNode, DivSignalNode> div_node_factory(qb::OperationType_Div);
 static TypedFactory<SignalOperationNode, ClampSignalNode> clamp_node_factory(qb::OperationType_Clamp);
 static TypedFactory<SignalOperationNode, AbsSignalNode> abs_node_factory(qb::OperationType_Abs);
+static TypedFactory<SignalOperationNode, TimeScaleNode> timescale_node_factory(qb::OperationType_TimeScale);
 
 //--------------------------------------------------------------
 AddSignalNode::AddSignalNode()
@@ -116,4 +117,21 @@ AbsSignalNode::AbsSignalNode()
 void AbsSignalNode::displayProperties()
 {
     displayPreview();
+}
+
+//--------------------------------------------------------------
+TimeScaleNode::TimeScaleNode()
+    : SignalOperationNode("TimeScale", qb::OperationType_TimeScale)
+{
+    addPin(0, "value", false);
+    addPin(0, "value", true);
+
+    setOperation(&timeScale);
+}
+//--------------------------------------------------------------
+void TimeScaleNode::displayProperties()
+{
+    displayPreview();
+    if (ImGui::InputFloat("delay", &timeScale.delay)) dirtyPreview();
+    if (ImGui::InputFloat("scale", &timeScale.scale)) dirtyPreview();
 }

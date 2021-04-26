@@ -26,7 +26,8 @@ namespace qb
         {OperationType_Waveform, "waveform"},
         {OperationType_KeySampler, "key-sampler"},
         {OperationType_Harmonics, "harmonics"},
-        {OperationType_Polynomial, "polynomial"}
+        {OperationType_Polynomial, "polynomial"},
+        {OperationType_TimeScale, "time-scale"}
     };
 }
 

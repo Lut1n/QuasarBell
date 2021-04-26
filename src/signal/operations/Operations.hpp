@@ -131,6 +131,20 @@ struct AbsOperation : SignalOperation
 };
 
 //--------------------------------------------------------------
+struct TimeScale : SignalOperation
+{
+    TimeScale();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+    
+    void getProperty(size_t i, float& value) const override;
+    void setProperty(size_t i, float value) override;
+
+    float delay = 0.0;
+    float scale = 1.0;
+};
+
+//--------------------------------------------------------------
 struct OutputOperation : SignalOperation
 {
     OutputOperation();

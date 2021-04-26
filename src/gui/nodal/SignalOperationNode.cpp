@@ -75,7 +75,6 @@ void SignalOperationNode::drawPreview(const Rect& previewArea)
 
     if(_hasChange)
     {
-        std::cout << "change" << std::endl;
         float minVal = 100000.0; float maxVal = -100000.0;
         s_imgui_sampler_set_count(sample_count);
         for(size_t i=0; i<sample_count; ++i)

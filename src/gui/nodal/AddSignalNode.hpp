@@ -61,4 +61,14 @@ public:
     AbsOperation abs;
 };
 
+struct TimeScaleNode : public SignalOperationNode
+{
+    TimeScaleNode();
+    void displayProperties() override;
+    
+public:
+    TimeScale timeScale;
+};
+
+
 #endif // GUI_ADD_SIGNAL_NODE_H

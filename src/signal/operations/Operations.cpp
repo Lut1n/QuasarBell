@@ -423,6 +423,52 @@ OperationData AbsOperation::sample(size_t index, const Time& t)
     return data;
 }
 
+
+//--------------------------------------------------------------
+TimeScale::TimeScale()
+{
+    initialize({DataType_Float},{DataType_Float}, {
+            {"delay",DataType_Float},
+            {"scale",DataType_Float}});
+}
+//--------------------------------------------------------------
+void TimeScale::validate()
+{
+}
+//--------------------------------------------------------------
+OperationData TimeScale::sample(size_t index, const Time& t)
+{
+    Time time2 = t;
+    time2.duration = t.duration * scale;
+    time2.elapsed = t.elapsed * scale;
+    time2.t = t.t*scale - delay;
+    time2.sec =  time2.t * time2.duration;
+
+    OperationData data;
+    auto output  = getOutput(0);
+    OperationData a = sampleInput(0, time2);
+
+    data.fvec[0] = a.type == DataType_Float ? a.fvec[0] : 0.0;
+    data.type = output->type;
+    data.count = output->count;
+    return data;
+}
+
+void TimeScale::getProperty(size_t i, float& value) const
+{
+    if (i==0)
+        value = delay;
+    if (i==1)
+        value = scale;
+}
+void TimeScale::setProperty(size_t i, float value)
+{
+    if (i==0)
+        delay = value;
+    if (i==1)
+        scale = value;
+}
+
 //--------------------------------------------------------------
 OutputOperation::OutputOperation()
 {
