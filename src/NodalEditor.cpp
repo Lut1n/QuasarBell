@@ -3,7 +3,7 @@
 #include "gui/nodal/AddSignalNode.hpp"
 #include "gui/nodal/FloatSignalNode.hpp"
 #include "gui/nodal/CubicSamplerNode.hpp"
-#include "gui/nodal/DebuggerNode.hpp"
+#include "gui/nodal/AudioOutputNode.hpp"
 #include "gui/nodal/OscillatorNode.hpp"
 #include "gui/nodal/QuantizerNode.hpp"
 #include "gui/nodal/MixNode.hpp"
@@ -132,15 +132,15 @@ void NodalEditorWorkSpace::update(double t)
     }
     if(gui.waveInput.confirmed)
     {
-        if(gui.waveInput.request == UserFileInput::Export_Wav && DebuggerNode::defaultOutput != nullptr)
+        if(gui.waveInput.request == UserFileInput::Export_Wav && AudioOutputNode::defaultOutput != nullptr)
         {
-            auto& output = DebuggerNode::defaultOutput->debug;
+            auto& output = AudioOutputNode::defaultOutput->output;
             std::unique_ptr<PcmDataBase> pcm;
             if (output.sampleBits == AudioSettings::Format_Mono8 || output.sampleBits == AudioSettings::Format_Stereo8)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
             if (output.sampleBits == AudioSettings::Format_Mono16 || output.sampleBits == AudioSettings::Format_Stereo16)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
-            DebuggerNode::defaultOutput->generate(*pcm);
+            AudioOutputNode::defaultOutput->generate(*pcm);
             WavExporter::exportAsWAV(gui.waveInput.filepath, *pcm);
         }
         gui.waveInput.request = UserFileInput::Nothing;

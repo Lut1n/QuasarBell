@@ -1,4 +1,4 @@
-#include "gui/nodal/DebuggerNode.hpp"
+#include "gui/nodal/AudioOutputNode.hpp"
 #include "signal/operations/OperationType.hpp"
 
 #include "signal/Signal.hpp"
@@ -11,38 +11,28 @@
 
 #include "Core/Factory.h"
 
-static TypedFactory<SignalOperationNode, DebuggerNode> debugger_node_factory(qb::OperationType_Debug);
+static TypedFactory<SignalOperationNode, AudioOutputNode> audiooutput_node_factory(qb::OperationType_AudioOutput);
 
-DebuggerNode* DebuggerNode::defaultOutput = nullptr;
+AudioOutputNode* AudioOutputNode::defaultOutput = nullptr;
 
 //--------------------------------------------------------------
-DebuggerNode::DebuggerNode()
-    : SignalOperationNode("Debugger", qb::OperationType_Debug)
+AudioOutputNode::AudioOutputNode()
+    : SignalOperationNode("Output", qb::OperationType_AudioOutput)
 {
     addPin(0, "in 1", false);
-    setOperation(&debug);
+    setOperation(&output);
 
     if (defaultOutput == nullptr) defaultOutput = this;
 }
 
 //--------------------------------------------------------------
-DebuggerNode::~DebuggerNode()
+AudioOutputNode::~AudioOutputNode()
 {
     if (defaultOutput == this) defaultOutput = nullptr;
 }
 
 //--------------------------------------------------------------
-void DebuggerNode::draw()
-{
-    getOperation()->validateGraph();
-    SignalOperation::Time time;
-    value = getOperation()->sample(0, time).fvec[0];
-    title->text = std::to_string(value);
-    UiNode::draw();
-}
-
-//--------------------------------------------------------------
-void DebuggerNode::displayProperties()
+void AudioOutputNode::displayProperties()
 {
     static constexpr size_t sampleRateCount = 6;
     static constexpr size_t sampleFormatCount = 2;
@@ -63,20 +53,20 @@ void DebuggerNode::displayProperties()
 
     getOperation()->validateGraph();
     s_imgui_sampler_set_count(100);
-    ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, -debug.range, debug.range, ImVec2(0, 60.0f));
+    ImGui::PlotLines("##preview", s_imgui_sampler, getOperation(), 100, 0, NULL, -output.range, output.range, ImVec2(0, 60.0f));
     std::string s = std::to_string(value);
     ImGui::Text(s.c_str());
 
-    if (ImGui::InputFloat("range", &debug.range)) dirtyPreview();
-    ImGui::InputFloat("duration scale", &debug.duration);
+    if (ImGui::InputFloat("range", &output.range)) dirtyPreview();
+    ImGui::InputFloat("duration scale", &output.duration);
 
     if (sampleRateIndex == -1)
     {
-        if(debug.sampleRate == 0) debug.sampleRate = AudioSettings::SampleRate_44kHz;
+        if(output.sampleRate == 0) output.sampleRate = AudioSettings::SampleRate_44kHz;
         sampleRateIndex = 4;
         for(size_t i=0; i<sampleRateCount; ++i)
         {
-            if (debug.sampleRate == indexedRates[i])
+            if (output.sampleRate == indexedRates[i])
             {
                 sampleRateIndex = i;
                 break;
@@ -86,11 +76,11 @@ void DebuggerNode::displayProperties()
     
     if (sampleFormatIndex == -1)
     {
-        if(debug.sampleBits == 0) debug.sampleBits = AudioSettings::Format_Mono16;
+        if(output.sampleBits == 0) output.sampleBits = AudioSettings::Format_Mono16;
         sampleFormatIndex = 1;
         for(size_t i=0; i<sampleFormatCount; ++i)
         {
-            if (debug.sampleBits == indexedFormats[i])
+            if (output.sampleBits == indexedFormats[i])
             {
                 sampleFormatIndex = i;
                 break;
@@ -101,13 +91,13 @@ void DebuggerNode::displayProperties()
     if (ImGui::Button(sampleRateNames[sampleRateIndex]))
     {
         sampleRateIndex = (sampleRateIndex+1) % sampleRateCount;
-        debug.sampleRate = indexedRates[sampleRateIndex];
+        output.sampleRate = indexedRates[sampleRateIndex];
     }
     
     if (ImGui::Button(sampleFormatNames[sampleFormatIndex]))
     {
         sampleFormatIndex = (sampleFormatIndex+1) % sampleFormatCount;
-        debug.sampleBits = indexedFormats[sampleFormatIndex];
+        output.sampleBits = indexedFormats[sampleFormatIndex];
     }
 
     if (ImGui::Button("Play") && App::s_instance)
@@ -116,11 +106,11 @@ void DebuggerNode::displayProperties()
         if(sound.getState() != SoundNode::Playing)
         {
             std::unique_ptr<PcmDataBase> pcm;
-            if (debug.sampleBits == AudioSettings::Format_Mono8 || debug.sampleBits == AudioSettings::Format_Stereo8)
+            if (output.sampleBits == AudioSettings::Format_Mono8 || output.sampleBits == AudioSettings::Format_Stereo8)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
-            if (debug.sampleBits == AudioSettings::Format_Mono16 || debug.sampleBits == AudioSettings::Format_Stereo16)
+            if (output.sampleBits == AudioSettings::Format_Mono16 || output.sampleBits == AudioSettings::Format_Stereo16)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
-            DebuggerNode::defaultOutput->generate(*pcm);
+            AudioOutputNode::defaultOutput->generate(*pcm);
             // generate(pcm);
             sound.queue(*pcm.get());
             sound.play();
@@ -129,11 +119,11 @@ void DebuggerNode::displayProperties()
 }
 
 //--------------------------------------------------------------
-void DebuggerNode::generate(PcmDataBase& pcm)
+void AudioOutputNode::generate(PcmDataBase& pcm)
 {
-    if (pcm.format != debug.sampleBits)
-        std::cout << "warning: DebuggerNode::generate() pcm format does not match" << std::endl;
-    float duration = debug.duration;
+    if (pcm.format != output.sampleBits)
+        std::cout << "warning: AudioOutputNode::generate() pcm format does not match" << std::endl;
+    float duration = output.duration;
     if (duration == 0.0f)
     {
         std::cout << "error: duration = 0; 1s is used" << std::endl;
@@ -145,22 +135,22 @@ void DebuggerNode::generate(PcmDataBase& pcm)
 
     operations->validateGraph();
 
-    /*if (debug.sampleBits == AudioSettings::Format_Mono8 || debug.sampleBits == AudioSettings::Format_Stereo8)
+    /*if (output.sampleBits == AudioSettings::Format_Mono8 || output.sampleBits == AudioSettings::Format_Stereo8)
         pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
-    if (debug.sampleBits == AudioSettings::Format_Mono16 || debug.sampleBits == AudioSettings::Format_Stereo16)
+    if (output.sampleBits == AudioSettings::Format_Mono16 || output.sampleBits == AudioSettings::Format_Stereo16)
         pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();*/
 
-    pcm.sampleRate = (AudioSettings::SampleRate)debug.sampleRate;
-    pcm.resize(duration * debug.sampleRate);
+    pcm.sampleRate = (AudioSettings::SampleRate)output.sampleRate;
+    pcm.resize(duration * output.sampleRate);
     
-    float sample_t = 1.0 / debug.sampleRate;
+    float sample_t = 1.0 / output.sampleRate;
     
     SignalOperation::Time time;
     time.duration = duration;
     time.elapsed = sample_t;
     for(unsigned i=0;i<pcm.count();++i)
     {
-        time.sec = (float)i / (float)debug.sampleRate;
+        time.sec = (float)i / (float)output.sampleRate;
         time.t = time.sec / time.duration;
         pcm.set(i, operations->sample(0, time).fvec[0]);
     }

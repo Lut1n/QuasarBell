@@ -16,7 +16,7 @@ namespace qb
         OperationType_Quantizer,
         OperationType_Mix,
         OperationType_Envelop,
-        OperationType_Debug,
+        OperationType_AudioOutput,
         OperationType_Step,
         OperationType_Filter,
         OperationType_Pitch,

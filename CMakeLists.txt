@@ -29,7 +29,7 @@ add_executable(
     src/gui/nodal/FloatSignalNode.hpp
     src/gui/nodal/CubicSamplerNode.hpp
     src/gui/nodal/OscillatorNode.hpp
-    src/gui/nodal/DebuggerNode.hpp
+    src/gui/nodal/AudioOutputNode.hpp
     src/gui/nodal/QuantizerNode.hpp
     src/gui/nodal/MixNode.hpp
     src/gui/nodal/EnvelopNode.hpp
@@ -117,7 +117,7 @@ add_executable(
     src/gui/nodal/FloatSignalNode.cpp
     src/gui/nodal/CubicSamplerNode.cpp
     src/gui/nodal/OscillatorNode.cpp
-    src/gui/nodal/DebuggerNode.cpp
+    src/gui/nodal/AudioOutputNode.cpp
     src/gui/nodal/QuantizerNode.cpp
     src/gui/nodal/MixNode.cpp
     src/gui/nodal/EnvelopNode.cpp

@@ -9,7 +9,7 @@ namespace qb
     {
         {OperationType_Add, "add"},
         {OperationType_CubicSampler, "cubic"},
-        {OperationType_Debug, "debugger"},
+        {OperationType_AudioOutput, "audio-output"},
         {OperationType_Envelop, "envelop"},
         {OperationType_Float, "float"},
         {OperationType_Mix, "mix"},
@@ -44,6 +44,7 @@ std::string qb::getOperationName(OperationType type)
 qb::OperationType qb::getOperationType(const std::string& name)
 {
     if(name == "sampler") return OperationType_CubicSampler;
+    if(name == "debugger") return OperationType_AudioOutput;
 
     for(auto& pair : s_operationNames)
     {

@@ -2,14 +2,7 @@
 
 #include "io/RwHelpers.hpp"
 
-#include "gui/nodal/AddSignalNode.hpp"
-#include "gui/nodal/DebuggerNode.hpp"
-#include "gui/nodal/FloatSignalNode.hpp"
-#include "gui/nodal/CubicSamplerNode.hpp"
-#include "gui/nodal/OscillatorNode.hpp"
-#include "gui/nodal/QuantizerNode.hpp"
-#include "gui/nodal/MixNode.hpp"
-#include "gui/nodal/EnvelopNode.hpp"
+#include "gui/nodal/SignalOperationNode.hpp"
 
 #include "signal/operations/OperationType.hpp"
 #include "NodalEditor.hpp"
