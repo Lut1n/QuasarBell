@@ -8,13 +8,13 @@
 //--------------------------------------------------------------
 Waveform::Waveform()
 {
-    initialize({},{DataType_Float}, {
-            {"period",DataType_Float},
-            {"min",DataType_Float},
-            {"max",DataType_Float},
-            {"type",DataType_Float},
-            {"noise-seed",DataType_Float},
-            {"noise-samples",DataType_Float}});
+    initialize({},{DataType_Float});
+    makeProperty({"period", DataType_Float, &period});
+    makeProperty({"min", DataType_Float, &minVal});
+    makeProperty({"max", DataType_Float, &maxVal});
+    makeProperty({"type", DataType_Int, &type});
+    makeProperty({"noise-seed", DataType_Int, &noiseSeed});
+    makeProperty({"noise-samples", DataType_Int, &noiseSamples});
 }
 //--------------------------------------------------------------
 void Waveform::validate()
@@ -77,37 +77,6 @@ OperationData Waveform::sample(size_t index, const Time& t)
     float ampl = (maxVal-minVal);
     data.fvec[0] = (sampleFlip(t.t * period) + 1.0) * 0.5 * ampl + minVal;
     return data;
-}
-
-void Waveform::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = period;
-    else if (i==1)
-        value = minVal;
-    else if (i==2)
-        value = maxVal;
-    else if (i==3)
-        value = type;
-    else if (i==4)
-        value = noiseSeed;
-    else if (i==5)
-        value = noiseSamples;
-}
-void Waveform::setProperty(size_t i, float value)
-{
-    if (i==0)
-        period = value;
-    else if (i==1)
-        minVal = value;
-    else if (i==2)
-        maxVal = value;
-    else if (i==3)
-        type = value;
-    else if (i==4)
-        noiseSeed = value;
-    else if (i==5)
-        noiseSamples = value;
 }
 
 void Waveform::computeNoise()

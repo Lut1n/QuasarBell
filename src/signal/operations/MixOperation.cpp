@@ -3,10 +3,10 @@
 //--------------------------------------------------------------
 MixOperation::MixOperation()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"input2",DataType_Float},
-            {"delta",DataType_Float}});
+    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeProperty({"input1",DataType_Float, &input1});
+    makeProperty({"input2",DataType_Float, &input2});
+    makeProperty({"delta",DataType_Float, &delta});
 }
 //--------------------------------------------------------------
 void MixOperation::validate()
@@ -30,23 +30,4 @@ OperationData MixOperation::sample(size_t index, const Time& t)
 
     data.fvec[0] = in1 * (1.0-dt) + in2 * dt;
     return data;
-}
-
-void MixOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = input2;
-    else if (i==2)
-        value = delta;
-}
-void MixOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        input2 = value;
-    else if (i==2)
-        delta = value;
 }

@@ -7,9 +7,9 @@
 //--------------------------------------------------------------
 PitchSelector::PitchSelector()
 {
-    initialize({DataType_Float,DataType_Float},{DataType_Float}, {
-            {"octave",DataType_Float},
-            {"semitone",DataType_Float}});
+    initialize({DataType_Float,DataType_Float},{DataType_Float});
+    makeProperty({"octave", DataType_Int, &octave});
+    makeProperty({"semitone", DataType_Int, &semitone});
 }
 //--------------------------------------------------------------
 void PitchSelector::validate()
@@ -52,19 +52,4 @@ OperationData PitchSelector::sample(size_t index, const Time& t)
     data.fvec[0] = pitchToFreq(midiindex, midi_la440, midi_semitones);
 
     return data;
-}
-
-void PitchSelector::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = octave;
-    else if (i==1)
-        value = semitone;
-}
-void PitchSelector::setProperty(size_t i, float value)
-{
-    if (i==0)
-        octave = value;
-    else if (i==1)
-        semitone = value;
 }

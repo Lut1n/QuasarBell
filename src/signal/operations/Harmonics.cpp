@@ -9,8 +9,8 @@
 Harmonics::Harmonics()
 {
     _hasCustomData = true;
-    initialize({},{DataType_Float}, {
-            {"count",DataType_Float}});
+    initialize({},{DataType_Float});
+    makeProperty({"count", DataType_Int, &count});
     freqs.resize(1,{440.0,1.0});
 }
 
@@ -33,20 +33,6 @@ OperationData Harmonics::sample(size_t index, const Time& t)
 }
 
 //--------------------------------------------------------------
-void Harmonics::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = count;
-}
-
-//--------------------------------------------------------------
-void Harmonics::setProperty(size_t i, float value)
-{
-    if (i==0)
-        count = value;
-}
-
-//--------------------------------------------------------------
 void Harmonics::saveCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("freq-ampl");
@@ -62,7 +48,7 @@ void Harmonics::saveCustomData(JsonValue& json)
 void Harmonics::loadCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("freq-ampl");
-    count = jArray.array.values.size();
+    count = jArray.count();
     freqs.resize(count);
     int index = 0;
     for(auto& jfa : jArray.array.values)

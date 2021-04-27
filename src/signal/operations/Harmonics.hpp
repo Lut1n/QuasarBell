@@ -10,9 +10,6 @@ struct Harmonics : public SignalOperation
     Harmonics();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;

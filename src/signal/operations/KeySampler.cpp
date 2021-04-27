@@ -8,9 +8,9 @@
 KeySampler::KeySampler()
 {
     _hasCustomData = true;
-    initialize({},{DataType_Float}, {
-            {"count",DataType_Float},
-            {"interpo",DataType_Float}});
+    initialize({},{DataType_Float});
+    makeProperty({"count", DataType_Int, &count});
+    makeProperty({"interpo", DataType_Int, &interpo});
     keys.resize(1,{0.0,1.0});
 }
 //--------------------------------------------------------------
@@ -63,23 +63,6 @@ float KeySampler::interpolate(float x)
     return x;
 }
 //--------------------------------------------------------------
-void KeySampler::getProperty(size_t i, float& value) const
-{
-    if (i == 0)
-        value = this->count;
-    else if (i == 1)
-        value = this->interpo;
-}
-//--------------------------------------------------------------
-void KeySampler::setProperty(size_t i, float value)
-{
-    if (i == 0)
-        this->count = value;
-    else if (i == 1)
-        this->interpo = value;
-}
-
-//--------------------------------------------------------------
 void KeySampler::saveCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("key-values");
@@ -95,7 +78,7 @@ void KeySampler::saveCustomData(JsonValue& json)
 void KeySampler::loadCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("key-values");
-    count = jArray.array.values.size();
+    count = jArray.count();
     keys.resize(count);
     int index = 0;
     for(auto& jkv : jArray.array.values)

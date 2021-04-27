@@ -10,9 +10,6 @@ struct FreqFilter : public SignalOperation
     FreqFilter();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float offset = 440.0f;
     float length = 200.0f;

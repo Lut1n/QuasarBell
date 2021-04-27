@@ -10,9 +10,6 @@ struct EnvelopOperation : public SignalOperation
     EnvelopOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float sampleADSR(float t);
 

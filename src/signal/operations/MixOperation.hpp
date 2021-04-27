@@ -10,9 +10,6 @@ struct MixOperation : public SignalOperation
     MixOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;

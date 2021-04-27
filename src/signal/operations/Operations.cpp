@@ -7,8 +7,8 @@
 //--------------------------------------------------------------
 FloatInput::FloatInput()
 {
-    initialize({},{DataType_Float}, {
-            {"value",DataType_Float}});
+    initialize({},{DataType_Float});
+    makeProperty({"value", DataType_Float, &value});
 }
 //--------------------------------------------------------------
 void FloatInput::validate()
@@ -24,24 +24,15 @@ OperationData FloatInput::sample(size_t index, const Time& t)
     return data;
 }
 
-void FloatInput::getProperty(size_t i, float& value) const
-{
-    value = this->value;
-}
-void FloatInput::setProperty(size_t i, float value)
-{
-    this->value = value;
-}
-
 //--------------------------------------------------------------
 CubicSampler::CubicSampler()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float}, {
-            {"value",DataType_Float},
-            {"speed",DataType_Float},
-            {"acc",DataType_Float},
-            {"jerk",DataType_Float},
-            {"reset",DataType_Float}});
+    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeProperty({"value", DataType_Float, &value});
+    makeProperty({"speed", DataType_Float, &speed});
+    makeProperty({"acc", DataType_Float, &acc});
+    makeProperty({"jerk", DataType_Float, &jerk});
+    makeProperty({"reset", DataType_Float, &reset});
 }
 //--------------------------------------------------------------
 void CubicSampler::validate()
@@ -79,39 +70,12 @@ OperationData CubicSampler::sample(size_t index, const Time& t)
     return data;
 }
 
-void CubicSampler::getProperty(size_t i, float& value) const
-{
-    if (i == 0)
-        value = this->value;
-    else if (i == 1)
-        value = this->speed;
-    else if (i == 2)
-        value = this->acc;
-    else if (i == 3)
-        value = this->jerk;
-    else if (i == 4)
-        value = this->reset;
-}
-void CubicSampler::setProperty(size_t i, float value)
-{
-    if (i == 0)
-        this->value = value;
-    else if (i == 1)
-        this->speed = value;
-    else if (i == 2)
-        this->acc = value;
-    else if (i == 3)
-        this->jerk = value;
-    else if (i == 4)
-        this->reset = value;
-}
-
 //--------------------------------------------------------------
 PolynomialSampler::PolynomialSampler()
 {
-    initialize({},{DataType_Float}, {
-            {"count",DataType_Float},
-            {"reset",DataType_Float}});
+    initialize({},{DataType_Float});
+    makeProperty({"count", DataType_Int, &count});
+    makeProperty({"reset", DataType_Float, &reset});
     coefs.resize(1, 0);
 }
 //--------------------------------------------------------------
@@ -142,20 +106,7 @@ OperationData PolynomialSampler::sample(size_t index, const Time& t)
     data.fvec[0] = res;
     return data;
 }
-void PolynomialSampler::getProperty(size_t i, float& value) const
-{
-    if (i == 0)
-        value = this->count;
-    else if (i == 1)
-        value = this->reset;
-}
-void PolynomialSampler::setProperty(size_t i, float value)
-{
-    if (i == 0)
-        this->count = value;
-    else if (i == 1)
-        this->reset = value;
-}
+
 void PolynomialSampler::saveCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("coefs");
@@ -168,7 +119,7 @@ void PolynomialSampler::saveCustomData(JsonValue& json)
 void PolynomialSampler::loadCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("coefs");
-    count = jArray.array.values.size();
+    count = jArray.count();
     coefs.resize(count);
     int index = 0;
     for(auto& jcoef : jArray.array.values)
@@ -179,9 +130,9 @@ void PolynomialSampler::loadCustomData(JsonValue& json)
 //--------------------------------------------------------------
 AddOperation::AddOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"input2",DataType_Float}});
+    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeProperty({"input1", DataType_Float, &input1});
+    makeProperty({"input2", DataType_Float, &input2});
 }
 //--------------------------------------------------------------
 void AddOperation::validate()
@@ -204,27 +155,12 @@ OperationData AddOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-void AddOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = input2;
-}
-void AddOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        input2 = value;
-}
-
 //--------------------------------------------------------------
 SubOperation::SubOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"input2",DataType_Float}});
+    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeProperty({"input1", DataType_Float, &input1});
+    makeProperty({"input2", DataType_Float, &input2});
 }
 //--------------------------------------------------------------
 void SubOperation::validate()
@@ -247,28 +183,12 @@ OperationData SubOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-void SubOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = input2;
-}
-void SubOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        input2 = value;
-}
-
-
 //--------------------------------------------------------------
 MultOperation::MultOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"input2",DataType_Float}});
+    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeProperty({"input1", DataType_Float, &input1});
+    makeProperty({"input2", DataType_Float, &input2});
 }
 //--------------------------------------------------------------
 void MultOperation::validate()
@@ -291,27 +211,12 @@ OperationData MultOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-void MultOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = input2;
-}
-void MultOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        input2 = value;
-}
-
 //--------------------------------------------------------------
 DivOperation::DivOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"input2",DataType_Float}});
+    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeProperty({"input1", DataType_Float, &input1});
+    makeProperty({"input2", DataType_Float, &input2});
 }
 //--------------------------------------------------------------
 void DivOperation::validate()
@@ -334,28 +239,13 @@ OperationData DivOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-void DivOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = input2;
-}
-void DivOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        input2 = value;
-}
-
 //--------------------------------------------------------------
 ClampOperation::ClampOperation()
 {
-    initialize({DataType_Float, DataType_Float, DataType_Float},{DataType_Float}, {
-            {"input1",DataType_Float},
-            {"minVal",DataType_Float},
-            {"maxVal",DataType_Float}});
+    initialize({DataType_Float, DataType_Float, DataType_Float},{DataType_Float});
+    makeProperty({"input1", DataType_Float, &input1});
+    makeProperty({"minVal", DataType_Float, &minVal});
+    makeProperty({"maxVal", DataType_Float, &maxVal});
 }
 //--------------------------------------------------------------
 void ClampOperation::validate()
@@ -380,29 +270,10 @@ OperationData ClampOperation::sample(size_t index, const Time& t)
     return data;
 }
 
-void ClampOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = input1;
-    else if (i==1)
-        value = minVal;
-    else if (i==2)
-        value = maxVal;
-}
-void ClampOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        input1 = value;
-    else if (i==1)
-        minVal = value;
-    else if (i==2)
-        maxVal = value;
-}
-
 //--------------------------------------------------------------
 AbsOperation::AbsOperation()
 {
-    initialize({DataType_Float},{DataType_Float}, {});
+    initialize({DataType_Float},{DataType_Float});
 }
 //--------------------------------------------------------------
 void AbsOperation::validate()
@@ -427,9 +298,9 @@ OperationData AbsOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 TimeScale::TimeScale()
 {
-    initialize({DataType_Float},{DataType_Float}, {
-            {"delay",DataType_Float},
-            {"scale",DataType_Float}});
+    initialize({DataType_Float},{DataType_Float});
+    makeProperty({"delay", DataType_Float, &delay});
+    makeProperty({"scale", DataType_Float, &scale});
 }
 //--------------------------------------------------------------
 void TimeScale::validate()
@@ -454,29 +325,14 @@ OperationData TimeScale::sample(size_t index, const Time& t)
     return data;
 }
 
-void TimeScale::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = delay;
-    if (i==1)
-        value = scale;
-}
-void TimeScale::setProperty(size_t i, float value)
-{
-    if (i==0)
-        delay = value;
-    if (i==1)
-        scale = value;
-}
-
 //--------------------------------------------------------------
 OutputOperation::OutputOperation()
 {
-    initialize({DataType_Float},{}, {
-            {"range",DataType_Float},
-            {"duration",DataType_Float},
-            {"sample-rate",DataType_Float},
-            {"sample-bits",DataType_Float}});
+    initialize({DataType_Float},{});
+    makeProperty({"range", DataType_Float, &range});
+    makeProperty({"duration", DataType_Float, &duration});
+    makeProperty({"sample-rate", DataType_Int, &sampleRate});
+    makeProperty({"sample-bits", DataType_Int, &sampleBits});
 }
 //--------------------------------------------------------------
 void OutputOperation::validate()
@@ -487,27 +343,4 @@ void OutputOperation::validate()
 OperationData OutputOperation::sample(size_t index, const Time& t)
 {
     return sampleInput(index, t);
-}
-
-void OutputOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = range;
-    if (i==1)
-        value = duration;
-    if (i==2)
-        value = sampleRate;
-    if (i==3)
-        value = sampleBits;
-}
-void OutputOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        range = value;
-    if (i==1)
-        duration = value;
-    if (i==2)
-        sampleRate = value;
-    if (i==3)
-        sampleBits = value;
 }

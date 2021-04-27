@@ -6,9 +6,9 @@
 //--------------------------------------------------------------
 Oscillator::Oscillator()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float}, {
-            {"freq",DataType_Float},
-            {"ampl",DataType_Float}});
+    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeProperty({"freq", DataType_Float, &freq});
+    makeProperty({"ampl", DataType_Float, &ampl});
 }
 //--------------------------------------------------------------
 void Oscillator::validate()
@@ -42,19 +42,4 @@ OperationData Oscillator::sample(size_t index, const Time& t)
     else
         data.fvec[0] = std::sin(phase * 2.0f * 3.141592f) * am;
     return data;
-}
-
-void Oscillator::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = freq;
-    else if (i==1)
-        value = ampl;
-}
-void Oscillator::setProperty(size_t i, float value)
-{
-    if (i==0)
-        freq = value;
-    else if (i==1)
-        ampl = value;
 }

@@ -3,11 +3,11 @@
 //--------------------------------------------------------------
 EnvelopOperation::EnvelopOperation()
 {
-    initialize({}, {DataType_Float}, {
-            {"attack",DataType_Float},
-            {"decay",DataType_Float},
-            {"sustain",DataType_Float},
-            {"release",DataType_Float}});
+    initialize({}, {DataType_Float});
+    makeProperty({"attack", DataType_Float, &attack});
+    makeProperty({"decay", DataType_Float, &decay});
+    makeProperty({"sustain", DataType_Float, &sustain});
+    makeProperty({"release", DataType_Float, &release});
 }
 //--------------------------------------------------------------
 void EnvelopOperation::validate()
@@ -22,29 +22,6 @@ OperationData EnvelopOperation::sample(size_t index, const Time& t)
     data.count = output->count;
     data.fvec[0] = sampleADSR(t.t);
     return data;
-}
-
-void EnvelopOperation::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = attack;
-    else if (i==1)
-        value = decay;
-    else if (i==2)
-        value = sustain;
-    else if (i==3)
-        value = release;
-}
-void EnvelopOperation::setProperty(size_t i, float value)
-{
-    if (i==0)
-        attack = value;
-    else if (i==1)
-        decay = value;
-    else if (i==2)
-        sustain = value;
-    else if (i==3)
-        release = value;
 }
 
 float EnvelopOperation::sampleADSR(float t)

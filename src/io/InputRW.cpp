@@ -50,7 +50,7 @@ void loadFrom(JsonValue& root, VibratoFxEdit& vibrato, ArpeggioFxEdit& arpeggio)
     arpeggio.rateSampler.resetTime = jsonArpeggio.setPath("rate","reset").getNumeric();
     
     auto& jsonNotes = jsonArpeggio.setPath("notes");
-    unsigned count = jsonNotes.array.values.size();
+    unsigned count = jsonNotes.count();
     arpeggio.notes.resize(count);
     for(unsigned i = 0; i<count; ++i)
         arpeggio.notes[i] = jsonNotes[i].getNumeric();

@@ -54,7 +54,7 @@ struct SignalOperation
         float duration = 1.0f;
     };
 
-    using PropDesc = std::pair<std::string,OperationDataType>;
+    using PropDesc = std::tuple<std::string,OperationDataType,void*>;
 
     SignalOperation() = default;
     virtual ~SignalOperation() = default;
@@ -70,7 +70,6 @@ struct SignalOperation
 
     SignalOperation* getInputOperation(size_t index);
 
-    void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output, const std::vector<PropDesc>& props);
     void update();
     OperationData sampleInput(size_t index, const Time& t);
 
@@ -89,14 +88,14 @@ struct SignalOperation
 
     bool hasCustomData() const;
     
-    virtual void getProperty(size_t i, std::string& value) const;
-    virtual void getProperty(size_t i, float& value) const;
-    virtual void getProperty(size_t i, int& value) const;
-    virtual void getProperty(size_t i, bool& value) const;
-    virtual void setProperty(size_t i, const std::string& value);
-    virtual void setProperty(size_t i, float value);
-    virtual void setProperty(size_t i, int value);
-    virtual void setProperty(size_t i, bool value);
+    void getProperty(size_t i, std::string& value) const;
+    void getProperty(size_t i, float& value) const;
+    void getProperty(size_t i, int& value) const;
+    void getProperty(size_t i, bool& value) const;
+    void setProperty(size_t i, const std::string& value);
+    void setProperty(size_t i, float value);
+    void setProperty(size_t i, int value);
+    void setProperty(size_t i, bool value);
 
     virtual void saveCustomData(JsonValue& json);
     virtual void loadCustomData(JsonValue& json);
@@ -105,6 +104,8 @@ struct SignalOperation
     static void remConnection(SignalOperation* op, size_t index);
 
 protected:
+    void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output);
+    void makeProperty(const PropDesc& property);
     bool _hasCustomData = false;
 
 private:

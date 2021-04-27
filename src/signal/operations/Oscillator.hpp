@@ -10,9 +10,6 @@ struct Oscillator : public SignalOperation
     Oscillator();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float freq = 440.0f;
     float ampl = 1.0f;

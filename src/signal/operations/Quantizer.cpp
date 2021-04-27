@@ -5,8 +5,8 @@
 //--------------------------------------------------------------
 Quantizer::Quantizer()
 {
-    initialize({DataType_Float,DataType_Int},{DataType_Float}, {
-            {"quantity",DataType_Float}});
+    initialize({DataType_Float,DataType_Int},{DataType_Float});
+    makeProperty({"quantity", DataType_Int, &quantity});
 }
 //--------------------------------------------------------------
 void Quantizer::validate()
@@ -43,15 +43,4 @@ OperationData Quantizer::sample(size_t index, const Time& t)
     }
 
     return data;
-}
-
-void Quantizer::getProperty(size_t i, float& value) const
-{
-    if(i==0)
-        value = quantity;
-}
-void Quantizer::setProperty(size_t i, float value)
-{
-    if(i==0)
-        quantity = value;
 }

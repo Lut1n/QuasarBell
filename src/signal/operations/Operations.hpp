@@ -10,9 +10,6 @@ struct FloatInput : public SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
-
     float value = 0.0;
 };
 
@@ -22,9 +19,6 @@ struct CubicSampler : public SignalOperation
     CubicSampler();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float value = 0.0;
     float speed = 0.0;
@@ -40,9 +34,6 @@ struct PolynomialSampler : public SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
-    
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;
 
@@ -57,9 +48,6 @@ struct AddOperation : public SignalOperation
     AddOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -71,9 +59,6 @@ struct SubOperation : public SignalOperation
     SubOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -85,9 +70,6 @@ struct MultOperation : SignalOperation
     MultOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -99,9 +81,6 @@ struct DivOperation : SignalOperation
     DivOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -113,9 +92,6 @@ struct ClampOperation : SignalOperation
     ClampOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float input1 = 0.0f;
     float minVal = 0.0f;
@@ -136,9 +112,6 @@ struct TimeScale : SignalOperation
     TimeScale();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float delay = 0.0;
     float scale = 1.0;
@@ -150,9 +123,6 @@ struct OutputOperation : SignalOperation
     OutputOperation();
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-    
-    void getProperty(size_t i, float& value) const override;
-    void setProperty(size_t i, float value) override;
 
     float range = 1.0;
     float duration = 1.0;

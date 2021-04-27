@@ -3,12 +3,12 @@
 //--------------------------------------------------------------
 FreqFilter::FreqFilter()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float,DataType_Float}, {
-            {"offset",DataType_Float},
-            {"length",DataType_Float},
-            {"minGain",DataType_Float},
-            {"maxGain",DataType_Float},
-            {"factor",DataType_Float}});
+    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float,DataType_Float});
+    makeProperty({"offset",DataType_Float, &offset});
+    makeProperty({"length",DataType_Float, &length});
+    makeProperty({"minGain",DataType_Float, &minGain});
+    makeProperty({"maxGain",DataType_Float, &maxGain});
+    makeProperty({"factor",DataType_Float, &factor});
 }
 //--------------------------------------------------------------
 void FreqFilter::validate()
@@ -48,31 +48,4 @@ OperationData FreqFilter::sample(size_t index, const Time& t)
         data.fvec[0] = freq;
     }
     return data;
-}
-
-void FreqFilter::getProperty(size_t i, float& value) const
-{
-    if (i==0)
-        value = offset;
-    else if (i==1)
-        value = length;
-    else if (i==2)
-        value = minGain;
-    else if (i==3)
-        value = maxGain;
-    else if (i==4)
-        value = factor;
-}
-void FreqFilter::setProperty(size_t i, float value)
-{
-    if (i==0)
-        offset = value;
-    else if (i==1)
-        length = value;
-    else if (i==2)
-        minGain = value;
-    else if (i==3)
-        maxGain = value;
-    else if (i==4)
-        factor = value;
 }

@@ -75,23 +75,18 @@ public:
     
     void makeCurrent(GuiComponent* component);
     
-    // double getTime() const;
-    
     void open();
     void close();
     
-    //bool shouldClose();
     void display();
     
     bool hasEvent();
     KeyEvent popEvent();
     
-    static void key_callback(/*GLFWwindow* window, */int key, int scancode, int action, int mods);
+    static void key_callback(int key, int scancode, int action, int mods);
 
 private:
     void ioMenuItem(const char* text, const std::string& default_filepath, UserFileInput& fileinput, UserFileInput::Req req);
-
-    //static void error_callback(int error, const char* description);
 
 public:
     AppState appState;
@@ -100,7 +95,6 @@ public:
 
 private:
     AboutPanel _aboutPanel;
-    //GLFWwindow* _window = nullptr;
     GuiComponent* _currentComponent = nullptr;
     
     static std::list<KeyEvent> s_keyEvents;

@@ -113,7 +113,7 @@ struct fmt_ck_t : public ck_data_t
     DECLARE_RIFF_CK_SZ(16)
     
     u32 freq = 44100;
-    u16 chanel = 1;
+    u16 channel = 1;
     u16 bitsPerSample = 16;
 
     void setup(u32 frequency = 44100, u16 sampleSize = 16)
@@ -125,11 +125,11 @@ struct fmt_ck_t : public ck_data_t
     virtual void write(Output& output)
     {
         u16 audio_fmt = 1; // PCM
-        u16 bytePerBloc = chanel * bitsPerSample/8;
+        u16 bytePerBloc = channel * bitsPerSample/8;
         u32 bytePerSec = freq * bytePerBloc;
         
         owrite(output, audio_fmt);
-        owrite(output, chanel);
+        owrite(output, channel);
         owrite(output, freq);
         owrite(output, bytePerSec);
         owrite(output, bytePerBloc);

@@ -5,10 +5,10 @@
 //--------------------------------------------------------------
 StepOperation::StepOperation()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float}, {
-            {"cond",DataType_Float},
-            {"then",DataType_Float},
-            {"else",DataType_Float}});
+    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeProperty({"edge", DataType_Float, &edge});
+    makeProperty({"then", DataType_Float, &thenValue});
+    makeProperty({"else", DataType_Float, &elseValue});
 }
 //--------------------------------------------------------------
 void StepOperation::validate()
@@ -34,23 +34,4 @@ OperationData StepOperation::sample(size_t index, const Time& t)
 
     data.fvec[0] = test > ed ? tv : ev;
     return data;
-}
-
-void StepOperation::getProperty(size_t i, float& value) const
-{
-    if(i==0)
-        value = edge;
-    if(i==1)
-        value = thenValue;
-    if(i==2)
-        value = elseValue;
-}
-void StepOperation::setProperty(size_t i, float value)
-{
-    if(i==0)
-        edge = value;
-    if(i==1)
-        thenValue = value;
-    if(i==2)
-        elseValue = value;
 }

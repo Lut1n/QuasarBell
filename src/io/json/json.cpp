@@ -44,7 +44,7 @@ size_t JsonValue::count() const
 //--------------------------------------------------------------
 bool JsonValue::has(int i) const
 {
-    return i>=0 && i<array.values.size();
+    return i>=0 && i<count();
 }
 //--------------------------------------------------------------
 bool JsonValue::has(const std::string& key) const

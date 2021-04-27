@@ -3,6 +3,20 @@
 #include <algorithm>
 
 
+namespace qb
+{
+    template<typename Ty>
+    Ty& getPropertyValueRef(SignalOperation::PropDesc& property)
+    {
+        return *reinterpret_cast<Ty*>(std::get<2>(property));
+    }
+    template<typename Ty>
+    const Ty& getPropertyValueRef(const SignalOperation::PropDesc& property)
+    {
+        return *reinterpret_cast<Ty*>(std::get<2>(property));
+    }
+};
+
 //--------------------------------------------------------------
 OperationDataType SignalOperation::getInputType(size_t index) const
 {
@@ -75,7 +89,7 @@ OperationData SignalOperation::sampleInput(size_t index, const Time& t)
 }
 
 //--------------------------------------------------------------
-void SignalOperation::initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output, const std::vector<PropDesc>& props)
+void SignalOperation::initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output)
 {
     inputs.resize(input.size());
     for (int i=0; i<inputs.size(); ++i)
@@ -91,7 +105,12 @@ void SignalOperation::initialize(const std::vector<OperationDataType>& input, co
         outputs[i].index = 0;
         outputs[i].operation = nullptr;
     }
-    propDescs = props;
+}
+
+//--------------------------------------------------------------
+void SignalOperation::makeProperty(const PropDesc& property)
+{
+    propDescs.push_back(property);
 }
 
 //--------------------------------------------------------------
@@ -101,7 +120,7 @@ void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalO
     
     if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
     {
-        std::cout << "create connection " << std::hex << src << "#" << srcIdx << " - " << std::hex << dst << "#" << dstIdx << std::endl;
+        // std::cout << "create connection " << std::hex << src << "#" << srcIdx << " - " << std::hex << dst << "#" << dstIdx << std::endl;
         src->outputs[srcIdx].operation = dst;
         src->outputs[srcIdx].index = dstIdx;
         
@@ -165,38 +184,47 @@ size_t SignalOperation::getPropertyCount() const
 OperationDataType SignalOperation::getPropertyType(size_t i) const
 {
     if(i >= 0 && i < propDescs.size())
-        return propDescs[i].second;
+        return std::get<1>(propDescs[i]);
     return DataType_Error;
 }
 std::string SignalOperation::getPropertyName(size_t i) const
 {
     if(i >= 0 && i < propDescs.size())
-        return propDescs[i].first;
+        return std::get<0>(propDescs[i]);
     return "None";
 }
+
 void SignalOperation::getProperty(size_t i, std::string& value) const
 {
+    value = qb::getPropertyValueRef<std::string>(propDescs[i]);
 }
 void SignalOperation::getProperty(size_t i, float& value) const
 {
+    value = qb::getPropertyValueRef<float>(propDescs[i]);
 }
 void SignalOperation::getProperty(size_t i, int& value) const
 {
+    value = qb::getPropertyValueRef<int>(propDescs[i]);
 }
 void SignalOperation::getProperty(size_t i, bool& value) const
 {
+    value = qb::getPropertyValueRef<bool>(propDescs[i]);
 }
 void SignalOperation::setProperty(size_t i, const std::string& value)
 {
+    qb::getPropertyValueRef<std::string>(propDescs[i]) = value;
 }
 void SignalOperation::setProperty(size_t i, float value)
 {
+    qb::getPropertyValueRef<float>(propDescs[i]) = value;
 }
 void SignalOperation::setProperty(size_t i, int value)
 {
+    qb::getPropertyValueRef<int>(propDescs[i]) = value;
 }
 void SignalOperation::setProperty(size_t i, bool value)
 {
+    qb::getPropertyValueRef<bool>(propDescs[i]) = value;
 }
 void SignalOperation::saveCustomData(JsonValue& json)
 {
