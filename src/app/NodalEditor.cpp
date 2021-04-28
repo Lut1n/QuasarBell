@@ -10,14 +10,14 @@
 #include "gui/nodal/EnvelopNode.hpp"
 
 
-#include "io/FileIO.hpp"
-#include "io/SignalRW.hpp"
+#include "readerwriter/FileIO.hpp"
+#include "readerwriter/SignalRW.hpp"
 #include "signal/WavExporter.hpp"
-#include "io/SignalOperationsRW.hpp"
+#include "readerwriter/SignalOperationsRW.hpp"
 
 #include "signal/operations/OperationType.hpp"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 App* App::s_instance = nullptr;
 

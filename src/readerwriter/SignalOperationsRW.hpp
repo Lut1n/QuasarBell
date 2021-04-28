@@ -1,7 +1,7 @@
 #ifndef JSON_SIGNAL_OPERATIONS_H
 #define JSON_SIGNAL_OPERATIONS_H
 
-#include "io/json/json.hpp"
+#include "json/json.hpp"
 // #include "signal/operations/SignalOperation.hpp"
 
 struct OperationCollection;

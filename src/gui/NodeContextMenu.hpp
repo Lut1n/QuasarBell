@@ -4,7 +4,7 @@
 #include "gui/Gui.hpp"
 
 #include "signal/operations/OperationType.hpp"
-#include "UI/UiNodeBoard.h"
+#include "ui/UiNodeBoard.h"
 
 //--------------------------------------------------------------
 class NodeContextMenu : public GuiComponent

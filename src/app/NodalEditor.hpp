@@ -5,14 +5,14 @@
 #include "gui/PostEffect.hpp"
 #include "gui/InputEffect.hpp"
 
-#include "Font/GlyphRenderer.h"
-#include "UI/UiSystem.h"
-#include "UI/UiForm.h"
-#include "UI/UiNode.h"
-#include "UI/UiText.h"
-#include "UI/UiInput.h"
-#include "UI/UiButton.h"
-#include "UI/UiNodeBoard.h"
+#include "font/GlyphRenderer.h"
+#include "ui/UiSystem.h"
+#include "ui/UiForm.h"
+#include "ui/UiNode.h"
+#include "ui/UiText.h"
+#include "ui/UiInput.h"
+#include "ui/UiButton.h"
+#include "ui/UiNodeBoard.h"
 
 #include <unordered_map>
 

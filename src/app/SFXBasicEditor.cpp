@@ -1,9 +1,7 @@
 #include "SFXBasicEditor.hpp"
 
-#include "io/FileIO.hpp"
-#include "io/SignalRW.hpp"
-#include "io/InputRW.hpp"
-#include "io/PostRW.hpp"
+#include "readerwriter/FileIO.hpp"
+#include "readerwriter/SignalRW.hpp"
 #include "signal/WavExporter.hpp"
 
 //--------------------------------------------------------------

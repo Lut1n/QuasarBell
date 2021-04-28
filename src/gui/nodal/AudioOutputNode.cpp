@@ -5,11 +5,11 @@
 
 #include "imgui.h"
 
-#include "App.hpp"
+#include "app/App.hpp"
 
 #include <string>
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, AudioOutputNode> audiooutput_node_factory(qb::OperationType_AudioOutput);
 

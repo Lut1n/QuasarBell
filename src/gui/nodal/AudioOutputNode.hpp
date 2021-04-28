@@ -6,7 +6,7 @@
 
 #include "gui/nodal/SignalOperationNode.hpp"
 #include "signal/operations/Operations.hpp"
-#include "render/AudioRenderer.hpp"
+#include "audio/AudioRenderer.hpp"
 
 struct AudioOutputNode : public SignalOperationNode
 {

@@ -66,7 +66,6 @@ float SignalOperationNode::s_imgui_sampler(void* data, int idx)
 void SignalOperationNode::drawPreview(const Rect& previewArea)
 {
     const float sample_count = _preview.size();
-    getOperation()->validate();
     RenderInterface::setColor(0x777777FF);
     Rect target = previewArea + parentPosition + position;
     RenderInterface::fill(target.p0, target.p1);
@@ -75,6 +74,7 @@ void SignalOperationNode::drawPreview(const Rect& previewArea)
 
     if(_hasChange)
     {
+        getOperation()->validateGraph();
         float minVal = 100000.0; float maxVal = -100000.0;
         s_imgui_sampler_set_count(sample_count);
         for(size_t i=0; i<sample_count; ++i)

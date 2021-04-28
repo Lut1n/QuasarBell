@@ -1,11 +1,11 @@
-#include "App.hpp"
-#include "Synth.hpp"
-#include "SFXBasicEditor.hpp"
-#include "NodalEditor.hpp"
+#include "app/App.hpp"
+#include "app/Synth.hpp"
+#include "app/SFXBasicEditor.hpp"
+#include "app/NodalEditor.hpp"
 
-#include "GL/RenderInterface.h"
-#include "Font/GlyphRenderer.h"
-#include "UI/UiSystem.h"
+#include "graphics/RenderInterface.h"
+#include "font/GlyphRenderer.h"
+#include "ui/UiSystem.h"
 
 //--------------------------------------------------------------
 int runQuasarBell(int argc, char* argv[])

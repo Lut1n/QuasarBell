@@ -1,27 +1,27 @@
-#include "GL/RenderInterface.h"
+#include "graphics/RenderInterface.h"
 
 //--------------------------------------------------------------
 // Append glad source code here
 #include "../../thirdparty/glad/src/glad.c"
 
-#include "GL/GlError.h"
+#include "graphics/GlError.h"
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <vector>
 
-#include "UI/UiSystem.h"
+#include "ui/UiSystem.h"
 
 unsigned RenderInterface::s_currentTarget = 0;
 unsigned RenderInterface::s_color = 0x000000FF;
 float RenderInterface::s_thickness = 1.0f;
 unsigned RenderInterface::s_precision = 1;
 
-#include "GL/RenderableTexture.h"
-#include "GL/GlQuad.h"
-#include "GL/GlSprite.h"
-#include "GL/GlQuadShader.h"
-#include "GL/GlSpriteShader.h"
+#include "graphics/RenderableTexture.h"
+#include "graphics/GlQuad.h"
+#include "graphics/GlSprite.h"
+#include "graphics/GlQuadShader.h"
+#include "graphics/GlSpriteShader.h"
 
 #include "imgui.h"
 #include "gui/imgui_impl_glfw.h"

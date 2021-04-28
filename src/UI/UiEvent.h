@@ -1,7 +1,7 @@
 #ifndef UI_EVENT_H
 #define UI_EVENT_H
 
-#include "Core/Vec2.h"
+#include "core/Vec2.h"
 
 struct UiEvent
 {

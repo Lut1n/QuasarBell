@@ -3,7 +3,7 @@
 
 #include "imgui.h"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, MixNode> mix_node_factory(qb::OperationType_Mix);
 

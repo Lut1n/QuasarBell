@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-#include "UI/UiNode.h"
+#include "ui/UiNode.h"
 
 //--------------------------------------------------------------
 NodePropertiesEdit::NodePropertiesEdit()

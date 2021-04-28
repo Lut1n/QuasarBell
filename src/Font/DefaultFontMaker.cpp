@@ -1,4 +1,4 @@
-#include "Font/DefaultFontMaker.h"
+#include "font/DefaultFontMaker.h"
 
 void DefaultFontMaker::generateCharset()
 {

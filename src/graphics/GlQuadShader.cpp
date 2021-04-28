@@ -1,6 +1,6 @@
-#include "GL/GlQuadShader.h"
+#include "graphics/GlQuadShader.h"
 
-#include "GL/GlError.h"
+#include "graphics/GlError.h"
 
 static const char* vert_quad_shader_text =
 "#version 330\n"

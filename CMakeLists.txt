@@ -12,10 +12,10 @@ find_package(OpenAL REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    src/App.hpp
-    src/SFXBasicEditor.hpp
-    src/NodalEditor.hpp
-    src/Synth.hpp
+    src/app/App.hpp
+    src/app/SFXBasicEditor.hpp
+    src/app/NodalEditor.hpp
+    src/app/Synth.hpp
     src/gui/Gui.hpp
     src/gui/UserFileInput.hpp
     src/gui/InputEffect.hpp
@@ -42,18 +42,16 @@ add_executable(
     src/gui/nodal/PolynomialNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
-    src/io/json/json.hpp
-    src/io/json/jsonrw.hpp
-    src/io/FileIO.hpp
-    src/io/SignalRW.hpp
-    src/io/InputRW.hpp
-    src/io/PostRW.hpp
-    src/io/RwHelpers.hpp
-    src/io/FileExplorer.hpp
-    src/io/SignalOperationsRW.hpp
-    src/render/AudioRenderer.hpp
-    src/render/Error.hpp
-    src/render/Format.hpp
+    src/json/json.hpp
+    src/json/jsonrw.hpp
+    src/readerwriter/FileIO.hpp
+    src/readerwriter/SignalRW.hpp
+    src/readerwriter/RwHelpers.hpp
+    src/readerwriter/FileExplorer.hpp
+    src/readerwriter/SignalOperationsRW.hpp
+    src/audio/AudioRenderer.hpp
+    src/audio/Error.hpp
+    src/audio/Format.hpp
     src/signal/LinearSamplers.hpp
     src/signal/Modulator.hpp
     src/signal/PcmData.hpp
@@ -72,40 +70,40 @@ add_executable(
     src/signal/operations/Waveform.hpp
     src/signal/operations/KeySampler.hpp
     src/signal/operations/Harmonics.hpp
-    src/Core/Vec2.h
-    src/Core/Factory.h
-    src/Core/Math.hpp
-    src/Core/PseudoRand.hpp
-    src/Font/DefaultFontMaker.h
-    src/Font/FontMaker.h
-    src/Font/GlyphRenderer.h
-    src/GL/GlError.h
-    src/GL/GlQuadShader.h
-    src/GL/GlSpriteShader.h
-    src/GL/GlQuad.h
-    src/GL/GlSprite.h
-    src/GL/RenderableTexture.h
-    src/GL/RenderInterface.h
-    src/UI/UiEvent.h
-    src/UI/UiSystem.h
-    src/UI/UiRect.h
-    src/UI/UiNode.h
-    src/UI/UiNodeBoard.h
-    src/UI/UiText.h
-    src/UI/UiInput.h
-    src/UI/UiContainer.h
-    src/UI/UiList.h
-    src/UI/UiButton.h
-    src/UI/UiSlider.h
-    src/UI/UiFrame.h
-    src/UI/UiForm.h
-    src/UI/UiPin.h
-    src/UI/UiConnections.h
+    src/core/Vec2.h
+    src/core/Factory.h
+    src/core/Math.hpp
+    src/core/PseudoRand.hpp
+    src/font/DefaultFontMaker.h
+    src/font/FontMaker.h
+    src/font/GlyphRenderer.h
+    src/graphics/GlError.h
+    src/graphics/GlQuadShader.h
+    src/graphics/GlSpriteShader.h
+    src/graphics/GlQuad.h
+    src/graphics/GlSprite.h
+    src/graphics/RenderableTexture.h
+    src/graphics/RenderInterface.h
+    src/ui/UiEvent.h
+    src/ui/UiSystem.h
+    src/ui/UiRect.h
+    src/ui/UiNode.h
+    src/ui/UiNodeBoard.h
+    src/ui/UiText.h
+    src/ui/UiInput.h
+    src/ui/UiContainer.h
+    src/ui/UiList.h
+    src/ui/UiButton.h
+    src/ui/UiSlider.h
+    src/ui/UiFrame.h
+    src/ui/UiForm.h
+    src/ui/UiPin.h
+    src/ui/UiConnections.h
     
     src/main.cpp
-    src/SFXBasicEditor.cpp
-    src/NodalEditor.cpp
-    src/Synth.cpp
+    src/app/SFXBasicEditor.cpp
+    src/app/NodalEditor.cpp
+    src/app/Synth.cpp
     src/gui/Gui.cpp
     src/gui/UserFileInput.cpp
     src/gui/InputEffect.cpp
@@ -132,16 +130,14 @@ add_executable(
     src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
     src/gui/imgui_impl_opengl3.cpp
-    src/io/json/json.cpp
-    src/io/json/jsonrw.cpp
-    src/io/FileIO.cpp
-    src/io/SignalRW.cpp
-    src/io/InputRW.cpp
-    src/io/PostRW.cpp
-    src/io/RwHelpers.cpp
-    src/io/FileExplorer.cpp
-    src/io/SignalOperationsRW.cpp
-    src/render/AudioRenderer.cpp
+    src/json/json.cpp
+    src/json/jsonrw.cpp
+    src/readerwriter/FileIO.cpp
+    src/readerwriter/SignalRW.cpp
+    src/readerwriter/RwHelpers.cpp
+    src/readerwriter/FileExplorer.cpp
+    src/readerwriter/SignalOperationsRW.cpp
+    src/audio/AudioRenderer.cpp
     src/signal/LinearSamplers.cpp
     src/signal/Modulator.cpp
     src/signal/PcmData.cpp
@@ -160,32 +156,32 @@ add_executable(
     src/signal/operations/Waveform.cpp
     src/signal/operations/KeySampler.cpp
     src/signal/operations/Harmonics.cpp
-    src/Core/Vec2.cpp
-    src/Core/Factory.cpp
-    src/Core/PseudoRand.cpp
-    src/Font/DefaultFontMaker.cpp
-    src/Font/FontMaker.cpp
-    src/Font/GlyphRenderer.cpp
-    src/GL/GlQuadShader.cpp
-    src/GL/GlSpriteShader.cpp
-    src/GL/GlQuad.cpp
-    src/GL/GlSprite.cpp
-    src/GL/RenderableTexture.cpp
-    src/GL/RenderInterfaceGlfw.cpp
-    src/UI/UiSystem.cpp
-    src/UI/UiRect.cpp
-    src/UI/UiNode.cpp
-    src/UI/UiNodeBoard.cpp
-    src/UI/UiText.cpp
-    src/UI/UiInput.cpp
-    src/UI/UiContainer.cpp
-    src/UI/UiList.cpp
-    src/UI/UiButton.cpp
-    src/UI/UiSlider.cpp
-    src/UI/UiFrame.cpp
-    src/UI/UiForm.cpp
-    src/UI/UiPin.cpp
-    src/UI/UiConnections.cpp
+    src/core/Vec2.cpp
+    src/core/Factory.cpp
+    src/core/PseudoRand.cpp
+    src/font/DefaultFontMaker.cpp
+    src/font/FontMaker.cpp
+    src/font/GlyphRenderer.cpp
+    src/graphics/GlQuadShader.cpp
+    src/graphics/GlSpriteShader.cpp
+    src/graphics/GlQuad.cpp
+    src/graphics/GlSprite.cpp
+    src/graphics/RenderableTexture.cpp
+    src/graphics/RenderInterfaceGlfw.cpp
+    src/ui/UiSystem.cpp
+    src/ui/UiRect.cpp
+    src/ui/UiNode.cpp
+    src/ui/UiNodeBoard.cpp
+    src/ui/UiText.cpp
+    src/ui/UiInput.cpp
+    src/ui/UiContainer.cpp
+    src/ui/UiList.cpp
+    src/ui/UiButton.cpp
+    src/ui/UiSlider.cpp
+    src/ui/UiFrame.cpp
+    src/ui/UiForm.cpp
+    src/ui/UiPin.cpp
+    src/ui/UiConnections.cpp
     
     thirdparty/imgui/imconfig.h
     thirdparty/imgui/imgui_demo.cpp

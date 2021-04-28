@@ -4,7 +4,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "UI/UiNode.h"
+#include "ui/UiNode.h"
 #include "signal/operations/SignalOperation.hpp"
 
 struct SignalOperationNode : public UiNode

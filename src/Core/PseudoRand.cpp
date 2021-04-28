@@ -1,4 +1,4 @@
-#include "Core/PseudoRand.hpp"
+#include "core/PseudoRand.hpp"
 
 //--------------------------------------------------------------
 namespace qb

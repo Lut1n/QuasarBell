@@ -1,6 +1,6 @@
-#include "UI/UiText.h"
+#include "ui/UiText.h"
 
-#include "GL/RenderInterface.h"
+#include "graphics/RenderInterface.h"
 
 UiText::UiText(const std::string& text, const vec2& position, float size, unsigned color)
     : UiElement(position)

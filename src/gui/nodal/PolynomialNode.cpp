@@ -3,7 +3,7 @@
 
 #include "imgui.h"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, PolynomialNode> polynomial_node_factory(qb::OperationType_Polynomial);
 

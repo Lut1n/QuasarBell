@@ -1,7 +1,7 @@
 #ifndef QUASARBELL_FILE_IO_H
 #define QUASARBELL_FILE_IO_H
 
-#include "io/json/json.hpp"
+#include "json/json.hpp"
 
 //--------------------------------------------------------------
 std::string loadTextFile(const std::string& filename);

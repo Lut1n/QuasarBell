@@ -1,4 +1,4 @@
-#include "UI/UiSlider.h"
+#include "ui/UiSlider.h"
 
 
 UiSlider::UiSlider(const vec2& position, const vec2& range)

@@ -1,4 +1,4 @@
-#include "io/RwHelpers.hpp"
+#include "readerwriter/RwHelpers.hpp"
 
 //--------------------------------------------------------------
 std::string toString(WaveEdit::Wave e)

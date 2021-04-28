@@ -1,6 +1,6 @@
-#include "GL/GlSpriteShader.h"
+#include "graphics/GlSpriteShader.h"
 
-#include "GL/GlError.h"
+#include "graphics/GlError.h"
 
 static const char* vert_spriteShader_text =
 "#version 330\n"

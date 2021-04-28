@@ -7,8 +7,8 @@
 #include <alc.h>
 
 #include "signal/Signal.hpp"
-#include "render/Error.hpp"
-#include "render/Format.hpp"
+#include "audio/Error.hpp"
+#include "audio/Format.hpp"
 
 //--------------------------------------------------------------
 Scene::Scene()

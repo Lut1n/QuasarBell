@@ -3,7 +3,7 @@
 #include <cmath> // sin
 #include <iostream>
 
-#include "io/json/Json.hpp"
+#include "json/Json.hpp"
 
 //--------------------------------------------------------------
 Harmonics::Harmonics()

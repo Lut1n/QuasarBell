@@ -1,7 +1,7 @@
 #ifndef UI_RECT_H
 #define UI_RECT_H
 
-#include "UI/UiSystem.h"
+#include "ui/UiSystem.h"
 
 struct UiRect : public UiElement
 {

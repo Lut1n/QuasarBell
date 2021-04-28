@@ -3,7 +3,7 @@
 #include <cmath> // sin
 #include <iostream>
 
-#include "Core/PseudoRand.hpp"
+#include "core/PseudoRand.hpp"
 
 //--------------------------------------------------------------
 Waveform::Waveform()

@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "UI/UiSystem.h"
+#include "ui/UiSystem.h"
 
-#include "UI/UiButton.h"
+#include "ui/UiButton.h"
 
 
 struct UiSlider : public UiButton

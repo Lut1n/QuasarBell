@@ -1,9 +1,9 @@
-#include "io/FileIO.hpp"
+#include "readerwriter/FileIO.hpp"
 
 #include <fstream>
 #include <filesystem>
 
-#include "io/json/jsonrw.hpp"
+#include "json/jsonrw.hpp"
 
 
 //--------------------------------------------------------------

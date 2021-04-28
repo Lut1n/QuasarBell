@@ -1,8 +1,8 @@
-#include "UI/UiPin.h"
+#include "ui/UiPin.h"
 
 #include <algorithm>
 
-#include "UI/UiConnections.h"
+#include "ui/UiConnections.h"
 
 UiPin::UiPin(UiNode* node, const std::string& label, const vec2& position, const vec2& size)
     : UiRect(position, size, 0x11AAAAFF)

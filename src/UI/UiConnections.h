@@ -4,9 +4,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "UI/UiSystem.h"
-#include "UI/UiRect.h"
-#include "UI/UiText.h"
+#include "ui/UiSystem.h"
+#include "ui/UiRect.h"
+#include "ui/UiText.h"
 
 struct UiPin;
 

@@ -1,6 +1,6 @@
-#include "UI/UiRect.h"
+#include "ui/UiRect.h"
 
-#include "GL/RenderInterface.h"
+#include "graphics/RenderInterface.h"
 
 UiRect::UiRect(const vec2& position, const vec2& size, unsigned color)
     : UiElement(position)

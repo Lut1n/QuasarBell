@@ -1,4 +1,4 @@
-#include "UI/UiInput.h"
+#include "ui/UiInput.h"
 
 
 UiInput::UiInput(const std::string& text, const vec2& position, const vec2& size)

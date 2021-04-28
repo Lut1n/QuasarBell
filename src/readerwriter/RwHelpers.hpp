@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "io/json/json.hpp"
-#include "Core/Vec2.h"
+#include "json/json.hpp"
+#include "core/Vec2.h"
 #include "gui/SignalEdit.hpp"
 
 //--------------------------------------------------------------

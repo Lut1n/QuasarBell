@@ -1,9 +1,9 @@
-#include "UI/UiSystem.h"
+#include "ui/UiSystem.h"
 
 #include <algorithm>
 
-#include "UI/UiConnections.h"
-#include "UI/UiNode.h"
+#include "ui/UiConnections.h"
+#include "ui/UiNode.h"
 
 static UiSystem s_uiSystemSingleton;
 

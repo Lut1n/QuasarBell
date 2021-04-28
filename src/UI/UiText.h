@@ -1,7 +1,7 @@
 #ifndef UI_TEXT_H
 #define UI_TEXT_H
 
-#include "UI/UiSystem.h"
+#include "ui/UiSystem.h"
 
 struct UiText : public UiElement
 {

@@ -3,7 +3,7 @@
 
 #include "imgui.h"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, CubicSamplerNode> linear_node_factory(qb::OperationType_CubicSampler);
 

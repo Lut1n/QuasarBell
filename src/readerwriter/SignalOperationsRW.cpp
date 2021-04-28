@@ -1,13 +1,13 @@
-#include "io/SignalOperationsRW.hpp"
+#include "readerwriter/SignalOperationsRW.hpp"
 
-#include "io/RwHelpers.hpp"
+#include "readerwriter/RwHelpers.hpp"
 
 #include "gui/nodal/SignalOperationNode.hpp"
 
 #include "signal/operations/OperationType.hpp"
-#include "NodalEditor.hpp"
+#include "app/NodalEditor.hpp"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 //--------------------------------------------------------------
 void saveInto(JsonValue& root, OperationCollection& collection, const OperationConnections& co)

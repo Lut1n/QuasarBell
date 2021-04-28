@@ -2,7 +2,7 @@
 #include "signal/operations/OperationType.hpp"
 
 #include "imgui.h"
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, AddSignalNode> add_node_factory(qb::OperationType_Add);
 static TypedFactory<SignalOperationNode, SubSignalNode> sub_node_factory(qb::OperationType_Sub);

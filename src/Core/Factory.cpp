@@ -1,4 +1,4 @@
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 std::unordered_map<size_t, BaseFactory*> BaseFactory::factories;
 

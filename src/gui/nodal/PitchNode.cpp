@@ -5,9 +5,9 @@
 
 #include "imgui.h"
 
-#include "App.hpp"
+#include "app/App.hpp"
 
-#include "Core/Factory.h"
+#include "core/Factory.h"
 
 static TypedFactory<SignalOperationNode, PitchNode> pitch_node_factory(qb::OperationType_Pitch);
 
