@@ -11,7 +11,7 @@ qb::Pcm16 Modulator::silent(float duration)
     auto& settings = AudioSettings::defaultSettings;
     
     qb::Pcm16 output;
-    output.resize(duration * settings.sampleRate);
+    output.resize((size_t)(duration * (float)settings.sampleRate));
     for(unsigned i=0;i<output.count();++i) output.set(i, 0.0);
     return output;
 }
@@ -26,7 +26,7 @@ qb::Pcm16 Modulator::generate(float freq, float duration, float ampl, float slop
     LinearGate gate(duration, slope_time);
     
     qb::Pcm16 output;
-    output.resize(duration * settings.sampleRate);
+    output.resize((size_t)(duration * (float)settings.sampleRate));
     
     for(unsigned i=0;i<output.count();++i)
     {
@@ -43,14 +43,14 @@ qb::Pcm16 Modulator::attack(float freq, float duration, float ampl, float ampl2,
     SinSampler signal(freq, ampl);
     
     qb::Pcm16 output;
-    output.resize(duration * settings.sampleRate);
+    output.resize((size_t)(duration * (float)settings.sampleRate));
     
-    float mid = 0.5 * duration;
+    float mid = 0.5f * duration;
     
-    for(unsigned i=0;i<output.count();++i)
+    for(size_t i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
-        float gate = t<mid ? (t/mid) : (1.0-(t-mid/mid))*ampl2;
+        float gate = t<mid ? (t/mid) : (1.f-(t-mid/mid))*ampl2;
         output.set(i, signal(oft_t + t) * gate);
     }
     return output;
@@ -63,12 +63,12 @@ qb::Pcm16 Modulator::release(float freq, float duration, float ampl, float oft_t
     SinSampler signal(freq, ampl);
     
     qb::Pcm16 output;
-    output.resize(duration * settings.sampleRate);
+    output.resize((size_t)(duration * (float)settings.sampleRate));
     
-    for(unsigned i=0;i<output.count();++i)
+    for(size_t i=0;i<output.count();++i)
     {
         float t = (float)i / (float)settings.sampleRate;
-        output.set(i, signal(oft_t + t) * (1.0-t/duration));
+        output.set(i, signal(oft_t + t) * (1.f-t/duration));
     }
     return output;
 }

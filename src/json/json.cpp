@@ -85,7 +85,7 @@ const JsonValue& JsonValue::operator[](const std::string& key) const
     }
     if(has(key))
     {
-        int i = array.at(key);
+        int i = (int)array.at(key);
         return array.values[i];
     }
     return s_nullVal;

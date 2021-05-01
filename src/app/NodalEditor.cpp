@@ -1,14 +1,9 @@
 #include "NodalEditor.hpp"
 
-#include "gui/nodal/AddSignalNode.hpp"
-#include "gui/nodal/FloatSignalNode.hpp"
-#include "gui/nodal/CubicSamplerNode.hpp"
-#include "gui/nodal/AudioOutputNode.hpp"
-#include "gui/nodal/OscillatorNode.hpp"
-#include "gui/nodal/QuantizerNode.hpp"
-#include "gui/nodal/MixNode.hpp"
-#include "gui/nodal/EnvelopNode.hpp"
+#include "core/Factory.h"
 
+#include "gui/nodal/SignalOperationNode.hpp"
+#include "gui/nodal/AudioOutputNode.hpp"
 
 #include "readerwriter/FileIO.hpp"
 #include "readerwriter/SignalRW.hpp"
@@ -17,7 +12,6 @@
 
 #include "signal/operations/OperationType.hpp"
 
-#include "core/Factory.h"
 
 App* App::s_instance = nullptr;
 
@@ -28,10 +22,10 @@ void OperationConnections::fill(UiConnections* ui, const OperationCollection& co
         auto co = link.second;
         auto pin1 = co.first;
         auto pin2 = co.second;
-        int id1 = coll.getId(dynamic_cast<SignalOperationNode*>(pin1->parentNode));
-        int id2 = coll.getId(dynamic_cast<SignalOperationNode*>(pin2->parentNode));
-        int idx1 = pin1->parentNode->getIndex(pin1);
-        int idx2 = pin2->parentNode->getIndex(pin2);
+        int id1 = (int)coll.getId(dynamic_cast<SignalOperationNode*>(pin1->parentNode));
+        int id2 = (int)coll.getId(dynamic_cast<SignalOperationNode*>(pin2->parentNode));
+        int idx1 = (int)pin1->parentNode->getIndex(pin1);
+        int idx2 = (int)pin2->parentNode->getIndex(pin2);
         if (pin1->multipleConnections)
             entries.push_back(Entry{id1,idx1,id2,idx2});
         else
@@ -65,7 +59,7 @@ void NodalEditorWorkSpace::onEvent(const KeyEvent& event)
 {
 }
 //--------------------------------------------------------------
-void NodalEditorWorkSpace::update(double t)
+void NodalEditorWorkSpace::update(float t)
 {
     if(!_ready)
     {
@@ -187,8 +181,8 @@ void NodalEditorWorkSpace::onConnect(UiPin* a, UiPin* b)
     auto* node2 = b->parentNode;
     bool node1_is_src = a->multipleConnections;
 
-    int node1_index = node1->getIndex(a);
-    int node2_index = node2->getIndex(b);
+    int node1_index = (int)node1->getIndex(a);
+    int node2_index = (int)node2->getIndex(b);
 
     SignalOperation* op1 = dynamic_cast<SignalOperationNode*>(node1)->getOperation();
     SignalOperation* op2 = dynamic_cast<SignalOperationNode*>(node2)->getOperation();
@@ -209,14 +203,14 @@ void NodalEditorWorkSpace::onDisconnect(UiPin* a, UiPin* b)
 
     if(node1_is_src && node2)
     {
-        int node2_index = node2->getIndex(b);
+        int node2_index = (int)node2->getIndex(b);
         auto* opnode = dynamic_cast<SignalOperationNode*>(node2);
         if (opnode)
             SignalOperation::remConnection(opnode->getOperation(), node2_index);
     }
     if(!node1_is_src && node1)
     {
-        int node1_index = node1->getIndex(a);
+        int node1_index = (int)node1->getIndex(a);
         auto* opnode = dynamic_cast<SignalOperationNode*>(node1);
         if (opnode)
             SignalOperation::remConnection(opnode->getOperation(), node1_index);

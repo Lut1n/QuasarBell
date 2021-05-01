@@ -29,8 +29,8 @@ OperationData Quantizer::sample(size_t index, const Time& t)
 
         if (qu > 0)
         {
-            int n = t.t * qu;
-            float rounded = ((float)n+0.5) / (float)qu;
+            int n = (int)(t.t * qu);
+            float rounded = ((float)n+0.5f) / (float)qu;
             Time t2 = t;
             t2.t = rounded;
             a = sampleInput(0, t2);

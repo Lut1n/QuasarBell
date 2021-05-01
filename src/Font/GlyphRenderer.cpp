@@ -157,8 +157,8 @@ void GlyphRenderer::addChar(char c)
 
 unsigned GlyphRenderer::size()
 {
-    unsigned count = _charset.size();
-    return _fontBaseSize * (std::sqrt((float)count * _glyphRatio) + 1.0);
+    unsigned count = (unsigned)_charset.size();
+    return (unsigned)(_fontBaseSize * (std::sqrt((float)count * _glyphRatio) + 1.0f));
 }
 
 void GlyphRenderer::generateUVs()
@@ -203,7 +203,7 @@ void GlyphRenderer::renderTexture(unsigned /*srcTarget*/)
     
     Rect dst;
     dst.p0 = vec2(0.0, 0.0);
-    dst.p1 = vec2(size(), size());
+    dst.p1 = vec2((float)size(), (float)size());
     
     RenderInterface::setColor(0xFFFFFFFF);
     RenderInterface::copy(_atlasTexture, uv, dst);
@@ -211,5 +211,5 @@ void GlyphRenderer::renderTexture(unsigned /*srcTarget*/)
 
 vec2 GlyphRenderer::computeSize(const std::string& str, float size)
 {
-    return vec2( str.size(), mix(1.f, _glyphRatio, 0.5) ) * size;
+    return vec2( (float)str.size(), mix(1.f, _glyphRatio, 0.5f) ) * size;
 }

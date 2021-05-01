@@ -1,3 +1,4 @@
+#include "core/Factory.h"
 #include "app/App.hpp"
 #include "app/Synth.hpp"
 #include "app/SFXBasicEditor.hpp"
@@ -53,7 +54,7 @@ int runQuasarBell(int argc, char* argv[])
             toolPtr->onEvent(event);
         }
         
-        toolPtr->update( RenderInterface::getTime() );
+        toolPtr->update( (float)RenderInterface::getTime() );
         scene.update();
         gui.display();
     
@@ -73,6 +74,7 @@ int runQuasarBell(int argc, char* argv[])
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+    static BaseFactory default_factory;
     int ret = runQuasarBell(argc, argv);
     return ret;
 }

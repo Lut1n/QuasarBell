@@ -59,9 +59,9 @@ void GlSpriteShader::bindAttributes()
 {
     size_t v2Size = sizeof(float)*2;
     size_t attribSize = v2Size*2;
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, attribSize, (void*) 0);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) 0);
     GL_CHECKERROR("sprite shader bind attrib (pos ptr)");
-    glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, attribSize, (void*) v2Size);
+    glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) v2Size);
     GL_CHECKERROR("sprite shader bind attrib (uv ptr)");
     glEnableVertexAttribArray(vpos_location);
     GL_CHECKERROR("sprite shader bind attrib (vpos)");

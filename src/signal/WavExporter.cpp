@@ -151,7 +151,7 @@ struct wave_data_t : public ck_data_t
     
     virtual u32 size()
     {
-        return wave_data->size();
+        return (u32)wave_data->size();
     }
     
     virtual void write(Output& output)

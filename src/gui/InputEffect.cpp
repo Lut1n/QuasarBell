@@ -164,12 +164,12 @@ float ArpeggioFxEdit::sample(float t, float noteRef)
     
     float ef_rate = rateSampler(t);
     
-    int n = std::floor(t * ef_rate);
+    int n = (int)std::floor(t * ef_rate);
     
         n = n % notes.size();
     if(n < notes.size())
     {
-        return noteRef + pitchToFreq(notes[n]) - 440.f;
+        return noteRef + pitchToFreq((float)notes[n]) - 440.f;
     }
     return 0.0;
 }

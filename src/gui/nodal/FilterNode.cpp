@@ -35,10 +35,10 @@ void FilterNode::displayProperties()
     for(size_t i=0; i<100; ++i)
     {
         SignalOperation::Time time;
-        time.duration = 1.0;
+        time.duration = 1.f;
         time.t = (float)i/100.0f;
         time.sec = (float)i/100.0f;
-        time.elapsed = 0.01;
+        time.elapsed = 0.01f;
 
         buf[i] =getOperation()->sample(1, time).fvec[0];
     }

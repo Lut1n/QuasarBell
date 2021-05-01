@@ -1,6 +1,6 @@
 #include "core/Factory.h"
 
-std::unordered_map<size_t, BaseFactory*> BaseFactory::factories;
+std::array<BaseFactory*, 256> BaseFactory::factories = {};
 
 void BaseFactory::regFactory(size_t typeId, BaseFactory* factory)
 {

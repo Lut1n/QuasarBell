@@ -52,7 +52,7 @@ void GuiComponentGroup::add(GuiComponent* component)
 //--------------------------------------------------------------
 int GuiComponentGroup::count() const
 {
-    return components.size();
+    return (int)components.size();
 }
 //--------------------------------------------------------------
 GuiComponent* GuiComponentGroup::get(int i)

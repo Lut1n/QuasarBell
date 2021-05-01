@@ -3,18 +3,21 @@
 
 #include <cmath>
 
+#undef min
+#undef max
+
 //--------------------------------------------------------------
 namespace qb
 {
     inline float log2(float v)
     {
-        return std::log(v) / std::log(2.0);
+        return (float)(std::log(v) / std::log(2.0));
     }
 
     //--------------------------------------------------------------
     inline float pow2(float v)
     {
-        return std::pow(2, v);
+        return (float)std::pow(2, v);
     }
 
     //--------------------------------------------------------------

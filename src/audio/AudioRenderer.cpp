@@ -125,7 +125,7 @@ void SoundNode::load(const PcmDataBase& pcm)
     alGenBuffers(1, &_bufferID);
     ackErr("alGenBuffers");
     
-    alBufferData(_bufferID, getFormatAL(pcm.format), pcm.data(), pcm.size(), pcm.sampleRate);
+    alBufferData(_bufferID, getFormatAL(pcm.format), pcm.data(), (ALsizei)pcm.size(), (ALsizei)pcm.sampleRate);
     ackErr("alBufferData buffer 0");
     // Attach buffer 0 to source
     alSourcei(_sourceID, AL_BUFFER, _bufferID);
@@ -186,16 +186,16 @@ void SoundNode::updateStream()
     
     if(_bufferReady.size() > 0 && _PcmDatas.size() > 0)
     {
-        unsigned count = std::min(_bufferReady.size(), _PcmDatas.size());
-        for(unsigned i=0;i<count;++i)
+        size_t count = std::min(_bufferReady.size(), _PcmDatas.size());
+        for(size_t i=0;i<count;++i)
         {
-            alBufferData(_bufferReady[i], getFormatAL(_PcmDatas[i]->format), _PcmDatas[i]->data(), _PcmDatas[i]->size(), _PcmDatas[i]->sampleRate);
+            alBufferData(_bufferReady[i], getFormatAL(_PcmDatas[i]->format), _PcmDatas[i]->data(), (ALsizei)_PcmDatas[i]->size(), (ALsizei)_PcmDatas[i]->sampleRate);
             ackErr("alBufferData");
             alSourceQueueBuffers(_sourceID, 1, &_bufferReady[i]);
             ackErr("alSourceQueueBuffers");
         }
         
-        for(unsigned i=0;i<count; ++i)
+        for(size_t i=0;i<count; ++i)
         {
             _PcmDatas.erase(_PcmDatas.begin());
             _bufferReady.erase(_bufferReady.begin());
@@ -247,9 +247,7 @@ void MicroNode::updateImpl()
     ackErr("alListenerfv VELOCITY");
     
     size_t vec3Size = sizeof(vec3);
-    ALfloat orientation[6];
-    std::memcpy(orientation, _lookAt.v, vec3Size);
-    std::memcpy(orientation + vec3Size, _lookUp.v, vec3Size);
+    ALfloat orientation[6] = {_lookAt .x,_lookAt.y ,_lookAt.z ,_lookUp.x ,_lookUp.y ,_lookUp.z };
     alListenerfv(AL_ORIENTATION, orientation);
     ackErr("alListenerfv ORIENTATION");
 }

@@ -58,7 +58,7 @@ void BasicEditorWorkSpace::onEvent(const KeyEvent& event)
     _doPlay = event.key == 'a' && event.pressed;
 }
 //--------------------------------------------------------------
-void BasicEditorWorkSpace::update(double t)
+void BasicEditorWorkSpace::update(float t)
 {
     float duration = _components.amplitudeEdit->duration + _components.amplitudeEdit->release;
     _components.tremolo->freqSampler.duration = duration;
@@ -155,10 +155,10 @@ qb::Pcm16 BasicEditorWorkSpace::generate()
     float duration = ampl.duration + ampl.release;
     
     qb::Pcm16 output;
-    output.resize(duration * settings.sampleRate);
+    output.resize((size_t)(duration * settings.sampleRate));
     
     float phase = 0.0f;
-    float sample_t = 1.0 / settings.sampleRate;
+    float sample_t = 1.0f / settings.sampleRate;
     
     for(unsigned i=0;i<output.count();++i)
     {

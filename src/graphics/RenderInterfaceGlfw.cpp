@@ -89,7 +89,7 @@ static vec2 lastCursorPosition;
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    lastCursorPosition = vec2(xpos, ypos);
+    lastCursorPosition = vec2((float) xpos, (float) ypos);
     UiEvent evn;
     evn.type = UiEvent::TYPE_MOUSE_MOVE;
     evn.position = lastCursorPosition;
@@ -207,7 +207,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         GL_CHECKERROR("create render texture");
     }
     
-    unsigned idx = s_targets.size();
+    unsigned idx = (unsigned) s_targets.size();
     s_targets.push_back(target);
     return idx;
 }
@@ -279,7 +279,7 @@ void RenderInterface::line(float x1, float y1, float x2, float y2)
 
 void RenderInterface::line(const vec2& p1, const vec2& p2)
 {
-    vec2 vp = vec2(s_targets[s_currentTarget].width, s_targets[s_currentTarget].height);
+    vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     vec2 d = p2-p1;
     
     float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
@@ -294,7 +294,7 @@ void RenderInterface::line(const vec2& p1, const vec2& p2)
 }
 void RenderInterface::dot(const vec2& p)
 {
-    vec2 hThX(s_thickness * 0.5, 0.0);
+    vec2 hThX(s_thickness * 0.5f, 0.f);
     line(p - hThX, p + hThX);
 }
 void RenderInterface::arc(const vec2& ctr, float r, float a1 , float a2)
@@ -318,7 +318,7 @@ void RenderInterface::rect(const vec2& tl, const vec2& br)
 }
 void RenderInterface::fill(const vec2& tl, const vec2& br)
 {
-    vec2 vp = vec2(s_targets[s_currentTarget].width, s_targets[s_currentTarget].height);
+    vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
     s_quadShader->setup(colorf);
     GL_CHECKERROR("quad::setup --- quad::update");
@@ -334,17 +334,17 @@ void RenderInterface::copy(unsigned srcTarget, const Rect& srcRect, const Rect& 
 {
     if(s_targets[srcTarget].isWindow) return;
     
-    vec2 srcSize = vec2(s_targets[srcTarget].width, s_targets[srcTarget].height);
+    vec2 srcSize = vec2((float) s_targets[srcTarget].width, (float) s_targets[srcTarget].height);
     vec2 uv1 = srcRect.p0 / srcSize;
     vec2 uv2 = srcRect.p1 / srcSize;
     
     //uv1 = uv1 * vec2(1.0, -1.0);
     //uv2 = uv2 * vec2(1.0, -1.0);
     
-    uv1.y = 1.0 - uv1.y;
-    uv2.y = 1.0 - uv2.y;
+    uv1.y = 1.f - uv1.y;
+    uv2.y = 1.f - uv2.y;
     
-    vec2 vp = vec2(s_targets[s_currentTarget].width, s_targets[s_currentTarget].height);
+    vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
     s_spriteShader->setup(colorf, 0);
     GL_CHECKERROR("sprite::setup --- sprite::update");

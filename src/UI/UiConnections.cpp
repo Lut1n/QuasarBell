@@ -138,7 +138,7 @@ void UiConnections::drawLink(vec2 p1, vec2 p2)
     for(size_t i=0; i<=pointCount; ++i)
     {
         float x = (float)i / pointCount;
-        float y = x * x * (3.0 - 2.0 * x);
+        float y = x * x * (3.f - 2.f * x);
         vec2 l2;
         l2.x = (p2.x-p1.x) * x + p1.x;
         l2.y = (p2.y-p1.y) * y + p1.y;

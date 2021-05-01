@@ -2,6 +2,7 @@
 #define GUI_SIGNAL_OP_NODE_H
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include "ui/UiNode.h"

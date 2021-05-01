@@ -29,7 +29,7 @@ float PitchSelector::getFreq() const
 {
     constexpr int midi_semitones = 12;
     constexpr int midi_la440 = 69;
-    return pitchToFreq(getMidiIndex(), midi_la440, midi_semitones);
+    return pitchToFreq((float)getMidiIndex(), midi_la440, midi_semitones);
 }
 
 //--------------------------------------------------------------

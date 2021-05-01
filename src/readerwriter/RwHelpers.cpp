@@ -23,6 +23,6 @@ void toJson(JsonValue& json, const vec2& v)
 //--------------------------------------------------------------
 void jsonTo(JsonValue& json, vec2& v)
 {
-    v.x = json.setPath(0).getNumeric();
-    v.y = json.setPath(1).getNumeric();
+    v.x = (float) json.setPath(0).getNumeric();
+    v.y = (float) json.setPath(1).getNumeric();
 }

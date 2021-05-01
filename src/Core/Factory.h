@@ -1,8 +1,8 @@
 #ifndef QB_FACTORY_H
 #define QB_FACTORY_H
 
-#include <unordered_map>
-#include <string>
+#include <array>
+#include <cstddef> // size_t
 
 struct BaseFactory
 {
@@ -11,7 +11,7 @@ struct BaseFactory
 
     void regFactory(size_t typeId, BaseFactory* factory);
     
-    static std::unordered_map<size_t, BaseFactory*> factories;
+    static std::array<BaseFactory*, 256> factories;
 };
 
 template<typename Base>
@@ -21,7 +21,7 @@ struct Factory : public BaseFactory
 
     static Base* create(size_t typeId)
     {
-        if (factories.find(typeId) != factories.end())
+        if (typeId < factories.size() && factories[typeId] != nullptr)
         {
             return static_cast<Factory<Base>*>(factories[typeId])->create();
         }

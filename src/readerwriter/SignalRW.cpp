@@ -39,26 +39,26 @@ void loadFrom(JsonValue& root, VibratoFxEdit& vibrato, ArpeggioFxEdit& arpeggio)
     stringTo(jsonVibrato.setPath("wave","type").getString(), vibrato.wave.wave);
     
     vibrato.isEnabled = jsonVibrato.setPath("enable").getBoolean();
-    vibrato.freqSampler.value = jsonVibrato.setPath("frequency","value").getNumeric();
-    vibrato.freqSampler.speed = jsonVibrato.setPath("frequency","speed").getNumeric();
-    vibrato.freqSampler.resetTime = jsonVibrato.setPath("frequency","reset").getNumeric();
+    vibrato.freqSampler.value = (float)jsonVibrato.setPath("frequency","value").getNumeric();
+    vibrato.freqSampler.speed = (float) jsonVibrato.setPath("frequency","speed").getNumeric();
+    vibrato.freqSampler.resetTime = (float) jsonVibrato.setPath("frequency","reset").getNumeric();
     
-    vibrato.amplSampler.value = jsonVibrato.setPath("amplitude","value").getNumeric();
-    vibrato.amplSampler.speed = jsonVibrato.setPath("amplitude","speed").getNumeric();
-    vibrato.amplSampler.resetTime = jsonVibrato.setPath("amplitude","reset").getNumeric();
+    vibrato.amplSampler.value = (float) jsonVibrato.setPath("amplitude","value").getNumeric();
+    vibrato.amplSampler.speed = (float) jsonVibrato.setPath("amplitude","speed").getNumeric();
+    vibrato.amplSampler.resetTime = (float) jsonVibrato.setPath("amplitude","reset").getNumeric();
     
     
     auto& jsonArpeggio = root.setPath("sfx-edition","input-fx","arpeggio");
     arpeggio.isEnabled = jsonArpeggio.setPath("enable").getBoolean();
-    arpeggio.rateSampler.value = jsonArpeggio.setPath("rate","value").getNumeric();
-    arpeggio.rateSampler.speed = jsonArpeggio.setPath("rate","speed").getNumeric();
-    arpeggio.rateSampler.resetTime = jsonArpeggio.setPath("rate","reset").getNumeric();
+    arpeggio.rateSampler.value = (float) jsonArpeggio.setPath("rate","value").getNumeric();
+    arpeggio.rateSampler.speed = (float) jsonArpeggio.setPath("rate","speed").getNumeric();
+    arpeggio.rateSampler.resetTime = (float) jsonArpeggio.setPath("rate","reset").getNumeric();
     
     auto& jsonNotes = jsonArpeggio.setPath("notes");
-    unsigned count = jsonNotes.count();
+    size_t count = jsonNotes.count();
     arpeggio.notes.resize(count);
-    for(unsigned i = 0; i<count; ++i)
-        arpeggio.notes[i] = jsonNotes[i].getNumeric();
+    for(size_t i = 0; i<count; ++i)
+        arpeggio.notes[i] = (int)jsonNotes[(int)i].getNumeric();
 }
 //--------------------------------------------------------------
 void saveInto(JsonValue& root, RingModFxEdit& ringmod, TremoloFxEdit& tremolo)
@@ -92,26 +92,26 @@ void loadFrom(JsonValue& root, RingModFxEdit& ringmod, TremoloFxEdit& tremolo)
     stringTo(jsonRingmod.setPath("wave","type").getString(), ringmod.wave.wave);
     
     ringmod.isEnabled = jsonRingmod.setPath("enable").getBoolean();
-    ringmod.freqSampler.value = jsonRingmod.setPath("frequency","value").getNumeric();
-    ringmod.freqSampler.speed = jsonRingmod.setPath("frequency","speed").getNumeric();
-    ringmod.freqSampler.resetTime = jsonRingmod.setPath("frequency","reset").getNumeric();
+    ringmod.freqSampler.value = (float) jsonRingmod.setPath("frequency","value").getNumeric();
+    ringmod.freqSampler.speed = (float) jsonRingmod.setPath("frequency","speed").getNumeric();
+    ringmod.freqSampler.resetTime = (float) jsonRingmod.setPath("frequency","reset").getNumeric();
     
-    ringmod.amplSampler.value = jsonRingmod.setPath("amplitude","value").getNumeric();
-    ringmod.amplSampler.speed = jsonRingmod.setPath("amplitude","speed").getNumeric();
-    ringmod.amplSampler.resetTime = jsonRingmod.setPath("amplitude","reset").getNumeric();
+    ringmod.amplSampler.value = (float) jsonRingmod.setPath("amplitude","value").getNumeric();
+    ringmod.amplSampler.speed = (float) jsonRingmod.setPath("amplitude","speed").getNumeric();
+    ringmod.amplSampler.resetTime = (float) jsonRingmod.setPath("amplitude","reset").getNumeric();
     
     
     auto& jsonTremolo = root.setPath("sfx-edition","post-fx","tremolo");
     stringTo(jsonTremolo.setPath("wave","type").getString(), tremolo.wave.wave);
     
     tremolo.isEnabled = jsonTremolo.setPath("enable").getBoolean();
-    tremolo.freqSampler.value = jsonTremolo.setPath("frequency","value").getNumeric();
-    tremolo.freqSampler.speed = jsonTremolo.setPath("frequency","speed").getNumeric();
-    tremolo.freqSampler.resetTime = jsonTremolo.setPath("frequency","reset").getNumeric();
+    tremolo.freqSampler.value = (float) jsonTremolo.setPath("frequency","value").getNumeric();
+    tremolo.freqSampler.speed = (float) jsonTremolo.setPath("frequency","speed").getNumeric();
+    tremolo.freqSampler.resetTime = (float) jsonTremolo.setPath("frequency","reset").getNumeric();
     
-    tremolo.amplSampler.value = jsonTremolo.setPath("amplitude","value").getNumeric();
-    tremolo.amplSampler.speed = jsonTremolo.setPath("amplitude","speed").getNumeric();
-    tremolo.amplSampler.resetTime = jsonTremolo.setPath("amplitude","reset").getNumeric();
+    tremolo.amplSampler.value = (float) jsonTremolo.setPath("amplitude","value").getNumeric();
+    tremolo.amplSampler.speed = (float) jsonTremolo.setPath("amplitude","speed").getNumeric();
+    tremolo.amplSampler.resetTime = (float) jsonTremolo.setPath("amplitude","reset").getNumeric();
 }
 //--------------------------------------------------------------
 void saveInto(JsonValue& root, WaveEdit& wave, FrequencyEdit& freq, AmplitudeEdit& ampl)
@@ -138,25 +138,27 @@ void loadFrom(JsonValue& root, WaveEdit& wave, FrequencyEdit& freq, AmplitudeEdi
     stringTo(root.setPath("sfx-edition","signal","wave","type").getString(), wave.wave);
     
     auto& jsonFreq = root.setPath("sfx-edition","signal","frequency");
-    freq.pitch = jsonFreq.setPath("pitch").getNumeric();
-    freq.speed = jsonFreq.setPath("speed").getNumeric();
-    freq.acc = jsonFreq.setPath("acc").getNumeric();
-    freq.jerk = jsonFreq.setPath("jerk").getNumeric();
-    freq.resetTime = jsonFreq.setPath("reset").getNumeric();
+    freq.pitch = (float) jsonFreq.setPath("pitch").getNumeric();
+    freq.speed = (float) jsonFreq.setPath("speed").getNumeric();
+    freq.acc = (float) jsonFreq.setPath("acc").getNumeric();
+    freq.jerk = (float) jsonFreq.setPath("jerk").getNumeric();
+    freq.resetTime = (float) jsonFreq.setPath("reset").getNumeric();
 
     auto& jsonAmpl = root.setPath("sfx-edition","signal","amplitude");
-    ampl.attack = jsonAmpl.setPath("attack").getNumeric();
-    ampl.decay = jsonAmpl.setPath("decay").getNumeric();
-    ampl.sustain = jsonAmpl.setPath("sustain").getNumeric();
-    ampl.release = jsonAmpl.setPath("release").getNumeric();
-    ampl.duration = jsonAmpl.setPath("duration").getNumeric();
+    ampl.attack = (float) jsonAmpl.setPath("attack").getNumeric();
+    ampl.decay = (float) jsonAmpl.setPath("decay").getNumeric();
+    ampl.sustain = (float) jsonAmpl.setPath("sustain").getNumeric();
+    ampl.release = (float) jsonAmpl.setPath("release").getNumeric();
+    ampl.duration = (float) jsonAmpl.setPath("duration").getNumeric();
 }
 //--------------------------------------------------------------
 void writeInfo(JsonValue& root)
 {
+    struct tm buf;
     auto now = std::chrono::system_clock::now();
     auto t_c = std::chrono::system_clock::to_time_t(now);
-    std::stringstream date; date << std::put_time(std::localtime(&t_c), "%Y-%m-%d %X");
+    ::localtime_s(&buf, &t_c);
+    std::stringstream date; date << std::put_time(&buf, "%Y-%m-%d %X");
 
     std::string app = "QuasarBell (https://www.github.com/Lut1n/QuasarBell)";
 

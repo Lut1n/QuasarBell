@@ -64,7 +64,7 @@ class NodalEditorWorkSpace : public ToolWorkSpace, public UiConnections::Handler
 public:
     void init(App* app) override;
     void onEvent(const KeyEvent& event) override;
-    void update(double t) override;
+    void update(float t) override;
     void render() override;
     
     void onConnect(UiPin* a, UiPin* b) override;

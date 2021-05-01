@@ -68,7 +68,7 @@ void AudioOutputNode::displayProperties()
         {
             if (output.sampleRate == indexedRates[i])
             {
-                sampleRateIndex = i;
+                sampleRateIndex = (int)i;
                 break;
             }
         }
@@ -82,7 +82,7 @@ void AudioOutputNode::displayProperties()
         {
             if (output.sampleBits == indexedFormats[i])
             {
-                sampleFormatIndex = i;
+                sampleFormatIndex = (int)i;
                 break;
             }
         }
@@ -90,13 +90,13 @@ void AudioOutputNode::displayProperties()
 
     if (ImGui::Button(sampleRateNames[sampleRateIndex]))
     {
-        sampleRateIndex = (sampleRateIndex+1) % sampleRateCount;
+        sampleRateIndex = (sampleRateIndex+1) % (int)sampleRateCount;
         output.sampleRate = indexedRates[sampleRateIndex];
     }
     
     if (ImGui::Button(sampleFormatNames[sampleFormatIndex]))
     {
-        sampleFormatIndex = (sampleFormatIndex+1) % sampleFormatCount;
+        sampleFormatIndex = (sampleFormatIndex+1) % (int)sampleFormatCount;
         output.sampleBits = indexedFormats[sampleFormatIndex];
     }
 
@@ -141,9 +141,9 @@ void AudioOutputNode::generate(PcmDataBase& pcm)
         pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();*/
 
     pcm.sampleRate = (AudioSettings::SampleRate)output.sampleRate;
-    pcm.resize(duration * output.sampleRate);
+    pcm.resize((size_t)(duration * output.sampleRate));
     
-    float sample_t = 1.0 / output.sampleRate;
+    float sample_t = 1.f / (float)output.sampleRate;
     
     SignalOperation::Time time;
     time.duration = duration;

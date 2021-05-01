@@ -52,7 +52,7 @@ void GlQuadShader::bindAttributes()
 {
     size_t attribSize = sizeof(float)*2;
     // std::cout << "vpos_location = " << vpos_location << std::endl;
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, attribSize, (void*) 0);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) 0);
     GL_CHECKERROR("quad shader vertex attrib pointer");
     glEnableVertexAttribArray(vpos_location);
     GL_CHECKERROR("quad shader enable vertex attrib array");

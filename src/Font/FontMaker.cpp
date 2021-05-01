@@ -58,15 +58,15 @@ DotData DotData::mirrored(bool h, bool v)
 
 void FontMaker::drawCorner(const vec2& p, const CornerData& corner)
 {
-    float pad_f = 0.2;
+    float pad_f = 0.2f;
     float padding = pad_f * _size;
     float r = _radius * _size;
     float h = _size;
-    float w = h - padding * 2.0;
+    float w = h - padding * 2.f;
     
-    vec2 padded_p = p + vec2(padding,0.0) + vec2(corner.x * w, corner.y * h)*0.5;
+    vec2 padded_p = p + vec2(padding,0.f) + vec2(corner.x * w, corner.y * h)*0.5f;
     
-    float a_step = 1.57;
+    float a_step = 1.57f;
     
     float a1 = 0.0;
     float a2 = a1 + a_step;
@@ -86,27 +86,27 @@ void FontMaker::drawCorner(const vec2& p, const CornerData& corner)
 
 void FontMaker::drawDot(const vec2& p, float ix, float iy)
 {
-    float pad_f = 0.2;
+    float pad_f = 0.2f;
     float padding = pad_f * _size;
     float h = _size;
-    float w = h - padding * 2.0;
+    float w = h - padding * 2.0f;
     
-    float x1 = p.x + padding + ix * w * 0.5;
-    float y1 = p.y + iy * h * 0.5;
+    float x1 = p.x + padding + ix * w * 0.5f;
+    float y1 = p.y + iy * h * 0.5f;
     
     RenderInterface::dot(vec2(x1, y1));
 }
 
 void FontMaker::drawLine(const vec2& p, const LineData& line)
 {
-    float pad_f = 0.2;
+    float pad_f = 0.2f;
     float padding = pad_f * _size;
     float r = _radius * _size;
     float h = _size;
-    float w = h - padding * 2.0;
+    float w = h - padding * 2.0f;
     
-    vec2 pa = p + vec2(padding,0.f) + vec2(line.p0x,line.p0y)*vec2(w,h)*0.5;
-    vec2 pb = p + vec2(padding,0.f) + vec2(line.p1x,line.p1y)*vec2(w,h)*0.5;
+    vec2 pa = p + vec2(padding,0.f) + vec2(line.p0x,line.p0y)*vec2(w,h)*0.5f;
+    vec2 pb = p + vec2(padding,0.f) + vec2(line.p1x,line.p1y)*vec2(w,h)*0.5f;
     
     vec2 dif = pb - pa;
     

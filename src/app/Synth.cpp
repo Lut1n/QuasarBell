@@ -42,7 +42,7 @@ void SynthWorkSpace::init(App* app)
 //--------------------------------------------------------------
 void SynthWorkSpace::_onEventImpl(int keyId, bool pressed)
 {
-    int keyIndex = keyId - _firstKeyID;
+    int keyIndex = keyId - (int)_firstKeyID;
     if(pressed)
     {
         if(_keyStates[keyIndex] == KeyState::None)
@@ -76,7 +76,7 @@ void SynthWorkSpace::onEvent(const KeyEvent& event)
     }
 }
 //--------------------------------------------------------------
-void SynthWorkSpace::update(double t)
+void SynthWorkSpace::update(float t)
 {
     for(auto& e : _components.keyboard->events)
     {
@@ -91,28 +91,28 @@ void SynthWorkSpace::update(double t)
     gui.makeCurrent(&_components);
     _components.keyboard->reset();
 
-    float fracTime = 0.02;
+    float fracTime = 0.02f;
     
     for(unsigned keyIndex = 0; keyIndex < _keyStates.size(); ++keyIndex)
     {
-        int keyID = keyIndex + _firstKeyID;
+        int keyID = keyIndex + (int)_firstKeyID;
         
         if(_keyStates[keyIndex] == KeyState::Pressed)
         {
             _components.keyboard->setPressed(keyID);
-            qb::Pcm16 pcm = Modulator::attack(pitchToFreq(keyID), fracTime, 1.0f, 0.5f, _genTime);
+            qb::Pcm16 pcm = Modulator::attack(pitchToFreq((float)keyID), fracTime, 1.0f, 0.5f, _genTime);
             _toQueue.push_back(pcm);
             _keyStates[keyIndex] = KeyState::Maintained;
         }
         else if(_keyStates[keyIndex] == KeyState::Maintained)
         {
             _components.keyboard->setPressed(keyID);
-            qb::Pcm16 pcm = Modulator::generate(pitchToFreq(keyID), fracTime, 0.5f, 0.0f, _genTime);
+            qb::Pcm16 pcm = Modulator::generate(pitchToFreq((float) keyID), fracTime, 0.5f, 0.0f, _genTime);
             _toQueue.push_back(pcm);
         }
         else if(_keyStates[keyIndex] == KeyState::Released)
         {
-            qb::Pcm16 pcm = Modulator::release(pitchToFreq(keyID), fracTime, 0.5f, _genTime);
+            qb::Pcm16 pcm = Modulator::release(pitchToFreq((float) keyID), fracTime, 0.5f, _genTime);
             _toQueue.push_back(pcm);
             _keyStates[keyIndex] = KeyState::None;
         }

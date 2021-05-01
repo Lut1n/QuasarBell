@@ -75,7 +75,7 @@ float RingModFxEdit::sample(float t)
     float a = amplSampler(t);
     
     float signal = wave.sample(t * f);
-    float rt = (1.0-a) + (signal * 0.5 + 0.5) * a;
+    float rt = (1.f-a) + (signal * 0.5f + 0.5f) * a;
     return rt;
 }
 //--------------------------------------------------------------
@@ -149,7 +149,7 @@ float TremoloFxEdit::sample(float t)
     float a = amplSampler(t);
     
     float signal = wave.sample(t * f);
-    float rt = (1.0-a) + (signal * 0.5 + 0.5) * a;
+    float rt = (1.f-a) + (signal * 0.5f + 0.5f) * a;
     return rt;
 }
 //--------------------------------------------------------------

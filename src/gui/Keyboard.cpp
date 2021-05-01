@@ -94,8 +94,8 @@ void Keyboard::draw()
     float xOffset = ImGui::GetCursorScreenPos().x;
     float yOffset = ImGui::GetCursorScreenPos().y;
     
-    _keyWidth = avail / (_keys.size() * 7.0/12.0);
-    _keyHeight = 5.0 * _keyWidth;
+    _keyWidth = avail / ((float)_keys.size() * 7.0f/12.0f);
+    _keyHeight = 5.0f * _keyWidth;
     
     size_t bk_index = 0;
     size_t wk_index = 0;
@@ -106,10 +106,10 @@ void Keyboard::draw()
         if(io == 1 || io == 4 || io == 6 || io == 9 || io == 11)
         {
             _blackKeys[bk_index].id = _keyFirstIndex + i;
-            _blackKeys[bk_index].oft = xOffset - _keyWidth * 0.5;
+            _blackKeys[bk_index].oft = xOffset - _keyWidth * 0.5f;
             _blackKeys[bk_index].black = true;
-            _blackKeys[bk_index].color = ImGui::GetColorU32(ImVec4(0.0,0.0,0.0,1.0));
-            if(_keys[i]) _blackKeys[bk_index].color  = ImGui::GetColorU32(ImVec4(0.3,0.3,0.3,1.0));
+            _blackKeys[bk_index].color = ImGui::GetColorU32(ImVec4(0.0f,0.0f,0.0f,1.0f));
+            if(_keys[i]) _blackKeys[bk_index].color  = ImGui::GetColorU32(ImVec4(0.3f,0.3f,0.3f,1.0f));
             bk_index++;
         }
         else
@@ -117,8 +117,8 @@ void Keyboard::draw()
             _whiteKeys[wk_index].id = _keyFirstIndex + i;
             _whiteKeys[wk_index].oft = xOffset;
             _whiteKeys[bk_index].black = false;
-            _whiteKeys[wk_index].color = ImGui::GetColorU32(ImVec4(1.0,1.0,1.0,1.0));
-            if(_keys[i]) _whiteKeys[wk_index].color  = ImGui::GetColorU32(ImVec4(0.7,0.7,0.7,1.0));
+            _whiteKeys[wk_index].color = ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f));
+            if(_keys[i]) _whiteKeys[wk_index].color  = ImGui::GetColorU32(ImVec4(0.7f,0.7f,0.7f,1.0f));
             wk_index++;
             
             xOffset += _keyWidth;
@@ -130,11 +130,11 @@ void Keyboard::draw()
     auto imguiDrawList = ImGui::GetWindowDrawList();
     for(auto& kv : _whiteKeys)
     {
-        imguiDrawList->AddRectFilled(ImVec2(kv.oft, yOffset), ImVec2(kv.oft + _keyWidth - 1, yOffset + _keyHeight), kv.color, 0.0f);
+        imguiDrawList->AddRectFilled(ImVec2(kv.oft, yOffset), ImVec2(kv.oft + _keyWidth - 1.f, yOffset + _keyHeight), kv.color, 0.0f);
     }
     for(auto& kv : _blackKeys)
     {
-        imguiDrawList->AddRectFilled(ImVec2(kv.oft, yOffset), ImVec2(kv.oft + _keyWidth - 1, yOffset + 0.6 * _keyHeight), kv.color, 0.0f);
+        imguiDrawList->AddRectFilled(ImVec2(kv.oft, yOffset), ImVec2(kv.oft + _keyWidth - 1.f, yOffset + 0.6f * _keyHeight), kv.color, 0.0f);
     }
 }
 //--------------------------------------------------------------

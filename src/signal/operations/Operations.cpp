@@ -119,12 +119,12 @@ void PolynomialSampler::saveCustomData(JsonValue& json)
 void PolynomialSampler::loadCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("coefs");
-    count = jArray.count();
-    coefs.resize(count);
+    count = (int)jArray.count();
+    coefs.resize(jArray.count());
     int index = 0;
     for(auto& jcoef : jArray.array.values)
     {
-        coefs[index++] = jcoef.getNumeric();
+        coefs[index++] = (float)jcoef.getNumeric();
     }
 }
 //--------------------------------------------------------------
@@ -286,7 +286,7 @@ OperationData AbsOperation::sample(size_t index, const Time& t)
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
 
-    float val = a.type == DataType_Float ? a.fvec[0] : 0.0;
+    float val = a.type == DataType_Float ? a.fvec[0] : 0.f;
 
     data.type = output->type;
     data.count = output->count;
@@ -319,7 +319,7 @@ OperationData TimeScale::sample(size_t index, const Time& t)
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, time2);
 
-    data.fvec[0] = a.type == DataType_Float ? a.fvec[0] : 0.0;
+    data.fvec[0] = a.type == DataType_Float ? a.fvec[0] : 0.f;
     data.type = output->type;
     data.count = output->count;
     return data;

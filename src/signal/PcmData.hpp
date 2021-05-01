@@ -57,7 +57,7 @@ public:
 
     void set(size_t i, float s) override
     {
-        samples[i] = s * Max;
+        samples[i] = (Type)(s * Max);
     }
 
     size_t size() const override

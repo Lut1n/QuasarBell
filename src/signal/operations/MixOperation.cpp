@@ -28,6 +28,6 @@ OperationData MixOperation::sample(size_t index, const Time& t)
     data.type = output->type;
     data.count = output->count;
 
-    data.fvec[0] = in1 * (1.0-dt) + in2 * dt;
+    data.fvec[0] = in1 * (1.f-dt) + in2 * dt;
     return data;
 }

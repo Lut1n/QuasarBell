@@ -42,7 +42,7 @@ int first(const std::string& str, char c)
 //--------------------------------------------------------------
 int last(const std::string& str, char c)
 {
-	for(int i=str.size()-1; i>=0; --i)
+	for(int i=(int)str.size()-1; i>=0; --i)
 	{
 		if(str[i] == c)
 			return i;
@@ -210,7 +210,7 @@ std::pair<std::string,JsonValue> parsePair(const std::string& str)
 	int p1 = first(str, ':')-1;
 	int p2 = p1+2;
 	std::string before = substring(str, 0, p1);
-	std::string after = substring(str, p2, str.size()-p2);
+	std::string after = substring(str, p2, (int)str.size()-p2);
 
     std::string key = getContained(before);
 	JsonValue value = parse(after);
@@ -230,7 +230,7 @@ JsonValue parseObject(const std::string& str)
 		int pnext = nextValue(next); // first(next, ',');
 		if(pnext == -1)
 		{
-            auto pair = parsePair(substring(next, 0, next.size()));
+            auto pair = parsePair(substring(next, 0, (int)next.size()));
             v.array.add(pair.first, pair.second);
 			next = "";
 		}
@@ -238,7 +238,7 @@ JsonValue parseObject(const std::string& str)
 		{
             auto pair = parsePair(substring(next, 0, pnext));
             v.array.add(pair.first, pair.second);
-			next = substring(next, pnext+1, next.size()-pnext);	
+			next = substring(next, pnext+1, (int)next.size()-pnext);	
 		}
 	}
 
@@ -258,13 +258,13 @@ JsonValue parseArray(const std::string& str)
 		int pnext = nextValue(next); // first(next, ',');
 		if(pnext == -1)
 		{
-            arr.array.values.push_back( parse(substring(next, 0, next.size())) );
+            arr.array.values.push_back( parse(substring(next, 0, (int)next.size())) );
 			next = "";
 		}
 		else
 		{
             arr.array.values.push_back( parse(substring(next, 0, pnext)) );
-			next = substring(next, pnext+1, next.size()-pnext);	
+			next = substring(next, pnext+1, (int)next.size()-pnext);	
 		}
 	}
 	return arr;

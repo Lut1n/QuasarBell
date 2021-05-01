@@ -19,7 +19,7 @@ class ToolWorkSpace
 {
 public:
     virtual void init(App* app) = 0;
-    virtual void update(double t) = 0;
+    virtual void update(float t) = 0;
     virtual void onEvent(const KeyEvent& event) = 0;
     virtual void render() = 0;
 };

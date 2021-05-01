@@ -41,12 +41,12 @@ float EnvelopOperation::sampleADSR(float t)
     }
     else if(t < 1.0)
     {
-        rt = sustain * (1.0f-(t-release)/(1.0-release));
+        rt = sustain * (1.f-(t-release)/(1.f-release));
     }
     else
     {
         rt = 0.0f;
     }
-    rt = rt > 1.0 ? 1.0 : (rt<-0.0 ? 0.0 : rt);
+    rt = rt > 1.f ? 1.f : (rt<-0.f ? 0.f : rt);
     return rt;
 }

@@ -12,7 +12,7 @@
 //--------------------------------------------------------------
 inline float halfStep(int n, float baseFreq = La440)
 {
-    return baseFreq * std::pow(2.0, (double)(n)/12.0);
+    return baseFreq * (float)std::pow(2.0, (double)(n)/12.0);
 }
 
 //--------------------------------------------------------------
@@ -96,7 +96,7 @@ private:
     float _freq;
     float _ampl;
     
-    constexpr static float PI2 = 2.0 * 3.141592;
+    constexpr static float PI2 = 2.0f * 3.141592f;
 };
 
 //--------------------------------------------------------------
@@ -115,13 +115,13 @@ private:
 //--------------------------------------------------------------
 inline float freqToPitch(float freq, float la440Pitch = 69/*MIDI*/, float semitones = 12)
 {
-    return la440Pitch + semitones * qb::log2(freq / 440.0 );
+    return la440Pitch + semitones * (float)qb::log2(freq / 440.0f );
 }
 
 //--------------------------------------------------------------
 inline float pitchToFreq(float pitch, float la440Pitch = 69/*MIDI*/, float semitones = 12)
 {
-    return qb::pow2((pitch - la440Pitch) / semitones) * 440.0;
+    return (float)qb::pow2((pitch - la440Pitch) / semitones) * 440.0f;
 }
 
 #endif // QUASAR_BELL_SIGNAL_HPP

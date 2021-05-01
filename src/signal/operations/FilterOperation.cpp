@@ -24,22 +24,22 @@ OperationData FreqFilter::sample(size_t index, const Time& t)
     OperationData b = sampleInput(1, t);
     OperationData c = sampleInput(2, t);
 
-    float freq = a.type == DataType_Float ? a.fvec[0] : 440.0;
-    float ampl = b.type == DataType_Float ? b.fvec[0] : 1.0;
+    float freq = a.type == DataType_Float ? a.fvec[0] : 440.f;
+    float ampl = b.type == DataType_Float ? b.fvec[0] : 1.f;
     float fct = c.type == DataType_Float ? c.fvec[0] : factor;
     
     auto min = [](float f1, float f2) {return f1<f2?f1:f2;};
 
-    float gain = 0.0;
+    float gain = 0.f;
     if (length > 0.0)
-        gain = 1.0 - min(1.0, std::abs(freq - offset) / length);
+        gain = 1.f - min(1.f, std::abs(freq - offset) / length);
 
     if (index == 1)
     {
         data.type = output2->type;
         data.count = output2->count;
         float res = ampl + fct * (minGain + gain * (maxGain-minGain));
-        data.fvec[0] = res > 1.0 ? 1.0 : (res < 0.0 ? 0.0 : res);
+        data.fvec[0] = res > 1.f ? 1.f : (res < 0.f ? 0.f : res);
     }
     else
     {

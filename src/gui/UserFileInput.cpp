@@ -35,7 +35,7 @@ void UserFileInput::display()
             if (std::string::npos != last_slash_idx)
                 filepath.erase(0, last_slash_idx + 1);
         }
-        strcpy(_editBuffer, filepath.c_str());
+        strcpy_s(_editBuffer, 512, filepath.c_str());
         requestOpen = false;
     }
     
@@ -49,7 +49,7 @@ void UserFileInput::display()
             _explorer.goToParentDir();
         }
         ImGui::SameLine();
-        ImGui::TextColored(ImVec4(0.7, 0.7, 1, 1), "< parent");
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 1.f, 1.f), "< parent");
         ImGui::Separator();
         size_t count = _explorer.getItemCount();
         for(size_t i=0; i<count; ++i)
@@ -60,7 +60,7 @@ void UserFileInput::display()
                 if(ImGui::Selectable(info.name.c_str(), info.name == filepath))
                 {
                     filepath = info.name;
-                    strcpy(_editBuffer, filepath.c_str());
+                    strcpy_s(_editBuffer, 512, filepath.c_str());
                 }
             }
             else if (info.isDir)
@@ -72,7 +72,7 @@ void UserFileInput::display()
                     _explorer.goToChildDir(i);
                 }
                 ImGui::SameLine();
-                ImGui::TextColored(ImVec4(0.7, 0.7, 1, 1), folder.c_str());
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 1.f, 1.f), folder.c_str());
             }
         }
         ImGui::ListBoxFooter();

@@ -71,7 +71,7 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
     int index = 0;
     for(auto& jNode : jsonOp.array.values)
     {
-        int id = jNode.setPath("id").getNumeric();
+        int id = (int) jNode.setPath("id").getNumeric();
         std::string type = jNode.setPath("type").getString();
         vec2 position;
         jsonTo(jNode.setPath("position"), position);
@@ -87,12 +87,12 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
             // std::cout << "from node " << type << " load prop " << op->getPropertyName(i) << std::endl;
             if (op->getPropertyType(i) == DataType_Float)
             {
-                f = jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
+                f = (float) jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
                 op->setProperty(i, f);
             }
             else if (op->getPropertyType(i) == DataType_Int)
             {
-                k = jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
+                k = (int) jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
                 op->setProperty(i, k);
             }
             else if (op->getPropertyType(i) == DataType_Bool)
@@ -114,10 +114,10 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
     for(auto& jco : jsonCo.array.values)
     {
         OperationConnections::Entry entry;
-        entry.src = jco.setPath("src").getNumeric();
-        entry.src_index = jco.setPath("src-pin").getNumeric();
-        entry.dst = jco.setPath("dst").getNumeric();
-        entry.dst_index = jco.setPath("dst-pin").getNumeric();
+        entry.src = (int) jco.setPath("src").getNumeric();
+        entry.src_index = (int) jco.setPath("src-pin").getNumeric();
+        entry.dst = (int) jco.setPath("dst").getNumeric();
+        entry.dst_index = (int) jco.setPath("dst-pin").getNumeric();
         co.entries.push_back(entry);
     }
 }

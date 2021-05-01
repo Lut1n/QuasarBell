@@ -61,7 +61,7 @@ void UiList::draw()
     slider->draw();
 
     float d = bounds.size().y - size.y;
-    scroll.y = -slider->progress() * (d > 0.0 ? d : 0.0);
+    scroll.y = -slider->progress() * (d > 0.f ? d : 0.f);
 }
 
 void UiList::add(UiElement* el, bool isRenderable, bool isListener)

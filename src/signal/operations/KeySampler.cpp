@@ -11,7 +11,7 @@ KeySampler::KeySampler()
     initialize({},{DataType_Float});
     makeProperty({"count", DataType_Int, &count});
     makeProperty({"interpo", DataType_Int, &interpo});
-    keys.resize(1,{0.0,1.0});
+    keys.resize(1,{0.f,1.f});
 }
 //--------------------------------------------------------------
 void KeySampler::validate()
@@ -30,9 +30,9 @@ OperationData KeySampler::sample(size_t index, const Time& t)
     int index2 = -1;
     for(size_t i=0; i<keys.size(); ++i)
     {
-        int j = keys.size()-1-i;
-        if(keys[i].first <= t.t) index1 = i;
-        if(keys[j].first >= t.t) index2 = j;
+        int j = (int)(keys.size()-1-i);
+        if(keys[i].first <= t.t) index1 = (int)i;
+        if(keys[j].first >= t.t) index2 = (int)j;
     }
 
     if(index1 == -1 && index2 == -1)
@@ -59,7 +59,7 @@ float KeySampler::interpolate(float x)
     else if (interpo == Interpo::Linear)
         return x;
     else if (interpo == Interpo::Cubic)
-        return x * x * (3.0 - 2.0 * x);
+        return x * x * (3.f - 2.f * x);
     return x;
 }
 //--------------------------------------------------------------
@@ -78,12 +78,12 @@ void KeySampler::saveCustomData(JsonValue& json)
 void KeySampler::loadCustomData(JsonValue& json)
 {
     auto& jArray = json.setPath("key-values");
-    count = jArray.count();
-    keys.resize(count);
+    count = (int)jArray.count();
+    keys.resize(jArray.count());
     int index = 0;
     for(auto& jkv : jArray.array.values)
     {
-        keys[index] = {jkv.setPath(0).getNumeric(),jkv.setPath(1).getNumeric()};
+        keys[index] = {(float)jkv.setPath(0).getNumeric(),(float) jkv.setPath(1).getNumeric()};
         index++;
     }
 }

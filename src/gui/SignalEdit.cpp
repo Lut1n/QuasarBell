@@ -82,7 +82,7 @@ float FrequencyEdit::sample(float t)
     
     float p = pitch + (speed + (acc + jerk * t) * t) * t;
     float f = qb::pow2(p);
-    f = f > 20000.0 ? 20000.0 : (f<0.0 ? 0.0 : f);
+    f = f > 20000.f ? 20000.f : (f<0.f ? 0.f : f);
     return f;
 }
 //--------------------------------------------------------------
@@ -148,7 +148,7 @@ float AmplitudeEdit::sample(float t)
     {
         rt = 0.0f;
     }
-    rt = rt > 1.0 ? 1.0 : (rt<-0.0 ? 0.0 : rt);
+    rt = rt > 1.f ? 1.f : (rt<-0.f ? 0.f : rt);
     return rt;
 }
 //--------------------------------------------------------------
@@ -226,13 +226,13 @@ WaveEdit::WaveEdit()
     platform_ind_srand(789456123);
 
     for(unsigned i=0; i<noiseData1.size(); ++i)
-        noiseData1[i] = noise_value() * 2.0 - 1.0;
+        noiseData1[i] = noise_value() * 2.f - 1.f;
     for(unsigned i=0; i<noiseData2.size(); ++i)
-        noiseData2[i] = noise_value() * 2.0 - 1.0;
+        noiseData2[i] = noise_value() * 2.f - 1.f;
     for(unsigned i=0; i<noiseData3.size(); ++i)
-        noiseData3[i] = noise_value() * 2.0 - 1.0;
+        noiseData3[i] = noise_value() * 2.f - 1.f;
     for(unsigned i=0; i<noiseData4.size(); ++i)
-        noiseData4[i] = noise_value() * 2.0 - 1.0;
+        noiseData4[i] = noise_value() * 2.f - 1.f;
 }
 //--------------------------------------------------------------
 float WaveEdit::sample(float t)
@@ -264,29 +264,29 @@ float WaveEdit::sample(float t)
     }
     else if(wave == Square)
     {
-        rt = std::sin(2.0f*3.141592f * t) >0.0f ? 1.0 : -1.0;
+        rt = std::sin(2.0f*3.141592f * t) >0.0f ? 1.f : -1.f;
     }
     else if(wave == Noise_1)
     {
-        while(t>1.0) t -= 1.0;
-        rt = noiseData1[(unsigned)(t * noiseData1.size())];
+        while(t>1.f) t -= 1.f;
+        rt = noiseData1[(unsigned)(t * (float)noiseData1.size())];
     }
     else if(wave == Noise_2)
     {
         while(t>1.0) t -= 1.0;
-        rt = noiseData2[(unsigned)(t * noiseData2.size())];
+        rt = noiseData2[(unsigned)(t * (float)noiseData2.size())];
     }
     else if(wave == Noise_3)
     {
         while(t>1.0) t -= 1.0;
-        rt = noiseData3[(unsigned)(t * noiseData3.size())];
+        rt = noiseData3[(unsigned)(t * (float)noiseData3.size())];
     }
     else if(wave == Noise_4)
     {
         while(t>1.0) t -= 1.0;
-        rt = noiseData4[(unsigned)(t * noiseData4.size())];
+        rt = noiseData4[(unsigned)(t * (float)noiseData4.size())];
     }
-    rt = rt > 1.0 ? 1.0 : (rt<-1.0 ? -1.0 : rt);
+    rt = rt > 1.f ? 1.f : (rt<-1.f ? -1.f : rt);
     return rt;
 }
 //--------------------------------------------------------------
@@ -327,11 +327,11 @@ float PcmPlayer::sample(void* data, int t)
 {
     PcmPlayer* that = static_cast<PcmPlayer*>(data);
     
-    float rate = AudioSettings::defaultSettings.sampleRate;
-    float displayCount = 10000.0;
+    float rate = (float)AudioSettings::defaultSettings.sampleRate;
+    float displayCount = 10000.f;
     float start_pos  = displayCount - that->oft * rate;
     
-    unsigned i = t - start_pos;
+    unsigned i = (unsigned)(t - start_pos);
     if( i < 0 || i>= that->pcm.count() )
     {
         return 0.0f;
@@ -344,7 +344,7 @@ float PcmPlayer::sample(void* data, int t)
 //--------------------------------------------------------------
 void PcmPlayer::draw()
 {
-    float displayCount = 10000.0;
+    int displayCount = 10000;
     float min = -1.0;
     float max = 1.0;
     ImGui::PlotHistogram("Stream", &PcmPlayer::sample, this, displayCount, 0, NULL, min, max, ImVec2(0, 80.0f));

@@ -55,14 +55,14 @@ float Waveform::sampleFlip(float t)
     }
     else if(type == Type::Square)
     {
-        return std::sin(t * pi2) >0.0f ? 1.0 : -1.0;
+        return std::sin(t * pi2) >0.f ? 1.f : -1.f;
     }
     else if(type == Type::Noise)
     {
-        while(t>1.0) t -= 1.0;
+        while(t>1.f) t -= 1.f;
         return samples[(size_t)(t * samples.size())];
     }
-    return 0.0;
+    return 0.f;
 }
 
 //--------------------------------------------------------------
@@ -75,7 +75,7 @@ OperationData Waveform::sample(size_t index, const Time& t)
     data.count = output->count;
 
     float ampl = (maxVal-minVal);
-    data.fvec[0] = (sampleFlip(t.t * period) + 1.0) * 0.5 * ampl + minVal;
+    data.fvec[0] = (sampleFlip(t.t * period) + 1.0f) * 0.5f * ampl + minVal;
     return data;
 }
 
@@ -88,6 +88,6 @@ void Waveform::computeNoise()
 
         qb::noiseSeed(noiseSeed);
         samples.resize(noiseSamples);
-        for(auto& s : samples) s = qb::noiseValue() * 2.0 - 1.0;
+        for(auto& s : samples) s = qb::noiseValue() * 2.f - 1.f;
     }
 }

@@ -6,7 +6,7 @@ UiInput::UiInput(const std::string& text, const vec2& position, const vec2& size
 {
     baseColor = 0xAAAAAAFF;
     baseText = text;
-    this->text = std::make_unique<UiText>(text, position, 6, baseColor);
+    this->text = std::make_unique<UiText>(text, position, 6.f, baseColor);
 }
 
 bool UiInput::onEvent(const UiEvent& event)
@@ -100,7 +100,7 @@ void UiInput::draw()
         text->color += pressAdditif;
         text->text += "/";
     }
-    text->position = position + vec2(5.0, (size.y - text->getTextSize().y) * 0.5);
+    text->position = position + vec2(5.f, (size.y - text->getTextSize().y) * 0.5f);
     text->parentPosition = parentPosition;
     text->parentClippingRect = parentClippingRect.clampTo(Rect::fromPosAndSize(parentPosition + position, size));
     text->draw();

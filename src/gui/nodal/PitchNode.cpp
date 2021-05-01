@@ -25,14 +25,14 @@ PitchNode::PitchNode()
 void PitchNode::displayProperties()
 {
     auto generator = [](float f){
-        float duration = 0.3;
+        float duration = 0.3f;
         auto& settings = AudioSettings::defaultSettings;
         qb::Pcm16 output;
-        output.resize(duration * settings.sampleRate);
+        output.resize((size_t)(duration * settings.sampleRate));
         for(unsigned i=0;i<output.count();++i)
         {
             float t = (float)i / (float)settings.sampleRate;
-            output.set(i, std::sin(f * t * 2.0*3.141592));
+            output.set(i, std::sin(f * t * 2.f*3.141592f));
         }
         return output;
     };

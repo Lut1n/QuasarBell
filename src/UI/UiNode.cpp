@@ -15,7 +15,7 @@ UiNode::UiNode(const std::string& title, const vec2& position, const vec2& size)
     : UiFrame(position, size)
 {
     this->title = std::make_unique<UiText>(title, vec2(5.0, 5.0), 6.0f, 0xAAAAFFFF);
-    float yoft = this->title->position.y + this->title->getTextSize().y * 2.0;
+    float yoft = this->title->position.y + this->title->getTextSize().y * 2.f;
     this->add(this->title.get());
     borderEnabled = false;
     color = colorOnIdle;
@@ -80,10 +80,10 @@ void UiNode::onMove(const vec2& delta)
 
 bool UiNode::onEvent(const UiEvent& event)
 {
-    static const float PinSize = 10.0;
+    static const float PinSize = 10.f;
     bool ret = false;
     float step_y = size.y / (1+inputs.size());
-    float y = step_y - PinSize * 0.5;
+    float y = step_y - PinSize * 0.5f;
     for (auto& pin : inputs)
     {
         pin->parentPosition = parentPosition;
@@ -93,7 +93,7 @@ bool UiNode::onEvent(const UiEvent& event)
         y += step_y;
     }
     step_y = size.y / (1+outputs.size());
-    y = step_y - PinSize * 0.5;
+    y = step_y - PinSize * 0.5f;
     for (auto& pin : outputs)
     {
         pin->parentPosition = parentPosition;
@@ -132,7 +132,7 @@ void UiNode::draw()
     drawPreview(previewArea);
 
     float step_y = size.y / (1+inputs.size());
-    float y = step_y - PinSize * 0.5;
+    float y = step_y - PinSize * 0.5f;
     for (auto& pin : inputs)
     {
         pin->parentPosition = parentPosition;
@@ -142,7 +142,7 @@ void UiNode::draw()
         y += step_y;
     }
     step_y = size.y / (1+outputs.size());
-    y = step_y - PinSize * 0.5;
+    y = step_y - PinSize * 0.5f;
     for (auto& pin : outputs)
     {
         pin->parentPosition = parentPosition;
