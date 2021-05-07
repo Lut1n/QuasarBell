@@ -4,6 +4,8 @@
 
 #include "json/Json.hpp"
 
+#include "core/PseudoRand.hpp"
+
 //--------------------------------------------------------------
 FloatInput::FloatInput()
 {
@@ -17,12 +19,76 @@ void FloatInput::validate()
 //--------------------------------------------------------------
 OperationData FloatInput::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     data.type = DataType_Float;
     data.count = 1;
     data.fvec[0] = value;
     return data;
 }
+
+//--------------------------------------------------------------
+NoiseInput::NoiseInput()
+{
+    initialize({},{DataType_Float});
+}
+//--------------------------------------------------------------
+void NoiseInput::validate()
+{
+}
+//--------------------------------------------------------------
+OperationData NoiseInput::sample(size_t index, const Time& t)
+{
+    t.dstOp = this;
+    OperationData data;
+    data.type = DataType_Float;
+    data.count = 1;
+    data.fvec[0] = qb::noiseValue() * 2.f - 1.f;;
+    return data;
+}
+
+
+//--------------------------------------------------------------
+Repeater::Repeater()
+{
+    initialize({DataType_Float,DataType_Int},{DataType_Float});
+    makeProperty({"count", DataType_Int, &count});
+}
+//--------------------------------------------------------------
+void Repeater::validate()
+{
+}
+//--------------------------------------------------------------
+OperationData Repeater::sample(size_t index, const Time& t)
+{
+    t.dstOp = this;
+    OperationData data;
+    auto output  = getOutput(0);
+    OperationData b = sampleInput(1, t);
+
+    float qu = b.type == DataType_Int ? b.ivec[0] : (float)count;
+    if (qu==0.0f) qu=1.0f;
+
+    Time t2 = t;
+    t2.t = (t.t*qu);
+    while(t2.t > 1.0f) t2.t -= 1.0f;
+
+    OperationData a = sampleInput(0, t2);
+
+    if (a.type == DataType_Float)
+    {
+        data.type = output->type;
+        data.count = output->count;
+        data.fvec[0] = a.fvec[0];
+    }
+    else
+    {
+        data.type = DataType_Error;
+    }
+
+    return data;
+}
+
 
 //--------------------------------------------------------------
 CubicSampler::CubicSampler()
@@ -41,6 +107,7 @@ void CubicSampler::validate()
 //--------------------------------------------------------------
 OperationData CubicSampler::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -85,6 +152,7 @@ void PolynomialSampler::validate()
 //--------------------------------------------------------------
 OperationData PolynomialSampler::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
 
@@ -141,6 +209,7 @@ void AddOperation::validate()
 //--------------------------------------------------------------
 OperationData AddOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -169,6 +238,7 @@ void SubOperation::validate()
 //--------------------------------------------------------------
 OperationData SubOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -197,6 +267,7 @@ void MultOperation::validate()
 //--------------------------------------------------------------
 OperationData MultOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -225,6 +296,7 @@ void DivOperation::validate()
 //--------------------------------------------------------------
 OperationData DivOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -254,6 +326,7 @@ void ClampOperation::validate()
 //--------------------------------------------------------------
 OperationData ClampOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -282,6 +355,7 @@ void AbsOperation::validate()
 //--------------------------------------------------------------
 OperationData AbsOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);
@@ -309,11 +383,13 @@ void TimeScale::validate()
 //--------------------------------------------------------------
 OperationData TimeScale::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     Time time2 = t;
     time2.duration = t.duration * scale;
     time2.elapsed = t.elapsed * scale;
     time2.t = t.t*scale - delay;
     time2.sec =  time2.t * time2.duration;
+    time2.dstOp = this;
 
     OperationData data;
     auto output  = getOutput(0);
@@ -342,5 +418,6 @@ void OutputOperation::validate()
 //--------------------------------------------------------------
 OperationData OutputOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     return sampleInput(index, t);
 }

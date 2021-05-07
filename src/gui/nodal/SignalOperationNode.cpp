@@ -60,6 +60,7 @@ float SignalOperationNode::s_imgui_sampler(void* data, int idx)
     time.t = (float)idx/qb::imgui::s_sampler_count;
     time.sec = (float)idx/qb::imgui::s_sampler_count;
     time.elapsed = 0.01f;
+    time.dstOp = &op;
     return op.sample(0, time).fvec[0];
 }
 

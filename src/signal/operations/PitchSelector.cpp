@@ -35,6 +35,7 @@ float PitchSelector::getFreq() const
 //--------------------------------------------------------------
 OperationData PitchSelector::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     auto output1  = getOutput(0);
     OperationData data;
     data.type = output1->type;

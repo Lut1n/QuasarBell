@@ -29,6 +29,8 @@ namespace qb
         OperationType_Harmonics,
         OperationType_Polynomial,
         OperationType_TimeScale,
+        OperationType_Noise,
+        OperationType_Repeater,
 
         OperationType_Count,
 

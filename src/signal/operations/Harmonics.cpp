@@ -22,6 +22,7 @@ void Harmonics::validate()
 //--------------------------------------------------------------
 OperationData Harmonics::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     auto output  = getOutput(0);
 
     OperationData data;

@@ -27,7 +27,9 @@ namespace qb
         {OperationType_KeySampler, "key-sampler"},
         {OperationType_Harmonics, "harmonics"},
         {OperationType_Polynomial, "polynomial"},
-        {OperationType_TimeScale, "time-scale"}
+        {OperationType_TimeScale, "time-scale"},
+        {OperationType_Noise, "noise"},
+        {OperationType_Repeater, "repeater"}
     };
 }
 

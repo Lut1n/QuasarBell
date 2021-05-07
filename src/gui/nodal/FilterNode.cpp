@@ -39,6 +39,7 @@ void FilterNode::displayProperties()
         time.t = (float)i/100.0f;
         time.sec = (float)i/100.0f;
         time.elapsed = 0.01f;
+        time.dstOp = getOperation();
 
         buf[i] =getOperation()->sample(1, time).fvec[0];
     }

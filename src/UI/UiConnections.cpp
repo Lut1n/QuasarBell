@@ -2,8 +2,37 @@
 
 #include "graphics/RenderInterface.h"
 #include "ui/UiPin.h"
+#include "ui/UiNode.h"
 
 UiConnections* UiConnections::instance = nullptr;
+
+static void findAncestors(UiNode* node, std::vector<UiNode*>& ancestors)
+{
+    if (node == nullptr) return;
+    ancestors.push_back(node);
+    for (auto& pin : node->inputs)
+    {
+        UiPin* linked = pin->getLinked();
+        if (linked)
+            findAncestors(linked->parentNode, ancestors);
+    }
+}
+
+static bool cycleCheck(UiPin* a, UiPin* b)
+{
+    if (a->textOnLeft)
+    {
+        UiPin* t = a;
+        a = b;
+        b = t;
+    }
+
+    std::vector<UiNode*> ancestors;
+    findAncestors(a->parentNode, ancestors);
+    for (auto a : ancestors)
+        if (a == b->parentNode) return true;
+    return false;
+}
 
 UiConnections::UiConnections()
     : UiElement(vec2(0.0,0.0))
@@ -14,6 +43,12 @@ UiConnections::UiConnections()
 std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
 {
     if(a == b || a->type != b->type || a->textOnLeft == b->textOnLeft) return 0;
+
+    if (cycleCheck(a, b))
+    {
+        std::cout << "Warning: Link canceled. Cycle detected" << std::endl;
+        return 0;
+    }
 
     std::uint64_t id = previousId++;
     links[id] = Link{a,b};

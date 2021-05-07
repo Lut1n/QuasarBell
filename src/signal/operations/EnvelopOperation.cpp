@@ -16,6 +16,7 @@ void EnvelopOperation::validate()
 //--------------------------------------------------------------
 OperationData EnvelopOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     data.type = output->type;

@@ -12,6 +12,22 @@ struct FloatInput : public SignalOperation
 
     float value = 0.0;
 };
+// --------------------------------------------------------------
+struct NoiseInput : public SignalOperation
+{
+    NoiseInput();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+};
+// --------------------------------------------------------------
+struct Repeater : public SignalOperation
+{
+    Repeater();
+    void validate() override;
+    OperationData sample(size_t index, const Time& t) override;
+
+    int count = 1;
+};
 
 //--------------------------------------------------------------
 struct CubicSampler : public SignalOperation
@@ -65,7 +81,7 @@ struct SubOperation : public SignalOperation
 };
 
 //--------------------------------------------------------------
-struct MultOperation : SignalOperation
+struct MultOperation : public SignalOperation
 {
     MultOperation();
     void validate() override;
@@ -76,7 +92,7 @@ struct MultOperation : SignalOperation
 };
 
 //--------------------------------------------------------------
-struct DivOperation : SignalOperation
+struct DivOperation : public SignalOperation
 {
     DivOperation();
     void validate() override;
@@ -87,7 +103,7 @@ struct DivOperation : SignalOperation
 };
 
 //--------------------------------------------------------------
-struct ClampOperation : SignalOperation
+struct ClampOperation : public SignalOperation
 {
     ClampOperation();
     void validate() override;
@@ -99,7 +115,7 @@ struct ClampOperation : SignalOperation
 };
 
 //--------------------------------------------------------------
-struct AbsOperation : SignalOperation
+struct AbsOperation : public SignalOperation
 {
     AbsOperation();
     void validate() override;
@@ -107,7 +123,7 @@ struct AbsOperation : SignalOperation
 };
 
 //--------------------------------------------------------------
-struct TimeScale : SignalOperation
+struct TimeScale : public SignalOperation
 {
     TimeScale();
     void validate() override;
@@ -118,7 +134,7 @@ struct TimeScale : SignalOperation
 };
 
 //--------------------------------------------------------------
-struct OutputOperation : SignalOperation
+struct OutputOperation : public SignalOperation
 {
     OutputOperation();
     void validate() override;

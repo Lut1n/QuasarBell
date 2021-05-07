@@ -148,6 +148,7 @@ void AudioOutputNode::generate(PcmDataBase& pcm)
     SignalOperation::Time time;
     time.duration = duration;
     time.elapsed = sample_t;
+    time.dstOp = getOperation();
     for(unsigned i=0;i<pcm.count();++i)
     {
         time.sec = (float)i / (float)output.sampleRate;

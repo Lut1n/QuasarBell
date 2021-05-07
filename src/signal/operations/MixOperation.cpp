@@ -15,6 +15,7 @@ void MixOperation::validate()
 //--------------------------------------------------------------
 OperationData MixOperation::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);

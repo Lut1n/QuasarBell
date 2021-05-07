@@ -68,6 +68,7 @@ float Waveform::sampleFlip(float t)
 //--------------------------------------------------------------
 OperationData Waveform::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     

@@ -15,7 +15,7 @@ struct Oscillator : public SignalOperation
     float ampl = 1.0f;
 
 private:
-    float phase = 0.0f;
+    std::unordered_map<SignalOperation*, float> phases;
 };
 
 

@@ -70,5 +70,14 @@ public:
     TimeScale timeScale;
 };
 
+struct RepeaterNode : public SignalOperationNode
+{
+    RepeaterNode();
+    void displayProperties() override;
+    
+public:
+    Repeater repeater;
+};
+
 
 #endif // GUI_ADD_SIGNAL_NODE_H

@@ -17,4 +17,14 @@ public:
     FloatInput floatInput;
 };
 
+struct NoiseSignalNode : public SignalOperationNode
+{
+    NoiseSignalNode();
+
+    void displayProperties() override;
+    
+public:
+    NoiseInput input;
+};
+
 #endif // GUI_FLOAT_SIGNAL_NODE_H

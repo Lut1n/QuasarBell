@@ -20,6 +20,7 @@ void KeySampler::validate()
 //--------------------------------------------------------------
 OperationData KeySampler::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
 

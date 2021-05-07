@@ -53,6 +53,7 @@ struct SignalOperation
         float sec = 0.0f;
         float elapsed = 0.0f;
         float duration = 1.0f;
+        mutable SignalOperation* dstOp = nullptr;
     };
 
     using PropDesc = std::tuple<std::string,OperationDataType,void*>;

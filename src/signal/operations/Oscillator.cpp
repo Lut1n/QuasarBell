@@ -13,12 +13,14 @@ Oscillator::Oscillator()
 //--------------------------------------------------------------
 void Oscillator::validate()
 {
-    phase = 0.0;
+    phases.clear();
 }
 //--------------------------------------------------------------
 OperationData Oscillator::sample(size_t index, const Time& t)
 {
+    float& phase = phases[t.dstOp];
 
+    t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
     OperationData a = sampleInput(0, t);

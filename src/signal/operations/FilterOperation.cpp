@@ -17,6 +17,7 @@ void FreqFilter::validate()
 //--------------------------------------------------------------
 OperationData FreqFilter::sample(size_t index, const Time& t)
 {
+    t.dstOp = this;
     OperationData data;
     auto output1  = getOutput(0);
     auto output2  = getOutput(1);
