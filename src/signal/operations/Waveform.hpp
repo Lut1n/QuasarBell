@@ -19,6 +19,8 @@ struct Waveform : public SignalOperation
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
+    void uiProperties() override;
+
     float sampleFlip(float t);
 
     float period = 1.0f;

@@ -6,7 +6,11 @@
 //--------------------------------------------------------------
 Oscillator::Oscillator()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    // initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeInput("freq", DataType_Float);
+    makeInput("ampl", DataType_Float);
+    makeInput("waveform", DataType_Float);
+    makeOutput("signal", DataType_Float);
     makeProperty({"freq", DataType_Float, &freq});
     makeProperty({"ampl", DataType_Float, &ampl});
 }

@@ -2,14 +2,20 @@
 
 #include <iostream>
 
+#include "imgui.h"
+#include "app/App.hpp"
+
 #include "json/Json.hpp"
 
 #include "core/PseudoRand.hpp"
 
+OutputOperation* OutputOperation::defaultOutput = nullptr;
+
 //--------------------------------------------------------------
 FloatInput::FloatInput()
 {
-    initialize({},{DataType_Float});
+    // initialize({},{DataType_Float});
+    makeOutput("value", DataType_Float);
     makeProperty({"value", DataType_Float, &value});
 }
 //--------------------------------------------------------------
@@ -30,7 +36,8 @@ OperationData FloatInput::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 NoiseInput::NoiseInput()
 {
-    initialize({},{DataType_Float});
+    // initialize({},{DataType_Float});
+    makeOutput("value", DataType_Float);
 }
 //--------------------------------------------------------------
 void NoiseInput::validate()
@@ -51,7 +58,10 @@ OperationData NoiseInput::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 Repeater::Repeater()
 {
-    initialize({DataType_Float,DataType_Int},{DataType_Float});
+    // initialize({DataType_Float,DataType_Int},{DataType_Float});
+    makeInput("value", DataType_Float);
+    makeInput("count", DataType_Int);
+    makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
 }
 //--------------------------------------------------------------
@@ -93,7 +103,13 @@ OperationData Repeater::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 CubicSampler::CubicSampler()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    // initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeInput("value", DataType_Float);
+    makeInput("speed", DataType_Float);
+    makeInput("acc", DataType_Float);
+    makeInput("jerk", DataType_Float);
+    makeInput("reset", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"value", DataType_Float, &value});
     makeProperty({"speed", DataType_Float, &speed});
     makeProperty({"acc", DataType_Float, &acc});
@@ -140,7 +156,9 @@ OperationData CubicSampler::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 PolynomialSampler::PolynomialSampler()
 {
-    initialize({},{DataType_Float});
+    // initialize({},{DataType_Float});
+    _hasCustomData = true;
+    makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
     makeProperty({"reset", DataType_Float, &reset});
     coefs.resize(1, 0);
@@ -195,10 +213,42 @@ void PolynomialSampler::loadCustomData(JsonValue& json)
         coefs[index++] = (float)jcoef.getNumeric();
     }
 }
+
+void PolynomialSampler::uiProperties()
+{
+    ImGui::Text("Preview:");
+    preview.compute(this);
+    ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
+    ImGui::Separator();
+
+    if (ImGui::InputInt("count", &count))
+    {
+        if (count < 1) count = 1;
+        if (count > 10) count = 10;
+        coefs.resize(count);
+        preview.dirty();
+    }
+
+    if (ImGui::InputFloat("reset", &reset)) preview.dirty();
+    
+    ImGui::Text("Coefs");
+    ImGui::Separator();
+    int index = 0;
+    for(auto& coef : coefs)
+    {
+        std::string textid = std::string("##") + std::to_string(index);
+        if (ImGui::InputFloat(textid.c_str(), &coef)) preview.dirty();
+        index++;
+    }
+}
+
 //--------------------------------------------------------------
 AddOperation::AddOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    // initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("input2", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
 }
@@ -227,7 +277,10 @@ OperationData AddOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 SubOperation::SubOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    // initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("input2", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
 }
@@ -256,7 +309,10 @@ OperationData SubOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 MultOperation::MultOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    // initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("input2", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
 }
@@ -285,7 +341,10 @@ OperationData MultOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 DivOperation::DivOperation()
 {
-    initialize({DataType_Float, DataType_Float},{DataType_Float});
+    // initialize({DataType_Float, DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("input2", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
 }
@@ -314,7 +373,11 @@ OperationData DivOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 ClampOperation::ClampOperation()
 {
-    initialize({DataType_Float, DataType_Float, DataType_Float},{DataType_Float});
+    // initialize({DataType_Float, DataType_Float, DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("minVal", DataType_Float);
+    makeInput("maxVal", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"minVal", DataType_Float, &minVal});
     makeProperty({"maxVal", DataType_Float, &maxVal});
@@ -346,7 +409,9 @@ OperationData ClampOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 AbsOperation::AbsOperation()
 {
-    initialize({DataType_Float},{DataType_Float});
+    // initialize({DataType_Float},{DataType_Float});
+    makeInput("value", DataType_Float);
+    makeOutput("value", DataType_Float);
 }
 //--------------------------------------------------------------
 void AbsOperation::validate()
@@ -372,7 +437,9 @@ OperationData AbsOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 TimeScale::TimeScale()
 {
-    initialize({DataType_Float},{DataType_Float});
+    // initialize({DataType_Float},{DataType_Float});
+    makeInput("value", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"delay", DataType_Float, &delay});
     makeProperty({"scale", DataType_Float, &scale});
 }
@@ -404,11 +471,18 @@ OperationData TimeScale::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 OutputOperation::OutputOperation()
 {
-    initialize({DataType_Float},{});
+    // initialize({DataType_Float},{});
+    makeInput("signal", DataType_Float);
     makeProperty({"range", DataType_Float, &range});
     makeProperty({"duration", DataType_Float, &duration});
     makeProperty({"sample-rate", DataType_Int, &sampleRate});
     makeProperty({"sample-bits", DataType_Int, &sampleBits});
+
+    if (defaultOutput == nullptr) defaultOutput = this;
+}
+OutputOperation::~OutputOperation()
+{
+    if (defaultOutput == this) defaultOutput = nullptr;
 }
 //--------------------------------------------------------------
 void OutputOperation::validate()
@@ -420,4 +494,116 @@ OperationData OutputOperation::sample(size_t index, const Time& t)
 {
     t.dstOp = this;
     return sampleInput(index, t);
+}
+
+void OutputOperation::uiProperties()
+{
+    static constexpr size_t sampleRateCount = 6;
+    static constexpr size_t sampleFormatCount = 2;
+    
+    static constexpr std::array<int,sampleRateCount> indexedRates = {AudioSettings::SampleRate_8kHz, AudioSettings::SampleRate_11kHz, AudioSettings::SampleRate_22kHz, AudioSettings::SampleRate_32kHz, AudioSettings::SampleRate_44kHz, AudioSettings::SampleRate_48kHz};
+    static constexpr std::array<const char*,sampleRateCount> sampleRateNames = {"SampleRate_8kHz", "SampleRate_11kHz", "SampleRate_22kHz", "SampleRate_32kHz", "SampleRate_44kHz", "SampleRate_48kHz"};
+    static constexpr std::array<int,sampleFormatCount> indexedFormats = {AudioSettings::Format_Mono8, AudioSettings::Format_Mono16};
+    static constexpr std::array<const char*,sampleFormatCount> sampleFormatNames = {"Format_Mono8", "Format_Mono16"};
+
+    if (defaultOutput == this)
+    {
+        ImGui::Text("Default output");
+    }
+    else if (ImGui::Button("Set as default output"))
+    {
+        defaultOutput = this;
+    }
+
+    preview.compute(this);
+    ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, -range, range, ImVec2(0, 60.0f));
+
+    if (ImGui::InputFloat("range", &range)) preview.dirty();
+    ImGui::InputFloat("duration scale", &duration);
+
+    if (sampleRateIndex == -1)
+    {
+        if(sampleRate == 0) sampleRate = AudioSettings::SampleRate_44kHz;
+        sampleRateIndex = 4;
+        for(size_t i=0; i<sampleRateCount; ++i)
+        {
+            if (sampleRate == indexedRates[i])
+            {
+                sampleRateIndex = (int)i;
+                break;
+            }
+        }
+    }
+    
+    if (sampleFormatIndex == -1)
+    {
+        if(sampleBits == 0) sampleBits = AudioSettings::Format_Mono16;
+        sampleFormatIndex = 1;
+        for(size_t i=0; i<sampleFormatCount; ++i)
+        {
+            if (sampleBits == indexedFormats[i])
+            {
+                sampleFormatIndex = (int)i;
+                break;
+            }
+        }
+    }
+
+    if (ImGui::Button(sampleRateNames[sampleRateIndex]))
+    {
+        sampleRateIndex = (sampleRateIndex+1) % (int)sampleRateCount;
+        sampleRate = indexedRates[sampleRateIndex];
+    }
+    
+    if (ImGui::Button(sampleFormatNames[sampleFormatIndex]))
+    {
+        sampleFormatIndex = (sampleFormatIndex+1) % (int)sampleFormatCount;
+        sampleBits = indexedFormats[sampleFormatIndex];
+    }
+
+    if (ImGui::Button("Play") && App::s_instance)
+    {
+        auto& sound = *(App::s_instance->sound);
+        if(sound.getState() != SoundNode::Playing)
+        {
+            std::unique_ptr<PcmDataBase> pcm;
+            if (sampleBits == AudioSettings::Format_Mono8 || sampleBits == AudioSettings::Format_Stereo8)
+                pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
+            if (sampleBits == AudioSettings::Format_Mono16 || sampleBits == AudioSettings::Format_Stereo16)
+                pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
+            generate(*pcm);
+            sound.queue(*pcm.get());
+            sound.play();
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void OutputOperation::generate(PcmDataBase& pcm)
+{
+    if (pcm.format != sampleBits)
+        std::cout << "warning: AudioOutputNode::generate() pcm format does not match" << std::endl;
+    if (duration == 0.0f)
+    {
+        std::cout << "error: duration = 0; 1s is used" << std::endl;
+        duration = 1.0;
+    }
+
+    validateGraph();
+
+    pcm.sampleRate = (AudioSettings::SampleRate)sampleRate;
+    pcm.resize((size_t)(duration * sampleRate));
+    
+    float sample_t = 1.f / (float)sampleRate;
+    
+    SignalOperation::Time time;
+    time.duration = duration;
+    time.elapsed = sample_t;
+    time.dstOp = this;
+    for(unsigned i=0;i<pcm.count();++i)
+    {
+        time.sec = (float)i / (float)sampleRate;
+        time.t = time.sec / time.duration;
+        pcm.set(i, sample(0, time).fvec[0]);
+    }
 }

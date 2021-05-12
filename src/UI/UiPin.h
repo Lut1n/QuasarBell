@@ -26,8 +26,7 @@ public:
     std::unique_ptr<UiText> label;
     UiNode* parentNode = nullptr;
     std::vector<std::uint64_t> connectionIds;
-    bool multipleConnections = false;
-    bool textOnLeft = false;
+    bool isInput = false;
     bool rightClicking = false;
 
     enum Type

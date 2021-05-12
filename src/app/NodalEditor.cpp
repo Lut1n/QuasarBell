@@ -3,14 +3,13 @@
 #include "core/Factory.h"
 
 #include "gui/nodal/SignalOperationNode.hpp"
-#include "gui/nodal/AudioOutputNode.hpp"
 
 #include "readerwriter/FileIO.hpp"
-#include "readerwriter/SignalRW.hpp"
 #include "signal/WavExporter.hpp"
 #include "readerwriter/SignalOperationsRW.hpp"
 
 #include "signal/operations/OperationType.hpp"
+#include "signal/operations/Operations.hpp"
 
 
 App* App::s_instance = nullptr;
@@ -26,10 +25,10 @@ void OperationConnections::fill(UiConnections* ui, const OperationCollection& co
         int id2 = (int)coll.getId(dynamic_cast<SignalOperationNode*>(pin2->parentNode));
         int idx1 = (int)pin1->parentNode->getIndex(pin1);
         int idx2 = (int)pin2->parentNode->getIndex(pin2);
-        if (pin1->multipleConnections)
-            entries.push_back(Entry{id1,idx1,id2,idx2});
-        else
+        if (pin1->isInput)
             entries.push_back(Entry{id2,idx2,id1,idx1});
+        else
+            entries.push_back(Entry{id1,idx1,id2,idx2});
     }
 }
 
@@ -117,7 +116,7 @@ void NodalEditorWorkSpace::update(float t)
             OperationConnections connections;
             connections.fill(uiConnections, operations);
             JsonValue root;
-            writeInfo(root);
+            // writeInfo(root);
             saveInto(root, operations, connections);
             saveJsonFile(gui.fileInput.filepath, root);
         }
@@ -126,15 +125,19 @@ void NodalEditorWorkSpace::update(float t)
     }
     if(gui.waveInput.confirmed)
     {
-        if(gui.waveInput.request == UserFileInput::Export_Wav && AudioOutputNode::defaultOutput != nullptr)
+        if(OutputOperation::defaultOutput == nullptr)
         {
-            auto& output = AudioOutputNode::defaultOutput->output;
+            std::cout << "Error: You must set an audio output node as default" << std::endl;
+        }
+        else if(gui.waveInput.request == UserFileInput::Export_Wav)
+        {
+            auto& output = OutputOperation::defaultOutput;
             std::unique_ptr<PcmDataBase> pcm;
-            if (output.sampleBits == AudioSettings::Format_Mono8 || output.sampleBits == AudioSettings::Format_Stereo8)
+            if (output->sampleBits == AudioSettings::Format_Mono8 || output->sampleBits == AudioSettings::Format_Stereo8)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
-            if (output.sampleBits == AudioSettings::Format_Mono16 || output.sampleBits == AudioSettings::Format_Stereo16)
+            if (output->sampleBits == AudioSettings::Format_Mono16 || output->sampleBits == AudioSettings::Format_Stereo16)
                 pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
-            AudioOutputNode::defaultOutput->generate(*pcm);
+            OutputOperation::defaultOutput->generate(*pcm);
             WavExporter::exportAsWAV(gui.waveInput.filepath, *pcm);
         }
         gui.waveInput.request = UserFileInput::Nothing;
@@ -179,7 +182,7 @@ void NodalEditorWorkSpace::onConnect(UiPin* a, UiPin* b)
 {
     auto* node1 = a->parentNode;
     auto* node2 = b->parentNode;
-    bool node1_is_src = a->multipleConnections;
+    bool node1_is_src = !a->isInput;
 
     int node1_index = (int)node1->getIndex(a);
     int node2_index = (int)node2->getIndex(b);
@@ -197,7 +200,7 @@ void NodalEditorWorkSpace::onDisconnect(UiPin* a, UiPin* b)
 {
     auto* node1 = a->parentNode;
     auto* node2 = b->parentNode;
-    bool node1_is_src = a->multipleConnections;
+    bool node1_is_src = !a->isInput;
 
 
 

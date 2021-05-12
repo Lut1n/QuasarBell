@@ -3,7 +3,11 @@
 //--------------------------------------------------------------
 MixOperation::MixOperation()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    // initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
+    makeInput("input1", DataType_Float);
+    makeInput("input2", DataType_Float);
+    makeInput("delta", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"input1",DataType_Float, &input1});
     makeProperty({"input2",DataType_Float, &input2});
     makeProperty({"delta",DataType_Float, &delta});

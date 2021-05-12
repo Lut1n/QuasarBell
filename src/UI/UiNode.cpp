@@ -164,15 +164,13 @@ void UiNode::addPin(int id, const std::string& label, bool isOutput)
     {
         if(outputs.size() <= id) outputs.resize(id+1);
         outputs[id] = std::make_unique<UiPin>(this, label, vec2(size.x,0.0), vec2(PinSize,PinSize));
-        outputs[id]->multipleConnections = true;
-        outputs[id]->textOnLeft = false;
+        outputs[id]->isInput = false;
     }
     else
     {
         if(inputs.size() <= id) inputs.resize(id+1);
         inputs[id] = std::make_unique<UiPin>(this, label, vec2(-10,0.0), vec2(PinSize,PinSize));
-        inputs[id]->multipleConnections = false;
-        inputs[id]->textOnLeft = true;
+        inputs[id]->isInput = true;
     }
 
 }

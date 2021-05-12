@@ -7,6 +7,9 @@
 
 #include "ui/UiNode.h"
 #include "signal/operations/SignalOperation.hpp"
+#include "signal/operations/OperationType.hpp"
+#include "core/Factory.h"
+
 
 struct SignalOperationNode : public UiNode
 {
@@ -18,18 +21,36 @@ struct SignalOperationNode : public UiNode
     void drawPreview(const Rect& previewArea) override;
 
     size_t nodeTypeId() const;
-
-protected:
-    void dirtyPreview();
-    void displayPreview();
-    static void s_imgui_sampler_set_count(int count);
-    static float s_imgui_sampler(void* data, int idx);
 private:
     SignalOperation* _operation = nullptr;
     size_t _nodetypeId;
-    std::array<float, 32> _preview;
-    float _previewMaxVal = 1.0;
-    bool _hasChange = true;
 };
+
+template<typename OpObject, qb::OperationType OpType>
+struct ConcretSignalNode : public SignalOperationNode
+{
+    ConcretSignalNode()
+        : SignalOperationNode("SignalNode", OpType)
+    {
+        title->text = qb::getOperationName(OpType);
+        setOperation(&concretOperation);
+    }
+
+    void displayProperties() override
+    {
+        getOperation()->uiProperties();
+    }
+    
+public:
+    OpObject concretOperation;
+};
+
+
+#define MAKE_SIGNAL_NODE(opclass, optype)\
+    struct opclass ## Node : public ConcretSignalNode<opclass, optype> {};
+
+#define MAKE_SIGNAL_NODE_CREATOR(opclass, optype)\
+    static TypedFactory<SignalOperationNode, opclass ## Node> opclass ## Factory(optype);
+
 
 #endif // GUI_SIGNAL_OP_NODE_H

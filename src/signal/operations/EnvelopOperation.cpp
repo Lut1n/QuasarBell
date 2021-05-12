@@ -3,7 +3,8 @@
 //--------------------------------------------------------------
 EnvelopOperation::EnvelopOperation()
 {
-    initialize({}, {DataType_Float});
+    // initialize({}, {DataType_Float});
+    makeOutput("value", DataType_Float);
     makeProperty({"attack", DataType_Float, &attack});
     makeProperty({"decay", DataType_Float, &decay});
     makeProperty({"sustain", DataType_Float, &sustain});

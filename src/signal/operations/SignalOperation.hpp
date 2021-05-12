@@ -42,6 +42,19 @@ struct SignalOperationConnection
     size_t index = 0;
     size_t count = 0;
     OperationDataType type = DataType_Undefined;
+    std::string name;
+};
+
+struct SignalOperation;
+
+struct SignalPreview
+{
+    std::array<float, 32> data;
+    float maxVal = 1.0;
+    bool hasChange = true;
+
+    void dirty();
+    void compute(SignalOperation* operation);
 };
 
 //--------------------------------------------------------------
@@ -105,9 +118,16 @@ struct SignalOperation
     static void setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx);
     static void remConnection(SignalOperation* op, size_t index);
 
+    virtual void uiProperties();
+
+    SignalPreview preview;
+
 protected:
-    void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output);
+    // void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output);
+    void makeInput(const std::string& name, OperationDataType type);
+    void makeOutput(const std::string& name, OperationDataType type);
     void makeProperty(const PropDesc& property);
+    void uiProperty(int index);
     bool _hasCustomData = false;
 
 private:

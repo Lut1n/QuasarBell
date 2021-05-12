@@ -20,6 +20,8 @@ struct KeySampler : public SignalOperation
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;
 
+    void uiProperties() override;
+
     float interpolate(float x);
 
     int count = 1;

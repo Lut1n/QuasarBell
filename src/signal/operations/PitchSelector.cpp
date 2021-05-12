@@ -2,12 +2,21 @@
 
 #include "signal/Signal.hpp"
 
+#include "signal/PcmData.hpp"
+
+#include "app/App.hpp"
+
 #include <array>
+
+#include "imgui.h"
 
 //--------------------------------------------------------------
 PitchSelector::PitchSelector()
 {
-    initialize({DataType_Float,DataType_Float},{DataType_Float});
+    // initialize({DataType_Float,DataType_Float},{DataType_Float});
+    makeInput("octave", DataType_Float);
+    makeInput("semitone", DataType_Float);
+    makeOutput("freq", DataType_Float);
     makeProperty({"octave", DataType_Int, &octave});
     makeProperty({"semitone", DataType_Int, &semitone});
 }
@@ -53,4 +62,51 @@ OperationData PitchSelector::sample(size_t index, const Time& t)
     data.fvec[0] = pitchToFreq(midiindex, midi_la440, midi_semitones);
 
     return data;
+}
+
+
+//--------------------------------------------------------------
+void PitchSelector::uiProperties()
+{
+    auto generator = [](float f){
+        float duration = 0.3f;
+        auto& settings = AudioSettings::defaultSettings;
+        qb::Pcm16 output;
+        output.resize((size_t)(duration * settings.sampleRate));
+        for(unsigned i=0;i<output.count();++i)
+        {
+            float t = (float)i / (float)settings.sampleRate;
+            output.set(i, std::sin(f * t * 2.f*3.141592f));
+        }
+        return output;
+    };
+
+
+    if (ImGui::InputInt("octave", &octave)) preview.dirty();
+    if (ImGui::InputInt("semitone", &semitone)) preview.dirty();
+    if (ImGui::Button("Play") && App::s_instance)
+    {
+        auto& sound = *(App::s_instance->sound);
+        if(sound.getState() != SoundNode::Playing)
+        {
+            qb::Pcm16 pcm = generator(getFreq());
+            sound.queue(pcm);
+            sound.play();
+        }
+    }
+
+    
+    constexpr std::array<const char*, 12> pitch_name = {"C", "C#/Db", "D", "Eb/D#", "E", "F", "F#/Gb", "G", "Ab/G#", "A", "Bb/A#", "B"};
+    ImGui::Separator();
+    ImGui::Text("info:");
+    int midi = getMidiIndex();
+    const char* noteName = pitch_name[midi % 12];
+    float freq = getFreq();
+    ImGui::Text(noteName);
+    ImGui::InputInt("midi", &midi);
+    ImGui::InputFloat("freq", &freq);
+    ImGui::Separator();
+    ImGui::Text("Preview");
+    preview.compute(this);
+    ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
 }

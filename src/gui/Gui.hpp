@@ -49,8 +49,8 @@ public:
 //--------------------------------------------------------------
 enum class ETool
 {
-    Synth,
-    BasicEditor,
+    //Synth,
+    //BasicEditor,
     NodalEditor
 };
 //--------------------------------------------------------------
@@ -59,12 +59,6 @@ struct AppState
     ETool toolMode = ETool::NodalEditor;
     bool resetProject = false;
 };
-
-//--------------------------------------------------------------
-FWD_CLASS(FrequencyEdit);
-FWD_CLASS(AmplitudeEdit);
-FWD_CLASS(WaveEdit);
-FWD_CLASS(PcmPlayer);
 
 //--------------------------------------------------------------
 class GuiRenderer

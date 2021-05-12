@@ -1,7 +1,5 @@
 #include "core/Factory.h"
 #include "app/App.hpp"
-#include "app/Synth.hpp"
-#include "app/SFXBasicEditor.hpp"
 #include "app/NodalEditor.hpp"
 
 #include "graphics/RenderInterface.h"
@@ -29,18 +27,13 @@ int runQuasarBell(int argc, char* argv[])
     app.sound = &sound;
     
     // workspace mode
-    BasicEditorWorkSpace basicEditor;
     NodalEditorWorkSpace nodalEditor;
-    SynthWorkSpace synth;
-    basicEditor.init(&app);
-    synth.init(&app);
     nodalEditor.init(&app);
     ToolWorkSpace* toolPtr = &nodalEditor;
     
     // main loop
     RenderInterface::setTarget(win);
     while(RenderInterface::begin())
-    // while(!gui.shouldClose())
     {
         RenderInterface::setTarget(win);
         RenderInterface::clear(0x1e1e1eFF);
@@ -58,11 +51,7 @@ int runQuasarBell(int argc, char* argv[])
         scene.update();
         gui.display();
     
-        if( gui.appState.toolMode == ETool::BasicEditor)
-            toolPtr = &basicEditor;
-        else if( gui.appState.toolMode == ETool::Synth)
-            toolPtr = &synth;
-        else if( gui.appState.toolMode == ETool::NodalEditor)
+        if( gui.appState.toolMode == ETool::NodalEditor)
             toolPtr = &nodalEditor;
         UiSystem::instance()->setActivated(gui.appState.toolMode == ETool::NodalEditor);
         RenderInterface::end();

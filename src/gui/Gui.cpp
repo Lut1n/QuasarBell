@@ -155,8 +155,8 @@ void GuiRenderer::display()
         }
         if(ImGui::BeginMenu("Tools"))
         {
-            if( ImGui::MenuItem("SFX Edition") ) appState.toolMode = ETool::BasicEditor;
-            if( ImGui::MenuItem("Synth") ) appState.toolMode = ETool::Synth;
+            // if( ImGui::MenuItem("SFX Edition") ) appState.toolMode = ETool::BasicEditor;
+            // if( ImGui::MenuItem("Synth") ) appState.toolMode = ETool::Synth;
             if( ImGui::MenuItem("Nodal Editor") ) appState.toolMode = ETool::NodalEditor;
             ImGui::EndMenu();
         }

@@ -2,6 +2,7 @@
 #define QUASAR_BELL_OPERATION_HPP
 
 #include "signal/operations/SignalOperation.hpp"
+#include "audio/AudioRenderer.hpp"
 
 //--------------------------------------------------------------
 struct FloatInput : public SignalOperation
@@ -52,6 +53,8 @@ struct PolynomialSampler : public SignalOperation
     
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;
+
+    void uiProperties() override;
 
     int count = 1;
     std::vector<float> coefs;
@@ -137,13 +140,25 @@ struct TimeScale : public SignalOperation
 struct OutputOperation : public SignalOperation
 {
     OutputOperation();
+    ~OutputOperation();
+    
     void validate() override;
     OperationData sample(size_t index, const Time& t) override;
+
+    void uiProperties() override;
+
+    void generate(PcmDataBase& pcm);
 
     float range = 1.0;
     float duration = 1.0;
     int sampleRate = 44100;
     int sampleBits = 16;
+
+    // indexes
+    int sampleRateIndex = -1;
+    int sampleFormatIndex = -1;
+    
+    static OutputOperation* defaultOutput;
 };
 
 

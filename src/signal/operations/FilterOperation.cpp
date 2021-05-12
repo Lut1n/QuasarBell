@@ -1,9 +1,14 @@
 #include "signal/operations/FilterOperation.hpp"
 
+#include "imgui.h"
+
 //--------------------------------------------------------------
 FreqFilter::FreqFilter()
 {
-    initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float,DataType_Float});
+    makeInput("freq", DataType_Float);
+    makeInput("ampl", DataType_Float);
+    makeInput("factor", DataType_Float);
+    makeOutput("value", DataType_Float);
     makeProperty({"offset",DataType_Float, &offset});
     makeProperty({"length",DataType_Float, &length});
     makeProperty({"minGain",DataType_Float, &minGain});
@@ -49,4 +54,30 @@ OperationData FreqFilter::sample(size_t index, const Time& t)
         data.fvec[0] = freq;
     }
     return data;
+}
+
+void FreqFilter::uiProperties()
+{
+    if (ImGui::InputFloat("offset", &offset)) preview.dirty();
+    if (ImGui::InputFloat("length", &length)) preview.dirty();
+    if (ImGui::InputFloat("minGain", &minGain)) preview.dirty();
+    if (ImGui::InputFloat("maxGain", &maxGain)) preview.dirty();
+    if (ImGui::InputFloat("factor", &factor)) preview.dirty();
+    
+    ImGui::Separator();
+    ImGui::Text("Preview");
+    validateGraph();
+    std::array<float, 100> buf;
+    for(size_t i=0; i<100; ++i)
+    {
+        SignalOperation::Time time;
+        time.duration = 1.f;
+        time.t = (float)i/100.0f;
+        time.sec = (float)i/100.0f;
+        time.elapsed = 0.01f;
+        time.dstOp = this;
+
+        buf[i] = sample(1, time).fvec[0];
+    }
+    ImGui::PlotLines("##preview", buf.data(), 100, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
 }

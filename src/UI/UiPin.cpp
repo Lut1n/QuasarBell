@@ -63,7 +63,7 @@ void UiPin::draw()
     UiRect::draw();
     this->label->parentClippingRect = parentClippingRect;
     this->label->parentPosition = parentPosition;
-    this->label->position = position + (textOnLeft ? vec2(-this->label->getTextSize().x - 5.f, 0.f) : vec2(size.x + 5.f, 0.f));
+    this->label->position = position + (isInput ? vec2(-this->label->getTextSize().x - 5.f, 0.f) : vec2(size.x + 5.f, 0.f));
     this->label->draw();
 }
 

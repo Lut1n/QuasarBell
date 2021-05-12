@@ -2,13 +2,16 @@
 
 #include <iostream>
 
+#include "imgui.h"
+
 #include "json/Json.hpp"
 
 //--------------------------------------------------------------
 KeySampler::KeySampler()
 {
     _hasCustomData = true;
-    initialize({},{DataType_Float});
+    // initialize({},{DataType_Float});
+    makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
     makeProperty({"interpo", DataType_Int, &interpo});
     keys.resize(1,{0.f,1.f});
@@ -87,4 +90,47 @@ void KeySampler::loadCustomData(JsonValue& json)
         keys[index] = {(float)jkv.setPath(0).getNumeric(),(float) jkv.setPath(1).getNumeric()};
         index++;
     }
+}
+
+//--------------------------------------------------------------
+void KeySampler::uiProperties()
+{
+    constexpr size_t typeCount = 3;
+    constexpr std::array<const char*, typeCount> typeNames = {"flat", "linear", "cubic"};
+    if (ImGui::Button(typeNames[interpo]))
+    {
+        interpo = (interpo+1) % typeCount;
+        preview.dirty();
+    }
+
+    if (ImGui::InputInt("count", &count))
+    {
+        if (count < 1) count = 1;
+        if (count > 10) count = 10;
+        keys.resize(count);
+        preview.dirty();
+    }
+    
+    ImGui::Columns(2);
+    ImGui::Text("Time");
+    ImGui::NextColumn();
+    ImGui::Text("Value");
+    ImGui::NextColumn();
+    ImGui::Separator();
+    int index = 0;
+    for(auto& kv : keys)
+    {
+        std::string keytext = std::string("##key") + std::to_string(index);
+        std::string valtext = std::string("##val") + std::to_string(index);
+        if (ImGui::InputFloat(keytext.c_str(), &kv.first)) preview.dirty();
+        ImGui::NextColumn();
+        if (ImGui::InputFloat(valtext.c_str(), &kv.second)) preview.dirty();
+        ImGui::NextColumn();
+        index++;
+    }
+    ImGui::Columns(1);
+    ImGui::Separator();
+    ImGui::Text("Preview");
+    preview.compute(this);
+    ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
 }

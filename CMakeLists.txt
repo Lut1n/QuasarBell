@@ -13,47 +13,24 @@ find_package(OpenAL REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     src/app/App.hpp
-    src/app/SFXBasicEditor.hpp
     src/app/NodalEditor.hpp
-    src/app/Synth.hpp
     src/gui/Gui.hpp
     src/gui/UserFileInput.hpp
-    src/gui/InputEffect.hpp
-    src/gui/Keyboard.hpp
-    src/gui/PostEffect.hpp
-    src/gui/SignalEdit.hpp
     src/gui/NodeContextMenu.hpp
     src/gui/NodePropertiesEdit.hpp
     src/gui/nodal/SignalOperationNode.hpp
-    src/gui/nodal/AddSignalNode.hpp
-    src/gui/nodal/FloatSignalNode.hpp
-    src/gui/nodal/CubicSamplerNode.hpp
-    src/gui/nodal/OscillatorNode.hpp
-    src/gui/nodal/AudioOutputNode.hpp
-    src/gui/nodal/QuantizerNode.hpp
-    src/gui/nodal/MixNode.hpp
-    src/gui/nodal/EnvelopNode.hpp
-    src/gui/nodal/StepNode.hpp
-    src/gui/nodal/FilterNode.hpp
-    src/gui/nodal/PitchNode.hpp
-    src/gui/nodal/WaveformNode.hpp
-    src/gui/nodal/KeySamplerNode.hpp
-    src/gui/nodal/HarmonicsNode.hpp
-    src/gui/nodal/PolynomialNode.hpp
+    src/gui/nodal/TypedSignalOperationNode.hpp
     src/gui/imgui_impl_glfw.h
     src/gui/imgui_impl_opengl3.h
     src/json/json.hpp
     src/json/jsonrw.hpp
     src/readerwriter/FileIO.hpp
-    src/readerwriter/SignalRW.hpp
     src/readerwriter/RwHelpers.hpp
     src/readerwriter/FileExplorer.hpp
     src/readerwriter/SignalOperationsRW.hpp
     src/audio/AudioRenderer.hpp
     src/audio/Error.hpp
     src/audio/Format.hpp
-    src/signal/LinearSamplers.hpp
-    src/signal/Modulator.hpp
     src/signal/PcmData.hpp
     src/signal/Signal.hpp
     src/signal/WavExporter.hpp
@@ -101,31 +78,11 @@ add_executable(
     src/ui/UiConnections.h
     
     src/main.cpp
-    src/app/SFXBasicEditor.cpp
     src/app/NodalEditor.cpp
-    src/app/Synth.cpp
     src/gui/Gui.cpp
     src/gui/UserFileInput.cpp
-    src/gui/InputEffect.cpp
-    src/gui/Keyboard.cpp
-    src/gui/PostEffect.cpp
-    src/gui/SignalEdit.cpp
     src/gui/nodal/SignalOperationNode.cpp
-    src/gui/nodal/AddSignalNode.cpp
-    src/gui/nodal/FloatSignalNode.cpp
-    src/gui/nodal/CubicSamplerNode.cpp
-    src/gui/nodal/OscillatorNode.cpp
-    src/gui/nodal/AudioOutputNode.cpp
-    src/gui/nodal/QuantizerNode.cpp
-    src/gui/nodal/MixNode.cpp
-    src/gui/nodal/EnvelopNode.cpp
-    src/gui/nodal/StepNode.cpp
-    src/gui/nodal/FilterNode.cpp
-    src/gui/nodal/PitchNode.cpp
-    src/gui/nodal/WaveformNode.cpp
-    src/gui/nodal/KeySamplerNode.cpp
-    src/gui/nodal/HarmonicsNode.cpp
-    src/gui/nodal/PolynomialNode.cpp
+    src/gui/nodal/TypedSignalOperationNode.cpp
     src/gui/NodeContextMenu.cpp
     src/gui/NodePropertiesEdit.cpp
     src/gui/imgui_impl_glfw.cpp
@@ -133,13 +90,10 @@ add_executable(
     src/json/json.cpp
     src/json/jsonrw.cpp
     src/readerwriter/FileIO.cpp
-    src/readerwriter/SignalRW.cpp
     src/readerwriter/RwHelpers.cpp
     src/readerwriter/FileExplorer.cpp
     src/readerwriter/SignalOperationsRW.cpp
     src/audio/AudioRenderer.cpp
-    src/signal/LinearSamplers.cpp
-    src/signal/Modulator.cpp
     src/signal/PcmData.cpp
     src/signal/Signal.cpp
     src/signal/WavExporter.cpp

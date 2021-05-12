@@ -3,12 +3,15 @@
 #include <cmath> // sin
 #include <iostream>
 
+#include "imgui.h"
+
 #include "core/PseudoRand.hpp"
 
 //--------------------------------------------------------------
 Waveform::Waveform()
 {
-    initialize({},{DataType_Float});
+    // initialize({},{DataType_Float});
+    makeOutput("value", DataType_Float);
     makeProperty({"period", DataType_Float, &period});
     makeProperty({"min", DataType_Float, &minVal});
     makeProperty({"max", DataType_Float, &maxVal});
@@ -90,5 +93,30 @@ void Waveform::computeNoise()
         qb::noiseSeed(noiseSeed);
         samples.resize(noiseSamples);
         for(auto& s : samples) s = qb::noiseValue() * 2.f - 1.f;
+    }
+}
+
+void Waveform::uiProperties()
+{
+    ImGui::Text("Preview:");
+    preview.compute(this);
+    ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
+    ImGui::Separator();
+
+    ImGui::InputFloat("period", &period);
+    ImGui::InputFloat("min", &minVal);
+    ImGui::InputFloat("max", &maxVal);
+
+    constexpr size_t count = 4;
+    constexpr std::array<const char*, count> typeNames = {"sin", "saw", "square", "noise"};
+    if (ImGui::Button(typeNames[type]))
+    {
+        type = (type+1) % count;
+    }
+
+    if (type == 3)
+    {
+        ImGui::InputInt("noise seed", &noiseSeed);
+        ImGui::InputInt("noise size", &noiseSamples);
     }
 }

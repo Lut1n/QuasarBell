@@ -2,8 +2,6 @@
 #define QUASAR_BELL_NODAL_EDITOR
 
 #include "App.hpp"
-#include "gui/PostEffect.hpp"
-#include "gui/InputEffect.hpp"
 
 #include "font/GlyphRenderer.h"
 #include "ui/UiSystem.h"

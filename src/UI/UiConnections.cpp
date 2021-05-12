@@ -20,7 +20,7 @@ static void findAncestors(UiNode* node, std::vector<UiNode*>& ancestors)
 
 static bool cycleCheck(UiPin* a, UiPin* b)
 {
-    if (a->textOnLeft)
+    if (a->isInput)
     {
         UiPin* t = a;
         a = b;
@@ -42,7 +42,7 @@ UiConnections::UiConnections()
 
 std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
 {
-    if(a == b || a->type != b->type || a->textOnLeft == b->textOnLeft) return 0;
+    if(a == b || a->type != b->type || a->isInput == b->isInput) return 0;
 
     if (cycleCheck(a, b))
     {
@@ -52,12 +52,12 @@ std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
 
     std::uint64_t id = previousId++;
     links[id] = Link{a,b};
-    if (a->connectionIds.size() > 0 && !a->multipleConnections)
+    if (a->connectionIds.size() > 0 && a->isInput)
     {
         for (auto id : a->connectionIds) deleteLink(id);
         a->connectionIds.clear();
     }
-    if (b->connectionIds.size() > 0 && !b->multipleConnections)
+    if (b->connectionIds.size() > 0 && b->isInput)
     {
         for (auto id : b->connectionIds) deleteLink(id);
         b->connectionIds.clear();

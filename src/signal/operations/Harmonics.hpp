@@ -14,6 +14,8 @@ struct Harmonics : public SignalOperation
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;
 
+    void uiProperties() override;
+
     int count = 1;
     std::vector<std::pair<float,float>> freqs;
 };
