@@ -5,11 +5,11 @@
 #include <unordered_map>
 #include <list>
 
-#include "ui/UiSystem.h"
-#include "ui/UiFrame.h"
-#include "ui/UiList.h"
-#include "ui/UiText.h"
-#include "ui/UiPin.h"
+#include "Ui/UiSystem.h"
+#include "Ui/UiFrame.h"
+#include "Ui/UiList.h"
+#include "Ui/UiText.h"
+#include "Ui/UiPin.h"
 
 struct UiNode : public UiFrame
 {

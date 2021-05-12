@@ -1,8 +1,8 @@
-#include "ui/UiConnections.h"
+#include "Ui/UiConnections.h"
 
-#include "graphics/RenderInterface.h"
-#include "ui/UiPin.h"
-#include "ui/UiNode.h"
+#include "Graphics/RenderInterface.h"
+#include "Ui/UiPin.h"
+#include "Ui/UiNode.h"
 
 UiConnections* UiConnections::instance = nullptr;
 

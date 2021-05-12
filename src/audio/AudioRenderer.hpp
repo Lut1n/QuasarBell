@@ -7,7 +7,7 @@
 #include <al.h>
 #include <alc.h>
 
-#include "signal/PcmData.hpp"
+#include "Audio/PcmData.hpp"
 
 //--------------------------------------------------------------
 class vec3

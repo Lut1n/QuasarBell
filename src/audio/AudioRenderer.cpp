@@ -6,9 +6,9 @@
 #include <al.h>
 #include <alc.h>
 
-#include "signal/Signal.hpp"
-#include "audio/Error.hpp"
-#include "audio/Format.hpp"
+#include "Audio/Signal.hpp"
+#include "Audio/Error.hpp"
+#include "Audio/Format.hpp"
 
 //--------------------------------------------------------------
 Scene::Scene()

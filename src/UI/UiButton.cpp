@@ -1,4 +1,4 @@
-#include "ui/UiButton.h"
+#include "Ui/UiButton.h"
 
 UiButton::UiButton(const std::string& text, const vec2& position, const vec2& size, unsigned color)
     : UiRect(position, size, color)

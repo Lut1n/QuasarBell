@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "core/Vec2.h"
-#include "font/GlyphRenderer.h"
+#include "Core/Vec2.h"
+#include "Font/GlyphRenderer.h"
 
-#include "ui/UiEvent.h"
+#include "Ui/UiEvent.h"
 
 struct UiTime
 {

@@ -1,7 +1,7 @@
 #ifndef GL_QUAD_H
 #define GL_QUAD_H
 
-#include "core/Vec2.h"
+#include "Core/Vec2.h"
 
 struct GlQuad
 {

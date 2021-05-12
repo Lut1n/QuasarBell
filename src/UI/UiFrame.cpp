@@ -1,4 +1,4 @@
-#include "ui/UiFrame.h"
+#include "Ui/UiFrame.h"
 
 UiFrame::UiFrame(const vec2& position, const vec2& size)
     : UiRect(position, size, colorOnIdle)

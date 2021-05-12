@@ -1,6 +1,6 @@
-#include "graphics/GlSprite.h"
+#include "Graphics/GlSprite.h"
 
-#include "graphics/GlError.h"
+#include "Graphics/GlError.h"
 
 GlSprite::GlSprite()
 {

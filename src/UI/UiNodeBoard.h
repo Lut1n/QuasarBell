@@ -3,10 +3,10 @@
 
 #include <list>
 
-#include "ui/UiSystem.h"
-#include "ui/UiFrame.h"
-#include "ui/UiNode.h"
-#include "ui/UiConnections.h"
+#include "Ui/UiSystem.h"
+#include "Ui/UiFrame.h"
+#include "Ui/UiNode.h"
+#include "Ui/UiConnections.h"
 
 struct UiNodeBoard : public UiFrame
 {

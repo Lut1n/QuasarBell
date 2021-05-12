@@ -1,10 +1,10 @@
-#include "core/Factory.h"
-#include "app/App.hpp"
-#include "app/NodalEditor.hpp"
+#include "Core/Factory.h"
+#include "App/App.hpp"
+#include "App/NodalEditor.hpp"
 
-#include "graphics/RenderInterface.h"
-#include "font/GlyphRenderer.h"
-#include "ui/UiSystem.h"
+#include "Graphics/RenderInterface.h"
+#include "Font/GlyphRenderer.h"
+#include "Ui/UiSystem.h"
 
 //--------------------------------------------------------------
 int runQuasarBell(int argc, char* argv[])

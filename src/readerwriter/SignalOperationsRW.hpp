@@ -1,8 +1,8 @@
 #ifndef JSON_SIGNAL_OPERATIONS_H
 #define JSON_SIGNAL_OPERATIONS_H
 
-#include "json/json.hpp"
-// #include "signal/operations/SignalOperation.hpp"
+#include "Json/json.hpp"
+// #include "SignalOperation/SignalOperation.hpp"
 
 struct OperationCollection;
 struct OperationConnections;

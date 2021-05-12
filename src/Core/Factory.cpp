@@ -1,4 +1,4 @@
-#include "core/Factory.h"
+#include "Core/Factory.h"
 
 std::array<BaseFactory*, 256> BaseFactory::factories = {};
 

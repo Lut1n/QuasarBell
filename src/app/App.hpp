@@ -1,8 +1,8 @@
 #ifndef QUASAR_BELL_APP_H
 #define QUASAR_BELL_APP_H
 
-#include "audio/AudioRenderer.hpp"
-#include "gui/Gui.hpp"
+#include "Audio/AudioRenderer.hpp"
+#include "App/Gui.hpp"
 
 //--------------------------------------------------------------
 class App

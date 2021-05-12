@@ -1,6 +1,6 @@
-#include "graphics/GlQuad.h"
+#include "Graphics/GlQuad.h"
 
-#include "graphics/GlError.h"
+#include "Graphics/GlError.h"
 
 GlQuad::GlQuad()
 {

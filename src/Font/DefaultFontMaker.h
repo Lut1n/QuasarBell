@@ -1,7 +1,7 @@
 #ifndef DEFAULT_FONT_H
 #define DEFAULT_FONT_H
 
-#include "font/FontMaker.h"
+#include "Font/FontMaker.h"
 
 struct DefaultFontMaker : public FontMaker
 {

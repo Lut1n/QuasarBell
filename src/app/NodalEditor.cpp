@@ -1,15 +1,15 @@
 #include "NodalEditor.hpp"
 
-#include "core/Factory.h"
+#include "Core/Factory.h"
 
-#include "gui/nodal/SignalOperationNode.hpp"
+#include "App/SignalOperationNode.hpp"
 
-#include "readerwriter/FileIO.hpp"
-#include "signal/WavExporter.hpp"
-#include "readerwriter/SignalOperationsRW.hpp"
+#include "ReaderWriter/FileIO.hpp"
+#include "Audio/WavExporter.hpp"
+#include "ReaderWriter/SignalOperationsRW.hpp"
 
-#include "signal/operations/OperationType.hpp"
-#include "signal/operations/Operations.hpp"
+#include "SignalOperation/OperationType.hpp"
+#include "SignalOperation/Operations.hpp"
 
 
 App* App::s_instance = nullptr;

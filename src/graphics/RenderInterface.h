@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "core/Vec2.h"
+#include "Core/Vec2.h"
 
 struct RenderInterface
 {

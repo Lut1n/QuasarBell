@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "core/Vec2.h"
-#include "font/DefaultFontMaker.h"
-#include "graphics/RenderInterface.h"
+#include "Core/Vec2.h"
+#include "Font/DefaultFontMaker.h"
+#include "Graphics/RenderInterface.h"
 
 struct GlyphRenderer
 {

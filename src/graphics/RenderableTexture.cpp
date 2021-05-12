@@ -1,6 +1,6 @@
-#include "graphics/RenderableTexture.h"
+#include "Graphics/RenderableTexture.h"
 
-#include "graphics/GlError.h"
+#include "Graphics/GlError.h"
 
 RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     : width(w)

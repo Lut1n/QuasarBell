@@ -1,6 +1,6 @@
-#include "ui/UiNode.h"
+#include "Ui/UiNode.h"
 
-#include "ui/UiConnections.h"
+#include "Ui/UiConnections.h"
 
 std::list<UiNode*> UiNode::selected;
 

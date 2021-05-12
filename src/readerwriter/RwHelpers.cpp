@@ -1,4 +1,4 @@
-#include "readerwriter/RwHelpers.hpp"
+#include "ReaderWriter/RwHelpers.hpp"
 
 //--------------------------------------------------------------
 void toJson(JsonValue& json, const vec2& v)

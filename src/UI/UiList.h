@@ -3,11 +3,11 @@
 
 #include <memory>
 
-#include "ui/UiSystem.h"
+#include "Ui/UiSystem.h"
 
-#include "ui/UiContainer.h"
-#include "ui/UiRect.h"
-#include "ui/UiSlider.h"
+#include "Ui/UiContainer.h"
+#include "Ui/UiRect.h"
+#include "Ui/UiSlider.h"
 
 struct UiList : public UiElement
 {

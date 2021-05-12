@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "json/json.hpp"
-#include "core/Vec2.h"
+#include "Json/json.hpp"
+#include "Core/Vec2.h"
 
 //--------------------------------------------------------------
 void toJson(JsonValue& json, const vec2& v);

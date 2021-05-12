@@ -3,21 +3,21 @@
 
 #include "App.hpp"
 
-#include "font/GlyphRenderer.h"
-#include "ui/UiSystem.h"
-#include "ui/UiForm.h"
-#include "ui/UiNode.h"
-#include "ui/UiText.h"
-#include "ui/UiInput.h"
-#include "ui/UiButton.h"
-#include "ui/UiNodeBoard.h"
+#include "Font/GlyphRenderer.h"
+#include "Ui/UiSystem.h"
+#include "Ui/UiForm.h"
+#include "Ui/UiNode.h"
+#include "Ui/UiText.h"
+#include "Ui/UiInput.h"
+#include "Ui/UiButton.h"
+#include "Ui/UiNodeBoard.h"
 
 #include <unordered_map>
 
-#include "gui/NodePropertiesEdit.hpp"
-#include "gui/NodeContextMenu.hpp"
+#include "App/NodePropertiesEdit.hpp"
+#include "App/NodeContextMenu.hpp"
 
-#include "gui/nodal/SignalOperationNode.hpp"
+#include "App/SignalOperationNode.hpp"
 
 
 struct OperationCollection

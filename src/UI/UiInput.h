@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include "ui/UiSystem.h"
+#include "Ui/UiSystem.h"
 
-#include "ui/UiText.h"
-#include "ui/UiRect.h"
+#include "Ui/UiText.h"
+#include "Ui/UiRect.h"
 
 struct UiInput : public UiRect
 {

@@ -1,4 +1,4 @@
-#include "font/GlyphRenderer.h"
+#include "Font/GlyphRenderer.h"
 
 
 #include <cmath>

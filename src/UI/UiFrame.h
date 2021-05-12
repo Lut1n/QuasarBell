@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include "ui/UiSystem.h"
+#include "Ui/UiSystem.h"
 
-#include "ui/UiRect.h"
-#include "ui/UiContainer.h"
+#include "Ui/UiRect.h"
+#include "Ui/UiContainer.h"
 
 struct UiFrame : public UiRect
 {

@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include "ui/UiSystem.h"
-#include "ui/UiFrame.h"
-#include "ui/UiList.h"
-#include "ui/UiText.h"
+#include "Ui/UiSystem.h"
+#include "Ui/UiFrame.h"
+#include "Ui/UiList.h"
+#include "Ui/UiText.h"
 
 struct UiForm : public UiFrame
 {
