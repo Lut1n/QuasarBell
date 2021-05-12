@@ -1,6 +1,7 @@
 #include "SignalOperation/KeySampler.hpp"
 
 #include <iostream>
+#include <string>
 
 #include "imgui.h"
 
@@ -10,15 +11,10 @@
 KeySampler::KeySampler()
 {
     _hasCustomData = true;
-    // initialize({},{DataType_Float});
     makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
     makeProperty({"interpo", DataType_Int, &interpo});
     keys.resize(1,{0.f,1.f});
-}
-//--------------------------------------------------------------
-void KeySampler::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData KeySampler::sample(size_t index, const Time& t)

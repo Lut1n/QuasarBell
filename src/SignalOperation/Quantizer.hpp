@@ -8,7 +8,6 @@
 struct Quantizer : public SignalOperation
 {
     Quantizer();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     int quantity = 0;

@@ -1,53 +1,50 @@
-#include "App/SignalOperationNode.hpp"
-
-#include "imgui.h"
-
-namespace qb
-{
-    namespace imgui
-    {
-        static float s_sampler_count = 100;
-    }
-}
+#include "App/SignalNode.hpp"
 
 //--------------------------------------------------------------
-SignalOperationNode::SignalOperationNode(const std::string& title, size_t nodeTypeId)
+namespace qb::imgui
+{
+    static float s_sampler_count = 100;
+}
+//--------------------------------------------------------------
+SignalNode::SignalNode(const std::string& title, size_t nodeTypeId)
     : UiNode(title, vec2(0.0,0.0), vec2(70,70))
     , _nodetypeId(nodeTypeId)
 {
 }
-
 //--------------------------------------------------------------
-void SignalOperationNode::setOperation(SignalOperation* op)
+void SignalNode::setOperation(SignalOperation* op)
 {
     _operation = op;
     for(size_t i=0; i<_operation->getInputCount(); ++i)
     {
         auto input = _operation->getInput(i);
-        addPin(i, input->name, false);
+        addPin((int)i, input->name, false);
     }
     for(size_t i=0; i<_operation->getOutputCount(); ++i)
     {
         auto output = _operation->getOutput(i);
-        addPin(i, output->name, true);
+        addPin((int)i, output->name, true);
     }
 }
-
 //--------------------------------------------------------------
-size_t SignalOperationNode::nodeTypeId() const
+size_t SignalNode::nodeTypeId() const
 {
     return _nodetypeId;
 }
-
 //--------------------------------------------------------------
-SignalOperation* SignalOperationNode::getOperation()
+SignalOperation* SignalNode::getOperation()
 {
     return _operation;
 }
-
-void SignalOperationNode::drawPreview(const Rect& previewArea)
+//--------------------------------------------------------------
+void SignalNode::displayProperties()
 {
-    auto& preview = getOperation()->preview;
+    _operation->uiProperties();
+}
+//--------------------------------------------------------------
+void SignalNode::drawPreview(const Rect& previewArea)
+{
+    auto& preview = _operation->preview;
     auto& data = preview.data;
     const int sample_count = (int)data.size();
     RenderInterface::setColor(0x777777FF);
@@ -56,7 +53,7 @@ void SignalOperationNode::drawPreview(const Rect& previewArea)
     vec2 barS(previewArea.size().x / (float)sample_count, 0);
     RenderInterface::setColor(0xEEEEEEFF);
 
-    preview.compute(getOperation());
+    preview.compute(_operation);
 
     for(int i=0; i< (int)data.size(); ++i)
     {

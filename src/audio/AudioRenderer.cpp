@@ -10,6 +10,11 @@
 #include "Audio/Error.hpp"
 #include "Audio/Format.hpp"
 
+namespace qb
+{
+    SoundNode* defaultSoundNode = nullptr;
+}
+
 //--------------------------------------------------------------
 Scene::Scene()
 {
@@ -55,6 +60,7 @@ SoundNode::SoundNode(bool isStream)
     : Node()
     , _stream(isStream)
 {
+    if(!qb::defaultSoundNode) setAsDefault();
     alGetError(); // clear error code
     
     // Generate Sources
@@ -72,6 +78,8 @@ SoundNode::SoundNode(bool isStream)
 //--------------------------------------------------------------
 SoundNode::~SoundNode()
 {
+    if (qb::defaultSoundNode == this) qb::defaultSoundNode = nullptr;
+    
     alDeleteSources(1, &_sourceID);
     if(_bufferID != 0)
         alDeleteBuffers(1, &_bufferID);
@@ -97,6 +105,16 @@ SoundNode::State SoundNode::getState() const
         return Stopped;
     
     return Initial;
+}
+//--------------------------------------------------------------
+void SoundNode::setAsDefault()
+{
+    qb::defaultSoundNode = this;
+}
+//--------------------------------------------------------------
+SoundNode* SoundNode::getDefault()
+{
+    return qb::defaultSoundNode;
 }
 //--------------------------------------------------------------
 void SoundNode::load(const PcmDataBase& pcm)

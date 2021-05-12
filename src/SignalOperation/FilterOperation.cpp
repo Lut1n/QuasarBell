@@ -16,10 +16,6 @@ FreqFilter::FreqFilter()
     makeProperty({"factor",DataType_Float, &factor});
 }
 //--------------------------------------------------------------
-void FreqFilter::validate()
-{
-}
-//--------------------------------------------------------------
 OperationData FreqFilter::sample(size_t index, const Time& t)
 {
     t.dstOp = this;
@@ -66,7 +62,7 @@ void FreqFilter::uiProperties()
     
     ImGui::Separator();
     ImGui::Text("Preview");
-    validateGraph();
+    startSamplingGraph();
     std::array<float, 100> buf;
     for(size_t i=0; i<100; ++i)
     {

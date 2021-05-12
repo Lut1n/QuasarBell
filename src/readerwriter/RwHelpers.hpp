@@ -10,5 +10,7 @@
 void toJson(JsonValue& json, const vec2& v);
 //--------------------------------------------------------------
 void jsonTo(JsonValue& json, vec2& v);
+//--------------------------------------------------------------
+void writeInfo(JsonValue& root);
 
 #endif // JSON_HELPERS_H

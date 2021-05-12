@@ -3,9 +3,10 @@
 #include "imgui.h"
 
 //--------------------------------------------------------------
-UserFileInput::UserFileInput(const std::string& title, const std::string& ext)
+UserFileInput::UserFileInput(const std::string& title, const std::string& ext, const std::string& defaultPath)
     : _title(title)
     , _ext(ext)
+    , filepath(defaultPath)
 {
 }
 //--------------------------------------------------------------
@@ -21,6 +22,15 @@ void UserFileInput::open()
 void UserFileInput::close()
 {
     ImGui::CloseCurrentPopup();
+}
+//--------------------------------------------------------------
+void UserFileInput::displayItem(const char* text, UserFileInput::Req req)
+{
+    if(ImGui::MenuItem(text))
+    {
+        request = req;
+        open();
+    }
 }
 //--------------------------------------------------------------
 void UserFileInput::display()
@@ -121,7 +131,7 @@ void AboutPanel::display()
         return;
 
     ImGui::Text("QuasarBell");
-    ImGui::Text("version 1.0");
+    ImGui::Text("version 2.2");
     ImGui::Text("2021 - Mathieu Boulet");
     ImGui::Text("sources: https://www.github.com/Lut1n/QuasarBell");
     if(ImGui::Button("Okay"))

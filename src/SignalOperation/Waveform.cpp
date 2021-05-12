@@ -10,7 +10,6 @@
 //--------------------------------------------------------------
 Waveform::Waveform()
 {
-    // initialize({},{DataType_Float});
     makeOutput("value", DataType_Float);
     makeProperty({"period", DataType_Float, &period});
     makeProperty({"min", DataType_Float, &minVal});
@@ -20,12 +19,9 @@ Waveform::Waveform()
     makeProperty({"noise-samples", DataType_Int, &noiseSamples});
 }
 //--------------------------------------------------------------
-void Waveform::validate()
+void Waveform::startSampling()
 {
-    if (type == Type::Noise)
-    {
-        computeNoise();
-    }
+    if (type == Type::Noise) computeNoise();
 }
 
 //--------------------------------------------------------------

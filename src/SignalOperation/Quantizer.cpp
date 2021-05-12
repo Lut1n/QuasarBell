@@ -5,15 +5,10 @@
 //--------------------------------------------------------------
 Quantizer::Quantizer()
 {
-    // initialize({DataType_Float,DataType_Int},{DataType_Float});
     makeInput("value", DataType_Float);
     makeInput("quantity", DataType_Int);
     makeOutput("value", DataType_Float);
     makeProperty({"quantity", DataType_Int, &quantity});
-}
-//--------------------------------------------------------------
-void Quantizer::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData Quantizer::sample(size_t index, const Time& t)

@@ -1,10 +1,10 @@
-#include "Core/Factory.h"
-#include "App/App.hpp"
-#include "App/NodalEditor.hpp"
+#include "App/AppInterface.hpp"
+#include "App/UiSignalNodeBoard.hpp"
 
 #include "Graphics/RenderInterface.h"
 #include "Font/GlyphRenderer.h"
 #include "Ui/UiSystem.h"
+#include "Audio/AudioRenderer.hpp"
 
 //--------------------------------------------------------------
 int runQuasarBell(int argc, char* argv[])
@@ -19,17 +19,10 @@ int runQuasarBell(int argc, char* argv[])
     // user interface
     unsigned win = RenderInterface::createTarget(1400, 560, true, "QuasarBell");
     UiSystem::instance()->initialize();
-    // auto& gr = UiSystem::instance()->glyphRenderer;
-    GuiRenderer gui;
-    gui.open();
-    App app;
-    app.gui = &gui;
-    app.sound = &sound;
+    AppInterface app;
     
     // workspace mode
-    NodalEditorWorkSpace nodalEditor;
-    nodalEditor.init(&app);
-    ToolWorkSpace* toolPtr = &nodalEditor;
+    UiSignalNodeBoard nodalEditor;
     
     // main loop
     RenderInterface::setTarget(win);
@@ -40,30 +33,21 @@ int runQuasarBell(int argc, char* argv[])
         
         RenderInterface::updateTime();
         UiSystem::instance()->draw();
-
-        while(gui.hasEvent())
-        {
-            KeyEvent event = gui.popEvent();
-            toolPtr->onEvent(event);
-        }
         
-        toolPtr->update( (float)RenderInterface::getTime() );
+        nodalEditor.update( (float)RenderInterface::getTime() );
         scene.update();
-        gui.display();
-    
-        if( gui.appState.toolMode == ETool::NodalEditor)
-            toolPtr = &nodalEditor;
-        UiSystem::instance()->setActivated(gui.appState.toolMode == ETool::NodalEditor);
+        app.display();
+
+        UiSystem::instance()->setActivated(true);
         RenderInterface::end();
     }
-    gui.close();
+    RenderInterface::shutdown();
     return 0;
 }
 
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-    static BaseFactory default_factory;
     int ret = runQuasarBell(argc, argv);
     return ret;
 }

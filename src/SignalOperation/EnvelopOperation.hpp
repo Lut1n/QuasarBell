@@ -8,10 +8,7 @@
 struct EnvelopOperation : public SignalOperation
 {
     EnvelopOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
-
-    // void uiPropertiesEdit() override;
 
     float sampleADSR(float t);
 

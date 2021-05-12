@@ -1,4 +1,4 @@
-#include "App/TypedSignaloperationNode.hpp"
+#include "App/TypedSignalNode.hpp"
 
 MAKE_SIGNAL_NODE_CREATOR(AddOperation, qb::OperationType_Add)
 MAKE_SIGNAL_NODE_CREATOR(SubOperation, qb::OperationType_Sub)

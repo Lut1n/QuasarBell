@@ -12,16 +12,11 @@ find_package(OpenAL REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    src/App/App.hpp
-    src/App/NodalEditor.hpp
-    src/App/Gui.hpp
+    src/App/UiSignalNodeBoard.hpp
+    src/App/AppInterface.hpp
     src/App/UserFileInput.hpp
-    src/App/NodeContextMenu.hpp
-    src/App/NodePropertiesEdit.hpp
-    src/App/SignalOperationNode.hpp
-    src/App/TypedSignalOperationNode.hpp
-    src/App/imgui_impl_glfw.h
-    src/App/imgui_impl_opengl3.h
+    src/App/SignalNode.hpp
+    src/App/TypedSignalNode.hpp
     src/Json/json.hpp
     src/Json/jsonrw.hpp
     src/ReaderWriter/FileIO.hpp
@@ -61,6 +56,8 @@ add_executable(
     src/Graphics/GlSprite.h
     src/Graphics/RenderableTexture.h
     src/Graphics/RenderInterface.h
+    src/Graphics/imgui_impl_glfw.h
+    src/Graphics/imgui_impl_opengl3.h
     src/Ui/UiEvent.h
     src/Ui/UiSystem.h
     src/Ui/UiRect.h
@@ -78,15 +75,11 @@ add_executable(
     src/Ui/UiConnections.h
     
     src/main.cpp
-    src/App/NodalEditor.cpp
-    src/App/Gui.cpp
+    src/App/UiSignalNodeBoard.cpp
+    src/App/AppInterface.cpp
     src/App/UserFileInput.cpp
-    src/App/SignalOperationNode.cpp
-    src/App/TypedSignalOperationNode.cpp
-    src/App/NodeContextMenu.cpp
-    src/App/NodePropertiesEdit.cpp
-    src/App/imgui_impl_glfw.cpp
-    src/App/imgui_impl_opengl3.cpp
+    src/App/SignalNode.cpp
+    src/App/TypedSignalNode.cpp
     src/Json/json.cpp
     src/Json/jsonrw.cpp
     src/ReaderWriter/FileIO.cpp
@@ -111,7 +104,6 @@ add_executable(
     src/SignalOperation/KeySampler.cpp
     src/SignalOperation/Harmonics.cpp
     src/Core/Vec2.cpp
-    src/Core/Factory.cpp
     src/Core/PseudoRand.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp
@@ -122,6 +114,8 @@ add_executable(
     src/Graphics/GlSprite.cpp
     src/Graphics/RenderableTexture.cpp
     src/Graphics/RenderInterfaceGlfw.cpp
+    src/Graphics/imgui_impl_glfw.cpp
+    src/Graphics/imgui_impl_opengl3.cpp
     src/Ui/UiSystem.cpp
     src/Ui/UiRect.cpp
     src/Ui/UiNode.cpp

@@ -8,7 +8,6 @@
 struct MixOperation : public SignalOperation
 {
     MixOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;

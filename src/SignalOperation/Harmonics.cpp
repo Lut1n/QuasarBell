@@ -2,6 +2,7 @@
 
 #include <cmath> // sin
 #include <iostream>
+#include <string>
 
 #include "imgui.h"
 
@@ -14,11 +15,6 @@ Harmonics::Harmonics()
     makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
     freqs.resize(1,{440.f,1.f});
-}
-
-//--------------------------------------------------------------
-void Harmonics::validate()
-{
 }
 
 //--------------------------------------------------------------

@@ -8,7 +8,6 @@
 struct StepOperation : public SignalOperation
 {
     StepOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float edge = 0.5f;

@@ -14,7 +14,6 @@ struct KeySampler : public SignalOperation
     };
 
     KeySampler();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     void saveCustomData(JsonValue& json) override;

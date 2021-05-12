@@ -3,8 +3,6 @@ QuasarBell is a small sfx editor made with openal + imgui
 
 ### Preview
 
-![preview](demo/preview.png)
-
 ![preview_nodal](demo/preview_nodal.png)
 
 ### Dependencies

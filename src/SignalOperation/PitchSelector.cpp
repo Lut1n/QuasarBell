@@ -1,10 +1,10 @@
 #include "SignalOperation/PitchSelector.hpp"
 
 #include "Audio/Signal.hpp"
-
+#include "Audio/AudioRenderer.hpp"
 #include "Audio/PcmData.hpp"
 
-#include "App/App.hpp"
+#include "App/AppInterface.hpp"
 
 #include <array>
 
@@ -13,7 +13,6 @@
 //--------------------------------------------------------------
 PitchSelector::PitchSelector()
 {
-    // initialize({DataType_Float,DataType_Float},{DataType_Float});
     makeInput("octave", DataType_Float);
     makeInput("semitone", DataType_Float);
     makeOutput("freq", DataType_Float);
@@ -21,18 +20,12 @@ PitchSelector::PitchSelector()
     makeProperty({"semitone", DataType_Int, &semitone});
 }
 //--------------------------------------------------------------
-void PitchSelector::validate()
-{
-}
-
-//--------------------------------------------------------------
 int PitchSelector::getMidiIndex() const
 {
     constexpr int midi_first_octave = -1;
     constexpr int midi_semitones = 12;
     return (octave-midi_first_octave) * midi_semitones + semitone;
 }
-
 //--------------------------------------------------------------
 float PitchSelector::getFreq() const
 {
@@ -40,7 +33,6 @@ float PitchSelector::getFreq() const
     constexpr int midi_la440 = 69;
     return pitchToFreq((float)getMidiIndex(), midi_la440, midi_semitones);
 }
-
 //--------------------------------------------------------------
 OperationData PitchSelector::sample(size_t index, const Time& t)
 {
@@ -63,8 +55,6 @@ OperationData PitchSelector::sample(size_t index, const Time& t)
 
     return data;
 }
-
-
 //--------------------------------------------------------------
 void PitchSelector::uiProperties()
 {
@@ -81,12 +71,11 @@ void PitchSelector::uiProperties()
         return output;
     };
 
-
     if (ImGui::InputInt("octave", &octave)) preview.dirty();
     if (ImGui::InputInt("semitone", &semitone)) preview.dirty();
-    if (ImGui::Button("Play") && App::s_instance)
+    if (ImGui::Button("Play"))
     {
-        auto& sound = *(App::s_instance->sound);
+        auto& sound = *SoundNode::getDefault();
         if(sound.getState() != SoundNode::Playing)
         {
             qb::Pcm16 pcm = generator(getFreq());
@@ -95,7 +84,6 @@ void PitchSelector::uiProperties()
         }
     }
 
-    
     constexpr std::array<const char*, 12> pitch_name = {"C", "C#/Db", "D", "Eb/D#", "E", "F", "F#/Gb", "G", "Ab/G#", "A", "Bb/A#", "B"};
     ImGui::Separator();
     ImGui::Text("info:");

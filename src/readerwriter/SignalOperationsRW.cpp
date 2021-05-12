@@ -2,10 +2,10 @@
 
 #include "ReaderWriter/RwHelpers.hpp"
 
-#include "App/SignalOperationNode.hpp"
-
 #include "SignalOperation/OperationType.hpp"
-#include "App/NodalEditor.hpp"
+
+#include "App/SignalNode.hpp"
+#include "App/UiSignalNodeBoard.hpp"
 
 #include "Core/Factory.h"
 
@@ -75,8 +75,8 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
         std::string type = jNode.setPath("type").getString();
         vec2 position;
         jsonTo(jNode.setPath("position"), position);
-        std::unique_ptr<SignalOperationNode> ptr;
-        ptr.reset( Factory<SignalOperationNode>::create(qb::getOperationType(type)) );
+        std::unique_ptr<SignalNode> ptr;
+        ptr.reset( Factory<SignalNode>::create(qb::getOperationType(type)) );
         
         auto op = ptr->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)

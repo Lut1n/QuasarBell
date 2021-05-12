@@ -1,9 +1,10 @@
 #include "SignalOperation/Operations.hpp"
 
 #include <iostream>
+#include <string>
 
 #include "imgui.h"
-#include "App/App.hpp"
+#include "App/AppInterface.hpp"
 
 #include "Json/Json.hpp"
 
@@ -14,13 +15,8 @@ OutputOperation* OutputOperation::defaultOutput = nullptr;
 //--------------------------------------------------------------
 FloatInput::FloatInput()
 {
-    // initialize({},{DataType_Float});
     makeOutput("value", DataType_Float);
     makeProperty({"value", DataType_Float, &value});
-}
-//--------------------------------------------------------------
-void FloatInput::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData FloatInput::sample(size_t index, const Time& t)
@@ -36,12 +32,7 @@ OperationData FloatInput::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 NoiseInput::NoiseInput()
 {
-    // initialize({},{DataType_Float});
     makeOutput("value", DataType_Float);
-}
-//--------------------------------------------------------------
-void NoiseInput::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData NoiseInput::sample(size_t index, const Time& t)
@@ -58,15 +49,10 @@ OperationData NoiseInput::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 Repeater::Repeater()
 {
-    // initialize({DataType_Float,DataType_Int},{DataType_Float});
     makeInput("value", DataType_Float);
     makeInput("count", DataType_Int);
     makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
-}
-//--------------------------------------------------------------
-void Repeater::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData Repeater::sample(size_t index, const Time& t)
@@ -103,7 +89,6 @@ OperationData Repeater::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 CubicSampler::CubicSampler()
 {
-    // initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
     makeInput("value", DataType_Float);
     makeInput("speed", DataType_Float);
     makeInput("acc", DataType_Float);
@@ -115,10 +100,6 @@ CubicSampler::CubicSampler()
     makeProperty({"acc", DataType_Float, &acc});
     makeProperty({"jerk", DataType_Float, &jerk});
     makeProperty({"reset", DataType_Float, &reset});
-}
-//--------------------------------------------------------------
-void CubicSampler::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData CubicSampler::sample(size_t index, const Time& t)
@@ -156,16 +137,11 @@ OperationData CubicSampler::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 PolynomialSampler::PolynomialSampler()
 {
-    // initialize({},{DataType_Float});
     _hasCustomData = true;
     makeOutput("value", DataType_Float);
     makeProperty({"count", DataType_Int, &count});
     makeProperty({"reset", DataType_Float, &reset});
     coefs.resize(1, 0);
-}
-//--------------------------------------------------------------
-void PolynomialSampler::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData PolynomialSampler::sample(size_t index, const Time& t)
@@ -245,16 +221,11 @@ void PolynomialSampler::uiProperties()
 //--------------------------------------------------------------
 AddOperation::AddOperation()
 {
-    // initialize({DataType_Float, DataType_Float},{DataType_Float});
     makeInput("input1", DataType_Float);
     makeInput("input2", DataType_Float);
     makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
-}
-//--------------------------------------------------------------
-void AddOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData AddOperation::sample(size_t index, const Time& t)
@@ -277,16 +248,11 @@ OperationData AddOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 SubOperation::SubOperation()
 {
-    // initialize({DataType_Float, DataType_Float},{DataType_Float});
     makeInput("input1", DataType_Float);
     makeInput("input2", DataType_Float);
     makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
-}
-//--------------------------------------------------------------
-void SubOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData SubOperation::sample(size_t index, const Time& t)
@@ -309,16 +275,11 @@ OperationData SubOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 MultOperation::MultOperation()
 {
-    // initialize({DataType_Float, DataType_Float},{DataType_Float});
     makeInput("input1", DataType_Float);
     makeInput("input2", DataType_Float);
     makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
-}
-//--------------------------------------------------------------
-void MultOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData MultOperation::sample(size_t index, const Time& t)
@@ -341,16 +302,11 @@ OperationData MultOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 DivOperation::DivOperation()
 {
-    // initialize({DataType_Float, DataType_Float},{DataType_Float});
     makeInput("input1", DataType_Float);
     makeInput("input2", DataType_Float);
     makeOutput("value", DataType_Float);
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"input2", DataType_Float, &input2});
-}
-//--------------------------------------------------------------
-void DivOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData DivOperation::sample(size_t index, const Time& t)
@@ -373,7 +329,6 @@ OperationData DivOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 ClampOperation::ClampOperation()
 {
-    // initialize({DataType_Float, DataType_Float, DataType_Float},{DataType_Float});
     makeInput("input1", DataType_Float);
     makeInput("minVal", DataType_Float);
     makeInput("maxVal", DataType_Float);
@@ -381,10 +336,6 @@ ClampOperation::ClampOperation()
     makeProperty({"input1", DataType_Float, &input1});
     makeProperty({"minVal", DataType_Float, &minVal});
     makeProperty({"maxVal", DataType_Float, &maxVal});
-}
-//--------------------------------------------------------------
-void ClampOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData ClampOperation::sample(size_t index, const Time& t)
@@ -409,13 +360,8 @@ OperationData ClampOperation::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 AbsOperation::AbsOperation()
 {
-    // initialize({DataType_Float},{DataType_Float});
     makeInput("value", DataType_Float);
     makeOutput("value", DataType_Float);
-}
-//--------------------------------------------------------------
-void AbsOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData AbsOperation::sample(size_t index, const Time& t)
@@ -432,20 +378,13 @@ OperationData AbsOperation::sample(size_t index, const Time& t)
     data.fvec[0] = val>0.0 ? val : -val;
     return data;
 }
-
-
 //--------------------------------------------------------------
 TimeScale::TimeScale()
 {
-    // initialize({DataType_Float},{DataType_Float});
     makeInput("value", DataType_Float);
     makeOutput("value", DataType_Float);
     makeProperty({"delay", DataType_Float, &delay});
     makeProperty({"scale", DataType_Float, &scale});
-}
-//--------------------------------------------------------------
-void TimeScale::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData TimeScale::sample(size_t index, const Time& t)
@@ -471,7 +410,6 @@ OperationData TimeScale::sample(size_t index, const Time& t)
 //--------------------------------------------------------------
 OutputOperation::OutputOperation()
 {
-    // initialize({DataType_Float},{});
     makeInput("signal", DataType_Float);
     makeProperty({"range", DataType_Float, &range});
     makeProperty({"duration", DataType_Float, &duration});
@@ -483,11 +421,6 @@ OutputOperation::OutputOperation()
 OutputOperation::~OutputOperation()
 {
     if (defaultOutput == this) defaultOutput = nullptr;
-}
-//--------------------------------------------------------------
-void OutputOperation::validate()
-{
-    // auto* input = getInput(0);
 }
 //--------------------------------------------------------------
 OperationData OutputOperation::sample(size_t index, const Time& t)
@@ -561,9 +494,9 @@ void OutputOperation::uiProperties()
         sampleBits = indexedFormats[sampleFormatIndex];
     }
 
-    if (ImGui::Button("Play") && App::s_instance)
+    if (ImGui::Button("Play"))
     {
-        auto& sound = *(App::s_instance->sound);
+        auto& sound = *SoundNode::getDefault();
         if(sound.getState() != SoundNode::Playing)
         {
             std::unique_ptr<PcmDataBase> pcm;
@@ -577,7 +510,6 @@ void OutputOperation::uiProperties()
         }
     }
 }
-
 //--------------------------------------------------------------
 void OutputOperation::generate(PcmDataBase& pcm)
 {
@@ -589,7 +521,7 @@ void OutputOperation::generate(PcmDataBase& pcm)
         duration = 1.0;
     }
 
-    validateGraph();
+    startSamplingGraph();
 
     pcm.sampleRate = (AudioSettings::SampleRate)sampleRate;
     pcm.resize((size_t)(duration * sampleRate));

@@ -8,7 +8,7 @@
 struct Oscillator : public SignalOperation
 {
     Oscillator();
-    void validate() override;
+    void startSampling() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float freq = 440.0f;

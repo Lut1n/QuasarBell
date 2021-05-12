@@ -6,7 +6,6 @@
 //--------------------------------------------------------------
 Oscillator::Oscillator()
 {
-    // initialize({DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
     makeInput("freq", DataType_Float);
     makeInput("ampl", DataType_Float);
     makeInput("waveform", DataType_Float);
@@ -15,7 +14,7 @@ Oscillator::Oscillator()
     makeProperty({"ampl", DataType_Float, &ampl});
 }
 //--------------------------------------------------------------
-void Oscillator::validate()
+void Oscillator::startSampling()
 {
     phases.clear();
 }

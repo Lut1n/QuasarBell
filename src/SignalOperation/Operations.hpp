@@ -8,7 +8,6 @@
 struct FloatInput : public SignalOperation
 {
     FloatInput();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float value = 0.0;
@@ -17,14 +16,12 @@ struct FloatInput : public SignalOperation
 struct NoiseInput : public SignalOperation
 {
     NoiseInput();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 };
 // --------------------------------------------------------------
 struct Repeater : public SignalOperation
 {
     Repeater();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     int count = 1;
@@ -34,7 +31,6 @@ struct Repeater : public SignalOperation
 struct CubicSampler : public SignalOperation
 {
     CubicSampler();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float value = 0.0;
@@ -48,7 +44,6 @@ struct CubicSampler : public SignalOperation
 struct PolynomialSampler : public SignalOperation
 {
     PolynomialSampler();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
     
     void saveCustomData(JsonValue& json) override;
@@ -65,7 +60,6 @@ struct PolynomialSampler : public SignalOperation
 struct AddOperation : public SignalOperation
 {
     AddOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;
@@ -76,7 +70,6 @@ struct AddOperation : public SignalOperation
 struct SubOperation : public SignalOperation
 {
     SubOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;
@@ -87,7 +80,6 @@ struct SubOperation : public SignalOperation
 struct MultOperation : public SignalOperation
 {
     MultOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;
@@ -98,7 +90,6 @@ struct MultOperation : public SignalOperation
 struct DivOperation : public SignalOperation
 {
     DivOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;
@@ -109,7 +100,6 @@ struct DivOperation : public SignalOperation
 struct ClampOperation : public SignalOperation
 {
     ClampOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float input1 = 0.0f;
@@ -121,7 +111,6 @@ struct ClampOperation : public SignalOperation
 struct AbsOperation : public SignalOperation
 {
     AbsOperation();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 };
 
@@ -129,7 +118,6 @@ struct AbsOperation : public SignalOperation
 struct TimeScale : public SignalOperation
 {
     TimeScale();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     float delay = 0.0;
@@ -142,7 +130,6 @@ struct OutputOperation : public SignalOperation
     OutputOperation();
     ~OutputOperation();
     
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     void uiProperties() override;

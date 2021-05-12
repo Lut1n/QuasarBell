@@ -24,9 +24,9 @@ unsigned RenderInterface::s_precision = 1;
 #include "Graphics/GlSpriteShader.h"
 
 #include "imgui.h"
-#include "App/imgui_impl_glfw.h"
-#include "App/imgui_impl_opengl3.h"
-#include "App/Gui.hpp"
+#include "Graphics/imgui_impl_glfw.h"
+#include "Graphics/imgui_impl_opengl3.h"
+#include "App/AppInterface.hpp"
 
 struct GLfwTarget
 {
@@ -71,10 +71,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     else if(action == GLFW_RELEASE)
         evn.state = UiEvent::STATE_RELEASED;
     evn.input = key;
-    if (!UiSystem::instance()->onEvent(evn))
-    {
-        GuiRenderer::key_callback(key, scancode, action, mods);
-    }
+    UiSystem::instance()->onEvent(evn);
 }
 
 static void character_callback(GLFWwindow* window, unsigned int codepoint)
@@ -404,4 +401,11 @@ void RenderInterface::updateTime()
 double RenderInterface::getTime()
 {
     return glfwGetTime();
+}
+
+void RenderInterface::shutdown()
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }

@@ -2,7 +2,6 @@
 #define JSON_SIGNAL_OPERATIONS_H
 
 #include "Json/json.hpp"
-// #include "SignalOperation/SignalOperation.hpp"
 
 struct OperationCollection;
 struct OperationConnections;

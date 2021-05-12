@@ -17,13 +17,14 @@ public:
         Export_Wav
     };
     
-    UserFileInput(const std::string& title, const std::string& ext);
+    UserFileInput(const std::string& title, const std::string& ext, const std::string& defaultPath);
     virtual ~UserFileInput();
     
     void open();
     void close();
     
     void display();
+    void displayItem(const char* text, UserFileInput::Req req);
 
 public:
     Req request = Nothing;

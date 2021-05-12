@@ -8,7 +8,6 @@
 struct PitchSelector : public SignalOperation
 {
     PitchSelector();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     void uiProperties() override;

@@ -32,6 +32,8 @@ struct RenderInterface
     static void updateTime();
     
     static double getTime();
+
+    static void shutdown();
 };
 
 #endif // RENDER_INTERFACE_H

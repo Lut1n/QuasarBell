@@ -8,7 +8,6 @@
 struct FreqFilter : public SignalOperation
 {
     FreqFilter();
-    void validate() override;
     OperationData sample(size_t index, const Time& t) override;
 
     void uiProperties() override;

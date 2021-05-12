@@ -4,37 +4,41 @@
 #include <array>
 #include <cstddef> // size_t
 
-struct BaseFactory
-{
-    BaseFactory() = default;
-    virtual ~BaseFactory() = default;
-
-    void regFactory(size_t typeId, BaseFactory* factory);
-    
-    static std::array<BaseFactory*, 256> factories;
-};
-
+//--------------------------------------------------------------
 template<typename Base>
-struct Factory : public BaseFactory
+struct FactoryCreator
 {
+    FactoryCreator() = default;
+    virtual ~FactoryCreator() = default;
     virtual Base* create() = 0;
-
+};
+//--------------------------------------------------------------
+template<typename Base>
+struct Factory
+{
+    static void regCreator(size_t typeId, FactoryCreator<Base>* creator)
+    {
+        creators[typeId] = creator;
+    }
     static Base* create(size_t typeId)
     {
-        if (typeId < factories.size() && factories[typeId] != nullptr)
+        if (typeId < creators.size() && creators[typeId] != nullptr)
         {
-            return static_cast<Factory<Base>*>(factories[typeId])->create();
+            return static_cast<Base*>(creators[typeId]->create());
         }
         return nullptr;
     }
+    static std::array<FactoryCreator<Base>*, 256> creators;
 };
-
+template<typename Base>
+std::array<FactoryCreator<Base>*, 256> Factory<Base>::creators = {};
+//--------------------------------------------------------------
 template<typename Base, typename Type>
-struct TypedFactory : public Factory<Base>
+struct TypedCreator : public FactoryCreator<Base>
 {
-    TypedFactory(size_t typeId)
+    TypedCreator(size_t typeId)
     {
-        this->regFactory(typeId, this);
+        Factory<Base>::regCreator(typeId, this);
     }
     Base* create() override
     {

@@ -5,7 +5,6 @@
 //--------------------------------------------------------------
 StepOperation::StepOperation()
 {
-    // initialize({DataType_Float,DataType_Float,DataType_Float,DataType_Float},{DataType_Float});
     makeInput("value", DataType_Float);
     makeInput("edge", DataType_Float);
     makeInput("then", DataType_Float);
@@ -14,10 +13,6 @@ StepOperation::StepOperation()
     makeProperty({"edge", DataType_Float, &edge});
     makeProperty({"then", DataType_Float, &thenValue});
     makeProperty({"else", DataType_Float, &elseValue});
-}
-//--------------------------------------------------------------
-void StepOperation::validate()
-{
 }
 //--------------------------------------------------------------
 OperationData StepOperation::sample(size_t index, const Time& t)

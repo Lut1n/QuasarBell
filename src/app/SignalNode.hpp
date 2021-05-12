@@ -10,14 +10,15 @@
 #include "SignalOperation/OperationType.hpp"
 #include "Core/Factory.h"
 
-
-struct SignalOperationNode : public UiNode
+//--------------------------------------------------------------
+struct SignalNode : public UiNode
 {
-    SignalOperationNode(const std::string& title, size_t nodetypeId);
+    SignalNode(const std::string& title, size_t nodetypeId);
 
     void setOperation(SignalOperation* op);
     SignalOperation* getOperation();
 
+    void displayProperties() override;
     void drawPreview(const Rect& previewArea) override;
 
     size_t nodeTypeId() const;
@@ -25,32 +26,25 @@ private:
     SignalOperation* _operation = nullptr;
     size_t _nodetypeId;
 };
-
+//--------------------------------------------------------------
 template<typename OpObject, qb::OperationType OpType>
-struct ConcretSignalNode : public SignalOperationNode
+struct TypedSignalNode : public SignalNode
 {
-    ConcretSignalNode()
-        : SignalOperationNode("SignalNode", OpType)
+    TypedSignalNode()
+        : SignalNode("SignalNode", OpType)
     {
         title->text = qb::getOperationName(OpType);
-        setOperation(&concretOperation);
+        setOperation(&signalOperation);
     }
-
-    void displayProperties() override
-    {
-        getOperation()->uiProperties();
-    }
-    
-public:
-    OpObject concretOperation;
+private:
+    OpObject signalOperation;
 };
-
-
+//--------------------------------------------------------------
 #define MAKE_SIGNAL_NODE(opclass, optype)\
-    struct opclass ## Node : public ConcretSignalNode<opclass, optype> {};
-
+    struct opclass ## Node : public TypedSignalNode<opclass, optype> {};
+//--------------------------------------------------------------
 #define MAKE_SIGNAL_NODE_CREATOR(opclass, optype)\
-    static TypedFactory<SignalOperationNode, opclass ## Node> opclass ## Factory(optype);
+    static TypedCreator<SignalNode, opclass ## Node> opclass ## Creator(optype);
 
 
 #endif // GUI_SIGNAL_OP_NODE_H

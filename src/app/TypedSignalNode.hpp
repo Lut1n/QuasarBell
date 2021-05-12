@@ -1,7 +1,7 @@
 #ifndef GUI_ADD_SIGNAL_NODE_H
 #define GUI_ADD_SIGNAL_NODE_H
 
-#include "App/SignalOperationNode.hpp"
+#include "App/SignalNode.hpp"
 #include "SignalOperation/Operations.hpp"
 #include "SignalOperation/EnvelopOperation.hpp"
 #include "SignalOperation/FilterOperation.hpp"

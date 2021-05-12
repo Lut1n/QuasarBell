@@ -88,10 +88,10 @@ struct SignalOperation
     void update();
     OperationData sampleInput(size_t index, const Time& t);
 
-    void validateGraph();
+    void startSamplingGraph();
 
     virtual std::string name() const;
-    virtual void validate();
+    virtual void startSampling();
     virtual OperationData sample(size_t index, const Time& t);
     
     size_t getInputCount() const;
@@ -123,7 +123,6 @@ struct SignalOperation
     SignalPreview preview;
 
 protected:
-    // void initialize(const std::vector<OperationDataType>& input, const std::vector<OperationDataType>& output);
     void makeInput(const std::string& name, OperationDataType type);
     void makeOutput(const std::string& name, OperationDataType type);
     void makeProperty(const PropDesc& property);
@@ -131,7 +130,6 @@ protected:
     bool _hasCustomData = false;
 
 private:
-    
     void updateAllChildren();
 
     std::vector<SignalOperationConnection> inputs;

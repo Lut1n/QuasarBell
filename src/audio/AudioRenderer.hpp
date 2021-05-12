@@ -116,6 +116,9 @@ public:
     
     virtual void update() override;
     
+    void setAsDefault();
+    static SoundNode* getDefault();
+    
 protected:
     void updateStream();
     void updateImpl() override;

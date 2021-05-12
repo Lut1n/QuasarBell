@@ -16,7 +16,7 @@ struct Waveform : public SignalOperation
     };
 
     Waveform();
-    void validate() override;
+    void startSampling() override;
     OperationData sample(size_t index, const Time& t) override;
 
     void uiProperties() override;
