@@ -15,6 +15,7 @@ AppInterface::AppInterface()
     , waveInput("wav path", ".wav", "./exported/output.wav")
 {
     operationNames = qb::getOperationNames();
+    imageOperationNames = qb::getImageOperationNames();
     qb::appInstance = this;
 }
 
@@ -57,6 +58,7 @@ void AppInterface::display()
     {
         ImGui::OpenPopup("New Node");
         nodeboard->requestContextMenu = false;
+        nodeToCreateCategory = NodeCategory_None;
     }
     if (ImGui::BeginPopup("New Node"))
     {
@@ -66,7 +68,20 @@ void AppInterface::display()
         for(size_t i=0; i<operationNames.size(); ++i)
         {
             if(ImGui::MenuItem(operationNames[i].c_str()))
-                nodeToCreateType = (qb::OperationType)i;
+            {
+                nodeToCreateCategory = NodeCategory_Signal;
+                nodeToCreateType = i;
+            }
+        }
+        ImGui::Separator();
+        ImGui::Spacing();
+        for(size_t i=0; i<imageOperationNames.size(); ++i)
+        {
+            if(ImGui::MenuItem(imageOperationNames[i].c_str()))
+            {
+                nodeToCreateCategory = NodeCategory_Image;
+                nodeToCreateType = i;
+            }
         }
         ImGui::EndPopup();
     }

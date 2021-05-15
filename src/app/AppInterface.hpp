@@ -7,7 +7,16 @@
 #include "Audio/PcmData.hpp"
 #include "App/UserFileInput.hpp"
 #include "SignalOperation/OperationType.hpp"
+#include "ImageOperation/ImageOperationType.hpp"
 #include "Ui/UiNodeBoard.h"
+
+enum NodeCategory
+{
+    NodeCategory_Signal,
+    NodeCategory_Image,
+    
+    NodeCategory_None
+};
 
 struct KeyEvent
 {
@@ -33,10 +42,14 @@ public:
     UserFileInput waveInput;
 
     vec2 nodeToCreatePos;
-    qb::OperationType nodeToCreateType = qb::OperationType_None;
+    NodeCategory nodeToCreateCategory = NodeCategory_None;
+
+    // qb::OperationType or qb::ImageOperationType depending on nodeToCreateCategory
+    size_t nodeToCreateType = qb::OperationType_None;
 
 private:
     std::vector<std::string> operationNames;
+    std::vector<std::string> imageOperationNames;
 
     AboutPanel _aboutPanel;
 };

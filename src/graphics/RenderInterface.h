@@ -13,8 +13,10 @@ struct RenderInterface
     static unsigned s_precision;
     
     // todo: deleteTarget and eventually call glfwTerminate()
+    static void deleteTarget(unsigned id);
     static unsigned createTarget(unsigned width, unsigned height, bool win = false, const std::string& title = "sfml window");
     static void setTarget(unsigned target);
+    static void* getTargetResource(unsigned target);
     static void clear(unsigned color);
     static void setColor(unsigned color);
     static void setThickness(float th);
@@ -30,6 +32,11 @@ struct RenderInterface
     static void end();
     static void debugSave(const std::string& filename);
     static void updateTime();
+
+    static unsigned createCustomProgram();
+    static void destroyCustomProgram(unsigned id);
+    static void updateCustomProgram(unsigned customId, const std::string& fragCode);
+    static void applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br);
     
     static double getTime();
 

@@ -1,5 +1,6 @@
 #include "App/AppInterface.hpp"
 #include "App/UiSignalNodeBoard.hpp"
+#include "App/UiImageNodeBoard.hpp"
 
 #include "Graphics/RenderInterface.h"
 #include "Font/GlyphRenderer.h"
@@ -14,7 +15,7 @@ int runQuasarBell(int argc, char* argv[])
     MicroNode micro;
     SoundNode sound(true);
     scene.add(&micro);
-    scene.add(&sound);    
+    scene.add(&sound);
 
     // user interface
     unsigned win = RenderInterface::createTarget(1400, 560, true, "QuasarBell");
@@ -28,6 +29,8 @@ int runQuasarBell(int argc, char* argv[])
     RenderInterface::setTarget(win);
     while(RenderInterface::begin())
     {
+        nodalEditor.initializePreviews();
+
         RenderInterface::setTarget(win);
         RenderInterface::clear(0x1e1e1eFF);
         

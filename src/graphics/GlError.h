@@ -55,10 +55,6 @@ inline void testCompilation(unsigned shader, const std::string& msg)
         
         std::cout << std::string(&errorLog[0]) << std::endl;
     }
-    else
-    {
-        std::cout << "compilation ok" << std::endl;
-    }
 }
 
 

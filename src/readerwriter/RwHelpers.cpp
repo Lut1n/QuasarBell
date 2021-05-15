@@ -29,6 +29,6 @@ void writeInfo(JsonValue& root)
     std::string app = "QuasarBell (https://www.github.com/Lut1n/QuasarBell)";
 
     root.setPath("info","app").set(app);
-    root.setPath("info","version").set(2.2);
+    root.setPath("info","version").set(3.0);
     root.setPath("info","date").set(date.str());
 }

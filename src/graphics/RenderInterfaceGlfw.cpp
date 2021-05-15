@@ -22,6 +22,7 @@ unsigned RenderInterface::s_precision = 1;
 #include "Graphics/GlSprite.h"
 #include "Graphics/GlQuadShader.h"
 #include "Graphics/GlSpriteShader.h"
+#include "Graphics/CustomProgram.h"
 
 #include "imgui.h"
 #include "Graphics/imgui_impl_glfw.h"
@@ -38,6 +39,7 @@ struct GLfwTarget
 };
 
 static std::vector<GLfwTarget> s_targets;
+static std::vector<GlCustomProgram*> s_CustomPrograms;
 
 static void error_callback(int error, const char* description)
 {
@@ -136,6 +138,16 @@ static GlSprite* s_sprite = nullptr;
 static GlSpriteShader* s_spriteShader = nullptr;
 static GlQuadShader* s_quadShader = nullptr;
 
+void RenderInterface::deleteTarget(unsigned id)
+{
+    if(!s_targets[id].isWindow)
+    {
+        delete s_targets[id].texture;
+        s_targets[id].texture = nullptr;
+        GL_CHECKERROR("delete target");
+    }
+}
+
 unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win, const std::string& title)
 {
     GLfwTarget target;
@@ -217,6 +229,13 @@ void RenderInterface::setTarget(unsigned target)
     else
        s_targets[s_currentTarget].texture->bind();
     GL_CHECKERROR("set target");
+}
+
+void* RenderInterface::getTargetResource(unsigned target)
+{
+    if(!s_targets[target].isWindow)
+        return (void*)s_targets[target].texture->tex;
+    return (void*)0;
 }
 
 float comp(unsigned color, int c)
@@ -408,4 +427,34 @@ void RenderInterface::shutdown()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+unsigned RenderInterface::createCustomProgram()
+{
+    unsigned id = s_CustomPrograms.size();
+    s_CustomPrograms.push_back(new GlCustomProgram());
+    return id;
+}
+void RenderInterface::destroyCustomProgram(unsigned id)
+{
+    delete s_CustomPrograms[id];
+    s_CustomPrograms[id] = nullptr;
+}
+
+void RenderInterface::updateCustomProgram(unsigned customId, const std::string& fragCode)
+{
+    s_CustomPrograms[customId]->setFragCode(fragCode);
+}
+
+void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br)
+{
+    vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
+    s_CustomPrograms[customId]->setup();
+    GL_CHECKERROR("custom::setup --- custom::update");
+    vec2 size = br-tl;
+    s_sprite->update(tl, size, vec2(0.0f,0.0f), vec2(1.0f,1.0f), vp);
+    GL_CHECKERROR("custom::update --- bindAttrib");
+    s_CustomPrograms[customId]->bindAttributes();
+    s_sprite->draw();
+    s_CustomPrograms[customId]->unbindAttributes();
 }

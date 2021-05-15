@@ -147,6 +147,7 @@ void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalO
         
         dst->inputs[dstIdx].operation = src;
         dst->inputs[dstIdx].index = srcIdx;
+        dst->preview.dirty();
     }
 }
 //--------------------------------------------------------------
@@ -163,6 +164,7 @@ void SignalOperation::remConnection(SignalOperation* dst, size_t dstIdx)
         }
         dst->inputs[dstIdx].operation = nullptr;
         dst->inputs[dstIdx].index = 0;
+        dst->preview.dirty();
     }
 }
 //--------------------------------------------------------------

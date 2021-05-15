@@ -157,7 +157,7 @@ void UiNode::drawPreview(const Rect& previewArea)
 {
 }
 
-void UiNode::addPin(int id, const std::string& label, bool isOutput)
+void UiNode::addPin(int id, const std::string& label, bool isOutput, UiPin::Type type)
 {
     static const float PinSize = 10.0;
     if (isOutput)
@@ -165,12 +165,14 @@ void UiNode::addPin(int id, const std::string& label, bool isOutput)
         if(outputs.size() <= id) outputs.resize(id+1);
         outputs[id] = std::make_unique<UiPin>(this, label, vec2(size.x,0.0), vec2(PinSize,PinSize));
         outputs[id]->isInput = false;
+        outputs[id]->type = type;
     }
     else
     {
         if(inputs.size() <= id) inputs.resize(id+1);
         inputs[id] = std::make_unique<UiPin>(this, label, vec2(-10,0.0), vec2(PinSize,PinSize));
         inputs[id]->isInput = true;
+        inputs[id]->type = type;
     }
 
 }

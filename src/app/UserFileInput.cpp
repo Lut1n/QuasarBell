@@ -131,7 +131,7 @@ void AboutPanel::display()
         return;
 
     ImGui::Text("QuasarBell");
-    ImGui::Text("version 2.2");
+    ImGui::Text("version 3.0");
     ImGui::Text("2021 - Mathieu Boulet");
     ImGui::Text("sources: https://www.github.com/Lut1n/QuasarBell");
     if(ImGui::Button("Okay"))

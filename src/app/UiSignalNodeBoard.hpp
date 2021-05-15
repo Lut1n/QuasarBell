@@ -7,7 +7,34 @@
 
 #include "App/AppInterface.hpp"
 #include "App/SignalNode.hpp"
+#include "App/ImageNode.hpp"
 
+
+//--------------------------------------------------------------
+struct ImageOperationCollection
+{
+    std::unordered_map<size_t, std::unique_ptr<ImageNode>> operations;
+    size_t getId(ImageNode* operation) const;
+    size_t getFreeId() const;
+    size_t addOperation(std::unique_ptr<ImageNode>& operation);
+    void setOperation(size_t id, std::unique_ptr<ImageNode>& operation);
+    ImageNode* getOperation(size_t id);
+};
+
+//--------------------------------------------------------------
+struct ImageOperationConnections
+{
+    struct Entry
+    {
+        int src;
+        int src_index;
+        int dst;
+        int dst_index;
+    };
+    std::vector<Entry> entries;
+
+    void fill(UiConnections* ui, const ImageOperationCollection& coll);
+};
 
 //--------------------------------------------------------------
 struct OperationCollection
@@ -44,11 +71,14 @@ public:
     void onConnect(UiPin* a, UiPin* b) override;
     void onDisconnect(UiPin* a, UiPin* b) override;
 
+    void initializePreviews();
+
 private:
     bool _ready = false;
 
     std::unique_ptr<UiNodeBoard> nodeboard;
     OperationCollection operations; 
+    ImageOperationCollection imageOperations; 
     UiConnections* uiConnections;
 };
 

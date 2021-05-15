@@ -13,6 +13,9 @@
 #include "SignalOperation/OperationType.hpp"
 #include "SignalOperation/Operations.hpp"
 
+#include "ImageOperation/ImageOperationType.hpp"
+#include "ImageOperation/ImageOperation.hpp"
+
 void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll)
 {
     for (auto link : ui->links)
@@ -31,6 +34,23 @@ void OperationConnections::fill(UiConnections* ui, const OperationCollection& co
     }
 }
 
+void ImageOperationConnections::fill(UiConnections* ui, const ImageOperationCollection& coll)
+{
+    for (auto link : ui->links)
+    {
+        auto co = link.second;
+        auto pin1 = co.first;
+        auto pin2 = co.second;
+        int id1 = (int)coll.getId(dynamic_cast<ImageNode*>(pin1->parentNode));
+        int id2 = (int)coll.getId(dynamic_cast<ImageNode*>(pin2->parentNode));
+        int idx1 = (int)pin1->parentNode->getIndex(pin1);
+        int idx2 = (int)pin2->parentNode->getIndex(pin2);
+        if (pin1->isInput)
+            entries.push_back(Entry{id2,idx2,id1,idx1});
+        else
+            entries.push_back(Entry{id1,idx1,id2,idx2});
+    }
+}
 //--------------------------------------------------------------
 void UiSignalNodeBoard::update(float t)
 {
@@ -63,7 +83,9 @@ void UiSignalNodeBoard::update(float t)
     if(app.resetProject)
     {
         for(auto& op : operations.operations) nodeboard->rem(op.second.get());
+        for(auto& op: imageOperations.operations) nodeboard->rem(op.second.get());
         operations.operations.clear();
+        imageOperations.operations.clear();
         app.resetProject = false;
     }
 
@@ -72,7 +94,9 @@ void UiSignalNodeBoard::update(float t)
         if(app.fileInput.request == UserFileInput::Load_Prj)
         {
             for(auto& op : operations.operations) nodeboard->rem(op.second.get());
+            for(auto& op: imageOperations.operations) nodeboard->rem(op.second.get());
             operations.operations.clear();
+            imageOperations.operations.clear();
             OperationConnections connections;
             JsonValue root = loadJsonFile(app.fileInput.filepath);
             loadFrom(root, operations, connections);
@@ -133,8 +157,28 @@ void UiSignalNodeBoard::update(float t)
         }
     }
 
+    
+    auto& icol = imageOperations.operations;
+    for(auto it = icol.begin(); it != icol.end();)
+    {
+        if (it->second->toDelete)
+        {
+            nodeboard->rem(it->second.get());
+            it = icol.erase(it);
+        }
+        else if (!it->second)
+        {
+            it = icol.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    auto category = app.nodeToCreateCategory;
     auto type = app.nodeToCreateType;
-    if (type != qb::OperationType_None && type < qb::OperationType_Count)
+    if(category == NodeCategory_Signal && type != qb::OperationType_None && type < qb::OperationType_Count)
     {
         std::unique_ptr<SignalNode> u;
         u.reset( Factory<SignalNode>::create(type) );
@@ -142,46 +186,113 @@ void UiSignalNodeBoard::update(float t)
         size_t id = operations.addOperation(u);
         nodeboard->add(operations.getOperation(id), true, true);
     }
-    app.nodeToCreateType = qb::OperationType_None;
+    if(category == NodeCategory_Image && type != qb::ImageOperationType_None && type < qb::ImageOperationType_Count)
+    {
+        std::unique_ptr<ImageNode> u;
+        u.reset( Factory<ImageNode>::create(type) );
+        u->position = nodeboard->contextMenuPosition;
+        size_t id = imageOperations.addOperation(u);
+        nodeboard->add(imageOperations.getOperation(id), true, true);
+    }
+    app.nodeToCreateCategory = NodeCategory_None;
+}
+
+void UiSignalNodeBoard::initializePreviews()
+{
+    auto& icol = imageOperations.operations;
+    for(auto it = icol.begin(); it!=icol.end(); ++it)
+    {
+        if (!it->second) continue;
+        it->second->initializePreview();
+    }
 }
 
 void UiSignalNodeBoard::onConnect(UiPin* a, UiPin* b)
 {
     auto* node1 = a->parentNode;
     auto* node2 = b->parentNode;
-    bool node1_is_src = !a->isInput;
+    if(dynamic_cast<ImageNode*>(node1) && dynamic_cast<ImageNode*>(node2))
+    {
+        bool node1_is_src = !a->isInput;
 
-    int node1_index = (int)node1->getIndex(a);
-    int node2_index = (int)node2->getIndex(b);
+        int node1_index = (int)node1->getIndex(a);
+        int node2_index = (int)node2->getIndex(b);
 
-    SignalOperation* op1 = dynamic_cast<SignalNode*>(node1)->getOperation();
-    SignalOperation* op2 = dynamic_cast<SignalNode*>(node2)->getOperation();
+        ImageOperation* op1 = dynamic_cast<ImageNode*>(node1)->getOperation();
+        ImageOperation* op2 = dynamic_cast<ImageNode*>(node2)->getOperation();
 
-    if(node1_is_src)
-        SignalOperation::setConnection(op1, node1_index, op2, node2_index);
+        if(node1_is_src)
+            ImageOperation::setConnection(op1, node1_index, op2, node2_index);
+        else
+            ImageOperation::setConnection(op2, node2_index, op1, node1_index);
+    }
+    else if(dynamic_cast<SignalNode*>(node1) && dynamic_cast<SignalNode*>(node2))
+    {
+        bool node1_is_src = !a->isInput;
+
+        int node1_index = (int)node1->getIndex(a);
+        int node2_index = (int)node2->getIndex(b);
+
+        SignalOperation* op1 = dynamic_cast<SignalNode*>(node1)->getOperation();
+        SignalOperation* op2 = dynamic_cast<SignalNode*>(node2)->getOperation();
+
+        if(node1_is_src)
+            SignalOperation::setConnection(op1, node1_index, op2, node2_index);
+        else
+            SignalOperation::setConnection(op2, node2_index, op1, node1_index);
+    }
     else
-        SignalOperation::setConnection(op2, node2_index, op1, node1_index);
+    {
+        std::cout << "Error: nodes have incompatible type" << std::endl;
+    }
 }
 
 void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
 {
     auto* node1 = a->parentNode;
     auto* node2 = b->parentNode;
-    bool node1_is_src = !a->isInput;
 
-    if(node1_is_src && node2)
+    if(dynamic_cast<ImageNode*>(node1) && dynamic_cast<ImageNode*>(node2))
     {
-        int node2_index = (int)node2->getIndex(b);
-        auto* opnode = dynamic_cast<SignalNode*>(node2);
-        if (opnode)
-            SignalOperation::remConnection(opnode->getOperation(), node2_index);
+        bool node1_is_src = !a->isInput;
+
+        if(node1_is_src && node2)
+        {
+            int node2_index = (int)node2->getIndex(b);
+            auto* opnode = dynamic_cast<ImageNode*>(node2);
+            if (opnode)
+                ImageOperation::remConnection(opnode->getOperation(), node2_index);
+        }
+        if(!node1_is_src && node1)
+        {
+            int node1_index = (int)node1->getIndex(a);
+            auto* opnode = dynamic_cast<ImageNode*>(node1);
+            if (opnode)
+                ImageOperation::remConnection(opnode->getOperation(), node1_index);
+        }
     }
-    if(!node1_is_src && node1)
+    else if(dynamic_cast<SignalNode*>(node1) && dynamic_cast<SignalNode*>(node2))
     {
-        int node1_index = (int)node1->getIndex(a);
-        auto* opnode = dynamic_cast<SignalNode*>(node1);
-        if (opnode)
-            SignalOperation::remConnection(opnode->getOperation(), node1_index);
+        bool node1_is_src = !a->isInput;
+
+        if(node1_is_src && node2)
+        {
+            int node2_index = (int)node2->getIndex(b);
+            auto* opnode = dynamic_cast<SignalNode*>(node2);
+            if (opnode)
+                SignalOperation::remConnection(opnode->getOperation(), node2_index);
+        }
+        if(!node1_is_src && node1)
+        {
+            int node1_index = (int)node1->getIndex(a);
+            auto* opnode = dynamic_cast<SignalNode*>(node1);
+            if (opnode)
+                SignalOperation::remConnection(opnode->getOperation(), node1_index);
+        }
+    }
+    else
+    {
+        std::cout << "Error: nodes have incompatible type" << std::endl;
     }
 }
 
@@ -217,6 +328,44 @@ void OperationCollection::setOperation(size_t id, std::unique_ptr<SignalNode>& o
 
 //--------------------------------------------------------------
 SignalNode* OperationCollection::getOperation(size_t id)
+{
+    auto it = operations.find(id);
+    if (it != operations.end()) return it->second.get();
+    return nullptr;
+}
+
+//--------------------------------------------------------------
+size_t ImageOperationCollection::getId(ImageNode* operation) const
+{
+    auto it = std::find_if(operations.begin(), operations.end(), [operation](auto& pair) {return operation == pair.second.get();});
+    if (it == operations.end()) return 0; // todo: do not that
+    return it->first;
+}
+
+//--------------------------------------------------------------
+size_t ImageOperationCollection::getFreeId() const
+{
+    size_t id = 0;
+    while ( operations.find(id) != operations.end() ) ++id;
+    return id;
+}
+
+//--------------------------------------------------------------
+size_t ImageOperationCollection::addOperation(std::unique_ptr<ImageNode>& operation)
+{
+    size_t id = getFreeId();
+    operations[id] = std::move(operation);
+    return id;
+}
+
+//--------------------------------------------------------------
+void ImageOperationCollection::setOperation(size_t id, std::unique_ptr<ImageNode>& operation)
+{
+    operations[id] = std::move(operation);
+}
+
+//--------------------------------------------------------------
+ImageNode* ImageOperationCollection::getOperation(size_t id)
 {
     auto it = operations.find(id);
     if (it != operations.end()) return it->second.get();

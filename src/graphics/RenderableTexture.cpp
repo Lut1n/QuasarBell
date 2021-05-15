@@ -29,6 +29,7 @@ RenderableTexture::RenderableTexture(unsigned w, unsigned h)
 
 RenderableTexture::~RenderableTexture()
 {
+    glDeleteTextures(1, &tex);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
 }

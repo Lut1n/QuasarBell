@@ -21,7 +21,7 @@ struct UiNode : public UiFrame
 
     virtual void drawPreview(const Rect& previewArea);
 
-    void addPin(int id, const std::string& label, bool isOutput);
+    void addPin(int id, const std::string& label, bool isOutput, UiPin::Type type);
     UiNode* getSourceNode(int id);
 
     virtual void displayProperties();

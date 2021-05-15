@@ -18,12 +18,12 @@ void SignalNode::setOperation(SignalOperation* op)
     for(size_t i=0; i<_operation->getInputCount(); ++i)
     {
         auto input = _operation->getInput(i);
-        addPin((int)i, input->name, false);
+        addPin((int)i, input->name, false, UiPin::TYPE_FLOAT1);
     }
     for(size_t i=0; i<_operation->getOutputCount(); ++i)
     {
         auto output = _operation->getOutput(i);
-        addPin((int)i, output->name, true);
+        addPin((int)i, output->name, true, UiPin::TYPE_FLOAT1);
     }
 }
 //--------------------------------------------------------------

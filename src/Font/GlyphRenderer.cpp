@@ -33,7 +33,6 @@ void GlyphRenderer::initialize()
     
     _atlasTexture = RenderInterface::createTarget(atlasSize,atlasSize,false);
     renderAtlas(_atlasTexture);
-    RenderInterface::end();
 }
 
 void GlyphRenderer::renderAtlas(unsigned target)

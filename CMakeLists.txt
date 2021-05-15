@@ -13,10 +13,13 @@ find_package(OpenAL REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     src/App/UiSignalNodeBoard.hpp
+    src/App/UiImageNodeBoard.hpp
     src/App/AppInterface.hpp
     src/App/UserFileInput.hpp
     src/App/SignalNode.hpp
     src/App/TypedSignalNode.hpp
+    src/App/ImageNode.hpp
+    src/App/TypedImageNode.hpp
     src/Json/json.hpp
     src/Json/jsonrw.hpp
     src/ReaderWriter/FileIO.hpp
@@ -42,6 +45,9 @@ add_executable(
     src/SignalOperation/Waveform.hpp
     src/SignalOperation/KeySampler.hpp
     src/SignalOperation/Harmonics.hpp
+    src/ImageOperation/HighResOutput.hpp
+    src/ImageOperation/ImageOperation.hpp
+    src/ImageOperation/ImageOperationType.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
     src/Core/Math.hpp
@@ -54,6 +60,7 @@ add_executable(
     src/Graphics/GlSpriteShader.h
     src/Graphics/GlQuad.h
     src/Graphics/GlSprite.h
+    src/Graphics/CustomProgram.h
     src/Graphics/RenderableTexture.h
     src/Graphics/RenderInterface.h
     src/Graphics/imgui_impl_glfw.h
@@ -76,10 +83,13 @@ add_executable(
     
     src/main.cpp
     src/App/UiSignalNodeBoard.cpp
+    src/App/UiImageNodeBoard.cpp
     src/App/AppInterface.cpp
     src/App/UserFileInput.cpp
     src/App/SignalNode.cpp
     src/App/TypedSignalNode.cpp
+    src/App/ImageNode.cpp
+    src/App/TypedImageNode.cpp
     src/Json/json.cpp
     src/Json/jsonrw.cpp
     src/ReaderWriter/FileIO.cpp
@@ -103,6 +113,9 @@ add_executable(
     src/SignalOperation/Waveform.cpp
     src/SignalOperation/KeySampler.cpp
     src/SignalOperation/Harmonics.cpp
+    src/ImageOperation/HighResOutput.cpp
+    src/ImageOperation/ImageOperation.cpp
+    src/ImageOperation/ImageOperationType.cpp
     src/Core/Vec2.cpp
     src/Core/PseudoRand.cpp
     src/Font/DefaultFontMaker.cpp
@@ -112,6 +125,7 @@ add_executable(
     src/Graphics/GlSpriteShader.cpp
     src/Graphics/GlQuad.cpp
     src/Graphics/GlSprite.cpp
+    src/Graphics/CustomProgram.cpp
     src/Graphics/RenderableTexture.cpp
     src/Graphics/RenderInterfaceGlfw.cpp
     src/Graphics/imgui_impl_glfw.cpp
