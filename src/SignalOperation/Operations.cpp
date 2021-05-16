@@ -113,6 +113,8 @@ OperationData CubicSampler::sample(size_t index, const Time& t)
     OperationData d = sampleInput(3, t);
     OperationData e = sampleInput(4, t);
 
+    if(reset < 0.0f) reset = 0.0f;
+
     float va = a.type != DataType_Error ? a.fvec[0] : value;
     float sp = b.type != DataType_Error ? b.fvec[0] : speed;
     float ac = c.type != DataType_Error ? c.fvec[0] : acc;
@@ -149,6 +151,8 @@ OperationData PolynomialSampler::sample(size_t index, const Time& t)
     t.dstOp = this;
     OperationData data;
     auto output  = getOutput(0);
+
+    if(reset < 0.0f) reset = 0.0f;
 
     float x = t.t;
     if(reset > 0.0)
