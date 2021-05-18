@@ -16,6 +16,13 @@ struct ColorInput : public ImageOperation
 };
 
 //--------------------------------------------------------------
+struct ImageAdd : public ImageOperation
+{
+    ImageAdd();
+    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+};
+
+//--------------------------------------------------------------
 struct ImageMult : public ImageOperation
 {
     ImageMult();
@@ -51,6 +58,36 @@ struct WhiteNoise : public ImageOperation
 
     std::string getOperationCode() const override;
 };
+
+//--------------------------------------------------------------
+struct UvMap : public ImageOperation
+{
+    UvMap();
+    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+};
+
+//--------------------------------------------------------------
+struct UvDistortion : public ImageOperation
+{
+    UvDistortion();
+    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+
+    std::string getOperationCode() const override;
+
+    float uOft = 0.0f;
+    float vOft = 0.0f;
+    float uFct = 1.0f;
+    float vFct = 1.0f;
+};
+
+//--------------------------------------------------------------
+/*struct BumpToNormal : public ImageOperation
+{
+    BumpToNormal();
+    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+
+    std::string getOperationCode() const override;
+};*/
 
 //--------------------------------------------------------------
 struct PerlinNoise : public ImageOperation

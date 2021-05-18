@@ -10,9 +10,13 @@ namespace qb
         {ImageOperationType_HighResOutput, "highres-output"},
         {ImageOperationType_Color, "color"},
         {ImageOperationType_Mult, "mult"},
+        {ImageOperationType_Add, "add"},
         {ImageOperationType_WhiteNoise, "white-noise"},
         {ImageOperationType_Perlin, "perlin"},
         {ImageOperationType_Dynamics, "dynamics"},
+        {ImageOperationType_UvDistortion, "uv-distortion"},
+        {ImageOperationType_UvMap, "uv-map"},
+        // {ImageOperationType_BumpToNormal, "bump-to-normal"},
         {ImageOperationType_Mix, "mix"}
     };
 }

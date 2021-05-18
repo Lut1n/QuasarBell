@@ -37,9 +37,11 @@ struct ImageOperationData
     };*/
     using vec4 = struct {float x,y,z,w;};
     std::vector<vec4> collectedUniforms;
-    std::vector<std::string> collectedOperations;
+    std::vector<std::string> collectedOperations; // uv + op
     std::unordered_map<qb::ImageOperationType, std::string> collectedFunctions;
     std::list<size_t> unusedVars;
+    std::vector<size_t> uvIndexes;
+    std::list<size_t> uvStack;
     bool useUV = false;
 };
 

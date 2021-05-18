@@ -6,16 +6,16 @@ static const char* vert_custom_shader_text =
 "#version 330\n"
 "in vec2 pos;\n"
 "in vec2 uv;\n"
-"out vec2 vUV;\n"
+"out vec2 uv0;\n"
 "void main()\n"
 "{\n"
 "    gl_Position = vec4(pos, 0.0, 1.0);\n"
-"    vUV = uv;\n"
+"    uv0 = uv;\n"
 "}\n";
  
 static const char* default_frag_shader_text =
 "#version 330\n"
-"in vec2 vUV;\n"
+"in vec2 uv0;\n"
 "void main()\n"
 "{\n"
 "    gl_FragColor = vec4(1.0f,1.0f,1.0f,1.0f);\n"

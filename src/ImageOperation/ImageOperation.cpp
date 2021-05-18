@@ -74,7 +74,7 @@ void ImagePreview::compute(ImageOperation* operation)
                 std::to_string(data.collectedUniforms[i].w) + std::string(");\n");
             }
 
-            if (data.useUV) opCode += "in vec2 vUV;\n";
+            if (data.useUV) opCode += "in vec2 uv0;\n";
             opCode += "out vec4 fragColor;\n";
 
             for(auto funcIt : data.collectedFunctions) opCode += funcIt.second;

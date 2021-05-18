@@ -12,10 +12,14 @@ namespace qb
         ImageOperationType_HighResOutput = 0,
         ImageOperationType_Color,
         ImageOperationType_Mult,
+        ImageOperationType_Add,
         ImageOperationType_WhiteNoise,
         ImageOperationType_Perlin,
         ImageOperationType_Dynamics,
         ImageOperationType_Mix,
+        ImageOperationType_UvDistortion,
+        ImageOperationType_UvMap,
+        // ImageOperationType_BumpToNormal,
 
         ImageOperationType_Count,
 

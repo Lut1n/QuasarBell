@@ -13,6 +13,10 @@ namespace qb
     {
         return std::string("v") + std::to_string(i);
     }
+    std::string uvName(size_t i)
+    {
+        return std::string("uv") + std::to_string(i);
+    }
 
     std::string inputName(size_t i)
     {
@@ -41,6 +45,10 @@ namespace qb
     std::string varNew(size_t i)
     {
         return std::string("vec4 ") + varName(i) + std::string(" = ");
+    }
+    std::string uvNew(size_t i)
+    {
+        return std::string("vec2 ") + uvName(i) + std::string(" = ");
     }
 };
 
@@ -116,6 +124,32 @@ bool ImageMult::sample(size_t index, const Time& t, ImageOperationData& data)
     return true;
 }
 
+//--------------------------------------------------------------
+ImageAdd::ImageAdd()
+    : ImageOperation(qb::ImageOperationType_Add)
+{
+    makeInput("input1", ImageDataType_Float);
+    makeInput("input2", ImageDataType_Float);
+    makeOutput("output", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool ImageAdd::sample(size_t index, const Time& t, ImageOperationData& data)
+{
+    t.dstOp = this;
+    
+    size_t var1, var2;
+    if(!sampleInput(0, t, data)) return false;
+    var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+    if(!sampleInput(1, t, data)) return false;
+    var2 = data.unusedVars.front(); data.unusedVars.pop_front();
+
+    size_t op_id = data.collectedOperations.size();
+    std::string opcode = qb::varNew(op_id) + qb::varName(var1) + std::string(" + ") + qb::varName(var2) + qb::opEnd();
+    data.collectedOperations.push_back(opcode);
+    data.unusedVars.push_back(op_id);
+    addOperationCode(data);
+    return true;
+}
 //--------------------------------------------------------------
 ImageMix::ImageMix()
     : ImageOperation(qb::ImageOperationType_Mix)
@@ -207,7 +241,8 @@ bool WhiteNoise::sample(size_t index, const Time& t, ImageOperationData& data)
     t.dstOp = this;
 
     size_t op_id = data.collectedOperations.size();
-    std::string opcode = qb::varNew(op_id) + qb::funCall("white_noise", {}) + qb::opEnd();
+    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+    std::string opcode = qb::varNew(op_id) + qb::funCall("white_noise", {qb::uvName(uvId)}) + qb::opEnd();
 
     data.collectedOperations.push_back(opcode);
     data.unusedVars.push_back(op_id);
@@ -224,12 +259,128 @@ std::string WhiteNoise::getOperationCode() const
     "float rand_wnoise(vec2 uv){\n"
     "    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
     "}\n"
-    "vec4 white_noise(){\n"
-    "    float r = rand_wnoise(vUV);\n"
+    "vec4 white_noise(vec2 uv){\n"
+    "    float r = rand_wnoise(uv);\n"
     "    return vec4(r,r,r,1.0f);\n"
     "}\n";
     return std::string(code);
 }
+//--------------------------------------------------------------
+UvMap::UvMap()
+    : ImageOperation(qb::ImageOperationType_UvMap)
+{
+    makeOutput("output", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool UvMap::sample(size_t index, const Time& t, ImageOperationData& data)
+{
+    t.dstOp = this;
+
+    size_t op_id = data.collectedOperations.size();
+    std::string opcode = qb::varNew(op_id) + std::string("vec4(uv0,0.0f,1.0f)") + qb::opEnd();
+
+    data.collectedOperations.push_back(opcode);
+    data.unusedVars.push_back(op_id);
+    data.useUV = true;
+
+    addOperationCode(data);
+    
+    return true;
+}
+//--------------------------------------------------------------
+UvDistortion::UvDistortion()
+    : ImageOperation(qb::ImageOperationType_UvDistortion)
+{
+    makeInput("input", ImageDataType_Float);
+    makeInput("uv-map", ImageDataType_Float);
+    makeOutput("output", ImageDataType_Float);
+    makeProperty("u offset", &uOft, -1.0f, 1.0f);
+    makeProperty("v offset", &vOft, -1.0f, 1.0f);
+    makeProperty("u factor", &uFct, -10.0f, 10.0f);
+    makeProperty("v factor", &vFct, -10.0f, 10.0f);
+}
+//--------------------------------------------------------------
+bool UvDistortion::sample(size_t index, const Time& t, ImageOperationData& data)
+{
+    t.dstOp = this;
+
+    size_t uv_id;
+    std::string opcode;
+
+    if(sampleInput(1, t, data))
+    {
+        size_t var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+        
+        uv_id = data.uvIndexes.size() + 1;
+        size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+        opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), std::string("vec4(") + qb::varName(var1) + std::string(".xy") + std::string("-uv0, 1.0f, 1.0f)")}) + qb::opEnd();
+    }
+    else
+    {
+        size_t input_id = data.collectedUniforms.size();
+        ImageOperationData::vec4 input = {uOft, vOft, uFct, vFct};
+        data.collectedUniforms.push_back(input);
+
+        uv_id = data.uvIndexes.size() + 1;
+        size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+        opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), qb::inputName(input_id)}) + qb::opEnd();
+    }
+
+
+    data.collectedOperations.push_back(opcode);
+    data.uvIndexes.push_back(uv_id);
+    data.uvStack.push_back(uv_id);
+    data.useUV = true;
+
+    addOperationCode(data);
+
+    bool ret = sampleInput(0, t, data);
+    data.uvStack.pop_back();
+    return ret;
+}
+//--------------------------------------------------------------
+std::string UvDistortion::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec2 distortion(vec2 uv, vec4 oft){\n"
+    "    return uv * oft.zw + oft.xy;\n"
+    "}\n";
+    return std::string(code);
+}
+//--------------------------------------------------------------
+/*BumpToNormal::BumpToNormal()
+    : ImageOperation(qb::ImageOperationType_BumpToNormal)
+{
+    makeInput("bump", ImageDataType_Float);
+    makeOutput("normal", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationData& data)
+{
+    t.dstOp = this;
+
+    size_t op_id = data.collectedOperations.size();
+    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+    std::string opcode = qb::varNew(op_id) + qb::funCall("bump_to_normal", {qb::uvName(uvId)}) + qb::opEnd();
+
+    data.collectedOperations.push_back(opcode);
+    data.unusedVars.push_back(op_id);
+    data.useUV = true;
+
+    addOperationCode(data);
+
+    return true;
+}
+//--------------------------------------------------------------
+std::string BumpToNormal::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec4 bump_to_normal(vec2 uv){\n"
+    "    float r = rand_wnoise(uv);\n"
+    "    return vec4(r,r,r,1.0f);\n"
+    "}\n";
+    return std::string(code);
+}*/
 //--------------------------------------------------------------
 PerlinNoise::PerlinNoise()
     : ImageOperation(qb::ImageOperationType_Perlin)
@@ -250,7 +401,8 @@ bool PerlinNoise::sample(size_t index, const Time& t, ImageOperationData& data)
     size_t op_id = data.collectedOperations.size();
     ImageOperationData::vec4 color = {(float)octaves, frequency, persistance, smoothness};
     data.collectedUniforms.push_back(color);
-    opcode = qb::varNew(op_id) + qb::funCall("perlin", {qb::inputName(input_id)}) + qb::opEnd();
+    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+    opcode = qb::varNew(op_id) + qb::funCall("perlin", {qb::inputName(input_id), {qb::uvName(uvId)}}) + qb::opEnd();
 
     data.collectedOperations.push_back(opcode);
     data.unusedVars.push_back(op_id);
@@ -268,8 +420,7 @@ std::string PerlinNoise::getOperationCode() const
     "float rand_perlin(vec2 uv){\n"
     "    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
     "}\n"
-    "vec4 perlin(vec4 res){\n"
-    "    vec2 uv = vUV;\n"
+    "vec4 perlin(vec4 res, vec2 uv){\n"
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
     "    float per = res.z;\n"
