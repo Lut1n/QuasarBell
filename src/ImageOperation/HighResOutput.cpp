@@ -17,6 +17,10 @@ namespace qb
     {
         return std::string("uv") + std::to_string(i);
     }
+    std::string ctxtName(size_t i)
+    {
+        return std::string("context_") + std::to_string(i);
+    }
 
     std::string inputName(size_t i)
     {
@@ -67,21 +71,17 @@ ColorInput::ColorInput()
     makeProperty("alpha", &a, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool ColorInput::sample(size_t index, const Time& t, ImageOperationData& data)
+bool ColorInput::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
-    size_t input_id = data.collectedUniforms.size();
-    size_t op_id = data.collectedOperations.size();
+    size_t input_id = data.global.pushUniform({r,g,b,a});
+    size_t op_id = data.getContext().getNextOperationId();
 
-    ImageOperationData::vec4 color = {r,g,b,a};
     std::string opcode = qb::varNew(op_id) + qb::inputName(input_id) + qb::opEnd();
 
-    data.collectedUniforms.push_back(color);
-    data.collectedOperations.push_back(opcode);
-
+    data.getContext().pushOperation(op_id, opcode);
     addOperationCode(data);
-    data.unusedVars.push_back(op_id);
 
     return true;
 }
@@ -89,7 +89,7 @@ bool ColorInput::sample(size_t index, const Time& t, ImageOperationData& data)
 void ColorInput::uiProperties()
 {
     uiPreview();
-    ImageOperationData::vec4 color = {r,g,b,a};
+    vec4 color = {r,g,b,a};
     if (ImGui::ColorEdit4("color", (float*)&color))
     {
         r = color.x; g = color.y; b = color.z; a = color.w;
@@ -106,20 +106,18 @@ ImageMult::ImageMult()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool ImageMult::sample(size_t index, const Time& t, ImageOperationData& data)
+bool ImageMult::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
     
-    size_t var1, var2;
     if(!sampleInput(0, t, data)) return false;
-    var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var1 = data.getContext().popResultId();
     if(!sampleInput(1, t, data)) return false;
-    var2 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var2 = data.getContext().popResultId();
 
-    size_t op_id = data.collectedOperations.size();
+    size_t op_id = data.getContext().getNextOperationId();
     std::string opcode = qb::varNew(op_id) + qb::varName(var1) + std::string(" * ") + qb::varName(var2) + qb::opEnd();
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
+    data.getContext().pushOperation(op_id, opcode);
     addOperationCode(data);
     return true;
 }
@@ -133,20 +131,18 @@ ImageAdd::ImageAdd()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool ImageAdd::sample(size_t index, const Time& t, ImageOperationData& data)
+bool ImageAdd::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
     
-    size_t var1, var2;
     if(!sampleInput(0, t, data)) return false;
-    var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var1 = data.getContext().popResultId();
     if(!sampleInput(1, t, data)) return false;
-    var2 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var2 = data.getContext().popResultId();
 
-    size_t op_id = data.collectedOperations.size();
+    size_t op_id = data.getContext().getNextOperationId();
     std::string opcode = qb::varNew(op_id) + qb::varName(var1) + std::string(" + ") + qb::varName(var2) + qb::opEnd();
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
+    data.getContext().pushOperation(op_id, opcode);
     addOperationCode(data);
     return true;
 }
@@ -161,20 +157,19 @@ ImageMix::ImageMix()
     makeProperty("delta", &delta, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool ImageMix::sample(size_t index, const Time& t, ImageOperationData& data)
+bool ImageMix::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
-    size_t var1, var2;
     if(!sampleInput(0, t, data)) return false;
-    var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var1 = data.getContext().popResultId();
     if(!sampleInput(1, t, data)) return false;
-    var2 = data.unusedVars.front(); data.unusedVars.pop_front();
+    size_t var2 = data.getContext().popResultId();
 
     std::vector<std::string> args;
     if (sampleInput(2, t, data))
     {
-        size_t var3 = data.unusedVars.front(); data.unusedVars.pop_front();
+        size_t var3 = data.getContext().popResultId();
         args = {qb::varName(var1), qb::varName(var2), qb::varName(var3)};
     }
     else
@@ -183,10 +178,9 @@ bool ImageMix::sample(size_t index, const Time& t, ImageOperationData& data)
         args = {qb::varName(var1), qb::varName(var2), vec4str};
     }
     
-    size_t op_id = data.collectedOperations.size();
+    size_t op_id = data.getContext().getNextOperationId();
     std::string opcode = qb::varNew(op_id) + qb::funCall("mix", args) + qb::opEnd();
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
+    data.getContext().pushOperation(op_id, opcode);
     addOperationCode(data);
     return true;
 }
@@ -200,20 +194,17 @@ Dynamics::Dynamics()
     makeProperty("contrast", &contrast, 0.0f, 10.0f);
 }
 //--------------------------------------------------------------
-bool Dynamics::sample(size_t index, const Time& t, ImageOperationData& data)
+bool Dynamics::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
     
     if(sampleInput(0, t, data))
     {
-        size_t var1 = data.unusedVars.front(); data.unusedVars.pop_front();
-        size_t input_id = data.collectedUniforms.size();
-        size_t op_id = data.collectedOperations.size();
-        ImageOperationData::vec4 bc = {brightness,contrast,0.0f,0.0f};
-        data.collectedUniforms.push_back(bc);
+        size_t var1 = data.getContext().popResultId();
+        size_t input_id = data.global.pushUniform({brightness,contrast,0.0f,0.0f});
+        size_t op_id = data.getContext().getNextOperationId();
         std::string opcode = qb::varNew(op_id) + qb::funCall("dynamics", {qb::varName(var1), qb::inputName(input_id)}) + qb::opEnd();
-        data.collectedOperations.push_back(opcode);
-        data.unusedVars.push_back(op_id);
+        data.getContext().pushOperation(op_id, opcode);
         addOperationCode(data);
         return true;
     }
@@ -236,17 +227,16 @@ WhiteNoise::WhiteNoise()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool WhiteNoise::sample(size_t index, const Time& t, ImageOperationData& data)
+bool WhiteNoise::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
-    size_t op_id = data.collectedOperations.size();
-    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+    size_t op_id = data.getContext().getNextOperationId();
+    size_t uvId = data.getContext().getUvId();
     std::string opcode = qb::varNew(op_id) + qb::funCall("white_noise", {qb::uvName(uvId)}) + qb::opEnd();
 
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
-    data.useUV = true;
+    data.getContext().pushOperation(op_id, opcode);
+    data.global.useUV = true;
 
     addOperationCode(data);
 
@@ -272,16 +262,15 @@ UvMap::UvMap()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool UvMap::sample(size_t index, const Time& t, ImageOperationData& data)
+bool UvMap::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
-    size_t op_id = data.collectedOperations.size();
+    size_t op_id = data.getContext().getNextOperationId();
     std::string opcode = qb::varNew(op_id) + std::string("vec4(uv0,0.0f,1.0f)") + qb::opEnd();
 
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
-    data.useUV = true;
+    data.getContext().pushOperation(op_id, opcode);
+    data.global.useUV = true;
 
     addOperationCode(data);
     
@@ -296,46 +285,40 @@ UvDistortion::UvDistortion()
     makeOutput("output", ImageDataType_Float);
     makeProperty("u offset", &uOft, -1.0f, 1.0f);
     makeProperty("v offset", &vOft, -1.0f, 1.0f);
-    makeProperty("u factor", &uFct, -10.0f, 10.0f);
-    makeProperty("v factor", &vFct, -10.0f, 10.0f);
+    makeProperty("u factor", &uFct, 0.0001f, 10.0f);
+    makeProperty("v factor", &vFct, 0.0001f, 10.0f);
 }
 //--------------------------------------------------------------
-bool UvDistortion::sample(size_t index, const Time& t, ImageOperationData& data)
+bool UvDistortion::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
     size_t uv_id;
     std::string opcode;
 
-    if(sampleInput(1, t, data))
+    if(sampleInput(1, t, data)) // uv map
     {
-        size_t var1 = data.unusedVars.front(); data.unusedVars.pop_front();
+        size_t var1 = data.getContext().popResultId();
         
-        uv_id = data.uvIndexes.size() + 1;
-        size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+        uv_id = data.getContext().getNextUvId();
+        size_t uvId = data.getContext().getUvId();
         opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), std::string("vec4(") + qb::varName(var1) + std::string(".xy") + std::string("-uv0, 1.0f, 1.0f)")}) + qb::opEnd();
     }
     else
     {
-        size_t input_id = data.collectedUniforms.size();
-        ImageOperationData::vec4 input = {uOft, vOft, uFct, vFct};
-        data.collectedUniforms.push_back(input);
+        size_t input_id = data.global.pushUniform({uOft, vOft, uFct, vFct});
 
-        uv_id = data.uvIndexes.size() + 1;
-        size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+        uv_id = data.getContext().getNextUvId();
+        size_t uvId = data.getContext().getUvId();
         opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), qb::inputName(input_id)}) + qb::opEnd();
     }
-
-
-    data.collectedOperations.push_back(opcode);
-    data.uvIndexes.push_back(uv_id);
-    data.uvStack.push_back(uv_id);
-    data.useUV = true;
-
+    
     addOperationCode(data);
+    data.global.useUV = true;
 
+    data.getContext().pushUv(uv_id, opcode);
     bool ret = sampleInput(0, t, data);
-    data.uvStack.pop_back();
+    data.getContext().popUv();
     return ret;
 }
 //--------------------------------------------------------------
@@ -348,6 +331,53 @@ std::string UvDistortion::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
+BlurFilter::BlurFilter()
+    : ImageOperation(qb::ImageOperationType_BlurFilter)
+{
+    makeInput("input", ImageDataType_Float);
+    makeOutput("output", ImageDataType_Float);
+    makeProperty("radius", &radius, 1, 10);
+}
+//--------------------------------------------------------------
+bool BlurFilter::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+{
+    t.dstOp = this;
+
+    size_t context_id = data.pushContext();
+    bool inputValid = sampleInput(0, t, data);
+    data.popContext();
+
+    std::string contextName = qb::ctxtName(context_id);
+
+    if(inputValid)
+    {
+        size_t op_id = data.getContext().getNextOperationId();
+        size_t uvId = data.getContext().getUvId();
+
+        std::string rid = std::string("r") + std::to_string(op_id);
+        std::string code;
+        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/512.0f;\n");
+        code += std::string("    int ") + rid + std::string(" = ") + std::to_string(radius) + std::string(";\n");
+        code += std::string("    for(int i=-") + rid + std::string("; i<=") + rid + std::string("; ++i)\n");
+        code += std::string("    for(int j=-") + rid + std::string("; j<=") + rid + std::string("; ++j)\n");
+
+        std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,0.0,0.0)") + qb::opEnd();
+        opcode += code;
+        opcode += std::string("        ") + qb::varName(op_id) + std::string(" += ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(i,j)*s") + std::to_string(op_id)}) + qb::opEnd();
+        int dv = qb::max(radius*2+1, 3);
+        opcode += std::string("    ") + qb::varName(op_id) + std::string("/=") + std::to_string(dv*dv) + std::string(".0f") + qb::opEnd();
+
+        data.getContext().pushOperation(op_id, opcode);
+
+        addOperationCode(data);
+        data.global.useUV = true;
+
+        return true;
+    }
+
+    return false;
+}
+//--------------------------------------------------------------
 /*BumpToNormal::BumpToNormal()
     : ImageOperation(qb::ImageOperationType_BumpToNormal)
 {
@@ -355,17 +385,17 @@ std::string UvDistortion::getOperationCode() const
     makeOutput("normal", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationData& data)
+bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
 
-    size_t op_id = data.collectedOperations.size();
-    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
+    size_t op_id = data.getContext().collectedOperations.size();
+    size_t uvId = 0; if (data.getContext().uvStack.size() > 0) uvId = data.getContext().uvStack.back();
     std::string opcode = qb::varNew(op_id) + qb::funCall("bump_to_normal", {qb::uvName(uvId)}) + qb::opEnd();
 
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
-    data.useUV = true;
+    data.getContext().collectedOperations.push_back(opcode);
+    data.getContext().unusedVars.push_back(op_id);
+    data.global.useUV = true;
 
     addOperationCode(data);
 
@@ -392,23 +422,19 @@ PerlinNoise::PerlinNoise()
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool PerlinNoise::sample(size_t index, const Time& t, ImageOperationData& data)
+bool PerlinNoise::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
     t.dstOp = this;
-    std::string opcode;
     
-    size_t input_id = data.collectedUniforms.size();
-    size_t op_id = data.collectedOperations.size();
-    ImageOperationData::vec4 color = {(float)octaves, frequency, persistance, smoothness};
-    data.collectedUniforms.push_back(color);
-    size_t uvId = 0; if (data.uvStack.size() > 0) uvId = data.uvStack.back();
-    opcode = qb::varNew(op_id) + qb::funCall("perlin", {qb::inputName(input_id), {qb::uvName(uvId)}}) + qb::opEnd();
+    size_t op_id = data.getContext().getNextOperationId();
+    size_t input_id = data.global.pushUniform({(float)octaves, frequency, persistance, smoothness});
+    size_t uvId = data.getContext().getUvId();
+    std::string opcode = qb::varNew(op_id) + qb::funCall("perlin", {qb::inputName(input_id), {qb::uvName(uvId)}}) + qb::opEnd();
 
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
-    data.useUV = true;
+    data.getContext().pushOperation(op_id, opcode);
 
     addOperationCode(data);
+    data.global.useUV = true;
 
     return true;
 }
@@ -458,26 +484,24 @@ HighResOutput::HighResOutput()
     makeProperty("res", ImageDataType_Int, &res);
 }
 //--------------------------------------------------------------
-bool HighResOutput::sample(size_t index, const Time& t, ImageOperationData& data)
+bool HighResOutput::sample(size_t index, const Time& t, ImageOperationVisitor& data)
 {
-    std::string opcode;
     size_t op_id;
+    std::string opcode;
+
     if(sampleInput(0, t, data))
     {
-        size_t var1 = data.unusedVars.front(); data.unusedVars.pop_front();
-        op_id = data.collectedOperations.size();
+        size_t var1 = data.getContext().popResultId();
+        op_id = data.getContext().getNextOperationId();
         opcode = qb::varNew(op_id) + qb::varName(var1) + qb::opEnd();
     }
     else
     {
-        size_t input_id = data.collectedUniforms.size();
-        op_id = data.collectedOperations.size();
-        ImageOperationData::vec4 color = {1.0f,1.0f,1.0f,1.0f};
-        data.collectedUniforms.push_back(color);
+        size_t input_id = data.global.pushUniform({1.0f,1.0f,1.0f,1.0f});
+        op_id = data.getContext().getNextOperationId();
         opcode = qb::varNew(op_id) + qb::inputName(input_id-1) + qb::opEnd();
     }
-    data.collectedOperations.push_back(opcode);
-    data.unusedVars.push_back(op_id);
+    data.getContext().pushOperation(op_id, opcode);
 
     addOperationCode(data);
 

@@ -165,7 +165,19 @@ void UiConnections::draw()
 
 void UiConnections::drawLink(vec2 p1, vec2 p2)
 {
-    const size_t pointCount = 8;
+    auto quintic = [](float t)
+    {
+        float t3 = t*t*t;
+        float t4 = t*t3;
+        return 6.0f*t*t4 - 15.0f*t4 + 10.0f*t3;
+    };
+
+    auto cubic = [](float t)
+    {
+        return t * t * (3.f - 2.f * t);
+    };
+
+    const size_t pointCount = 16;
     auto swapv = [](vec2& v1, vec2& v2) { vec2 t=v1; v1=v2; v2=t; };
     if(p2.x < p1.x) swapv(p1, p2);
 
@@ -173,7 +185,8 @@ void UiConnections::drawLink(vec2 p1, vec2 p2)
     for(size_t i=0; i<=pointCount; ++i)
     {
         float x = (float)i / pointCount;
-        float y = x * x * (3.f - 2.f * x);
+        // float y = cubic(x);
+        float y = quintic(x);
         vec2 l2;
         l2.x = (p2.x-p1.x) * x + p1.x;
         l2.y = (p2.y-p1.y) * y + p1.y;

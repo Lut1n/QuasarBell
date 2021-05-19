@@ -8,7 +8,7 @@
 struct ColorInput : public ImageOperation
 {
     ColorInput();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     void uiProperties() override;
 
@@ -19,21 +19,21 @@ struct ColorInput : public ImageOperation
 struct ImageAdd : public ImageOperation
 {
     ImageAdd();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 };
 
 //--------------------------------------------------------------
 struct ImageMult : public ImageOperation
 {
     ImageMult();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 };
 
 //--------------------------------------------------------------
 struct ImageMix : public ImageOperation
 {
     ImageMix();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     float delta;
 };
@@ -42,7 +42,7 @@ struct ImageMix : public ImageOperation
 struct Dynamics : public ImageOperation
 {
     Dynamics();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     std::string getOperationCode() const override;
 
@@ -54,7 +54,7 @@ struct Dynamics : public ImageOperation
 struct WhiteNoise : public ImageOperation
 {
     WhiteNoise();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     std::string getOperationCode() const override;
 };
@@ -63,14 +63,14 @@ struct WhiteNoise : public ImageOperation
 struct UvMap : public ImageOperation
 {
     UvMap();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 };
 
 //--------------------------------------------------------------
 struct UvDistortion : public ImageOperation
 {
     UvDistortion();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     std::string getOperationCode() const override;
 
@@ -80,11 +80,19 @@ struct UvDistortion : public ImageOperation
     float vFct = 1.0f;
 };
 
+struct BlurFilter : public ImageOperation
+{
+    BlurFilter();
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+
+    int radius = 1;
+};
+
 //--------------------------------------------------------------
 /*struct BumpToNormal : public ImageOperation
 {
     BumpToNormal();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     std::string getOperationCode() const override;
 };*/
@@ -93,7 +101,7 @@ struct UvDistortion : public ImageOperation
 struct PerlinNoise : public ImageOperation
 {
     PerlinNoise();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     std::string getOperationCode() const override;
 
@@ -107,7 +115,7 @@ struct PerlinNoise : public ImageOperation
 struct HighResOutput : public ImageOperation
 {
     HighResOutput();
-    bool sample(size_t index, const Time& t, ImageOperationData& data) override;
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
 
     int res = 1024;
 };

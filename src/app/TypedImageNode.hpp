@@ -13,6 +13,7 @@ MAKE_IMAGE_NODE(Dynamics, qb::ImageOperationType_Dynamics)
 MAKE_IMAGE_NODE(ImageMix, qb::ImageOperationType_Mix)
 MAKE_IMAGE_NODE(HighResOutput, qb::ImageOperationType_HighResOutput)
 MAKE_IMAGE_NODE(UvDistortion, qb::ImageOperationType_UvDistortion)
+MAKE_IMAGE_NODE(BlurFilter, qb::ImageOperationType_BlurFilter)
 MAKE_IMAGE_NODE(UvMap, qb::ImageOperationType_UvMap)
 
 

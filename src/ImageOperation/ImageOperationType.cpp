@@ -16,6 +16,7 @@ namespace qb
         {ImageOperationType_Dynamics, "dynamics"},
         {ImageOperationType_UvDistortion, "uv-distortion"},
         {ImageOperationType_UvMap, "uv-map"},
+        {ImageOperationType_BlurFilter, "blur-filter"},
         // {ImageOperationType_BumpToNormal, "bump-to-normal"},
         {ImageOperationType_Mix, "mix"}
     };

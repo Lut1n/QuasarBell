@@ -33,6 +33,12 @@ namespace qb
     {
         return a > b ? a : b;
     }
+
+};
+
+struct vec4
+{
+    union {struct{float x,y,z,w;}; float v[4];};
 };
 
 #endif // QUASAR_BELL_MATH_HPP
