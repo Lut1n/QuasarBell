@@ -89,13 +89,11 @@ struct BlurFilter : public ImageOperation
 };
 
 //--------------------------------------------------------------
-/*struct BumpToNormal : public ImageOperation
+struct BumpToNormal : public ImageOperation
 {
     BumpToNormal();
     bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
-
-    std::string getOperationCode() const override;
-};*/
+};
 
 //--------------------------------------------------------------
 struct PerlinNoise : public ImageOperation

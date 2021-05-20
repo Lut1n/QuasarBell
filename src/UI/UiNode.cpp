@@ -23,16 +23,6 @@ UiNode::UiNode(const std::string& title, const vec2& position, const vec2& size)
 
 UiNode::~UiNode()
 {
-    /*for (auto& pin : inputs)
-    {
-        for (auto id : pin->connectionIds)
-            UiConnections::instance->deleteLink(id);
-    }
-    for (auto& pin : outputs)
-    {
-        for (auto id : pin->connectionIds)
-            UiConnections::instance->deleteLink(id);
-    }*/
     for (auto it = selected.begin(); it != selected.end();)
     {
         if (*it == this)
@@ -43,6 +33,20 @@ UiNode::~UiNode()
         {
             it++;
         }
+    }
+}
+
+void UiNode::disconnectAllPins()
+{
+    for (auto& pin : inputs)
+    {
+        for (auto id : pin->connectionIds)
+            UiConnections::instance->deleteLink(id);
+    }
+    for (auto& pin : outputs)
+    {
+        for (auto id : pin->connectionIds)
+            UiConnections::instance->deleteLink(id);
     }
 }
 

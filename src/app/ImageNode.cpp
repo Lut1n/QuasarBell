@@ -12,6 +12,11 @@ ImageNode::ImageNode(const std::string& title, size_t nodeTypeId)
 {
 }
 //--------------------------------------------------------------
+ImageNode::~ImageNode()
+{
+    disconnectAllPins();
+}
+//--------------------------------------------------------------
 void ImageNode::setOperation(ImageOperation* op)
 {
     _operation = op;
@@ -43,6 +48,11 @@ void ImageNode::displayProperties()
 }
 //--------------------------------------------------------------
 void ImageNode::initializePreview()
+{
+    _operation->preview.initialize(_operation);
+}
+//--------------------------------------------------------------
+void ImageNode::updatePreview()
 {
     _operation->preview.compute(_operation);
 }

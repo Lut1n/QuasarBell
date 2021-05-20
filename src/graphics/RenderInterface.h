@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "Core/Math.hpp"
 #include "Core/Vec2.h"
 
 struct RenderInterface
@@ -36,6 +37,7 @@ struct RenderInterface
     static unsigned createCustomProgram();
     static void destroyCustomProgram(unsigned id);
     static void updateCustomProgram(unsigned customId, const std::string& fragCode);
+    static void setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4);
     static void applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br);
     
     static double getTime();

@@ -12,6 +12,11 @@ SignalNode::SignalNode(const std::string& title, size_t nodeTypeId)
 {
 }
 //--------------------------------------------------------------
+SignalNode::~SignalNode()
+{
+    disconnectAllPins();
+}
+//--------------------------------------------------------------
 void SignalNode::setOperation(SignalOperation* op)
 {
     _operation = op;

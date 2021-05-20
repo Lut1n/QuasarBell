@@ -33,12 +33,13 @@ ImageOperation::ImageOperation(qb::ImageOperationType opType)
 {
 }
 //--------------------------------------------------------------
-void ImagePreview::dirty()
+void ImagePreview::dirty(bool recompile)
 {
     hasChange = true;
+    toRecompile = recompile;
 }
 //--------------------------------------------------------------
-void ImagePreview::compute(ImageOperation* operation)
+void ImagePreview::initialize(ImageOperation* operation)
 {
     if(!initialized)
     {
@@ -49,8 +50,16 @@ void ImagePreview::compute(ImageOperation* operation)
         glProgram = RenderInterface::createCustomProgram();
 
         initialized = true;
+        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " intialized" << std::endl;
     }
-    if(hasChange)
+}
+//--------------------------------------------------------------
+void ImagePreview::compute(ImageOperation* operation)
+{
+    if(!initialized) initialize(operation);
+    if(!hasChange) return;
+
+    if(toRecompile)
     {
         operation->startSamplingGraph();
         ImageOperation::Time time;
@@ -109,9 +118,38 @@ void ImagePreview::compute(ImageOperation* operation)
             RenderInterface::clear(0x0000FFFF);
             RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
         }
-        
-        hasChange = false;
+        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " recompiled" << std::endl;
+
+        toRecompile = false;
     }
+    else
+    // update uniforms
+    {
+        operation->startSamplingGraph();
+        ImageOperation::Time time;
+        time.size = {(float)res,(float)res};
+        time.coord = {0.0f,0.0f};
+        time.uv = {0.0f, 0.0f};
+        time.dstOp = operation;
+
+        ImageOperationVisitor visitor;
+        if(operation->sample(0, time, visitor))
+        {
+            for(size_t i=0; i<visitor.global.collectedUniforms.size(); ++i)
+            {
+                RenderInterface::setInputCustomProgram(glProgram, i, visitor.global.collectedUniforms[i]);
+            }
+        }
+
+        Rect surface = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(res,res));
+        RenderInterface::setTarget(glResource);
+        RenderInterface::clear(0x0000FFFF);
+        RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
+
+        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " uniforms updated" << std::endl;
+    }
+        
+    hasChange = false;
 }
 //--------------------------------------------------------------
 ImageOperationDataType ImageOperation::getInputType(size_t index) const
@@ -224,7 +262,7 @@ void ImageOperation::setConnection(ImageOperation* src, size_t srcIdx, ImageOper
         
         dst->inputs[dstIdx].operation = src;
         dst->inputs[dstIdx].index = srcIdx;
-        dst->preview.dirty();
+        dst->preview.dirty(true);
     }
 }
 //--------------------------------------------------------------
@@ -241,7 +279,7 @@ void ImageOperation::remConnection(ImageOperation* dst, size_t dstIdx)
         }
         dst->inputs[dstIdx].operation = nullptr;
         dst->inputs[dstIdx].index = 0;
-        dst->preview.dirty();
+        dst->preview.dirty(true);
     }
 }
 //--------------------------------------------------------------
@@ -415,14 +453,19 @@ void ImageOperation::uiProperty(int index)
         changed = ImGui::Checkbox(name.c_str(), (bool*)std::get<2>(propDescs[index]));
     }
 
-    if (changed) dirty();
+    if (changed) dirty(false);
 }
 
-void ImageOperation::dirty()
+void ImageOperation::dirty(bool recompile)
 {
-    preview.dirty();
+    preview.dirty(recompile);
     for(auto& output : outputs)
     {
-        if(output.operation) output.operation->dirty();
+        if(output.operation) output.operation->dirty(recompile);
     }
+}
+
+qb::ImageOperationType ImageOperation::getNodeType() const
+{
+    return _operationType;
 }

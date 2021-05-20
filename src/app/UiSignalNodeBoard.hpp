@@ -72,8 +72,11 @@ public:
     void onDisconnect(UiPin* a, UiPin* b) override;
 
     void initializePreviews();
+    void updatePreviews();
 
 private:
+    size_t _lastUpdatedPreview = 0;
+    double _lastUpdateTime = 0.0;
     bool _ready = false;
 
     std::unique_ptr<UiNodeBoard> nodeboard;

@@ -80,6 +80,14 @@ void GlCustomProgram::use()
     GL_CHECKERROR("custom program use");
 }
 
+void GlCustomProgram::setUniform(size_t id, const vec4& v4)
+{
+    use();
+    // size_t loc = glGetUniformLocation(program, std::string("u")+std::to_string(id));
+    size_t loc = id;
+    glUniform4fv(loc, 1, v4.v);
+}
+
 void GlCustomProgram::bindAttributes()
 {
     size_t v2Size = sizeof(float)*2;

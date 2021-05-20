@@ -30,6 +30,7 @@ int runQuasarBell(int argc, char* argv[])
     while(RenderInterface::begin())
     {
         nodalEditor.initializePreviews();
+        nodalEditor.updatePreviews();
 
         RenderInterface::setTarget(win);
         RenderInterface::clear(0x1e1e1eFF);

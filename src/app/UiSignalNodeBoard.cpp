@@ -161,13 +161,13 @@ void UiSignalNodeBoard::update(float t)
     auto& icol = imageOperations.operations;
     for(auto it = icol.begin(); it != icol.end();)
     {
-        if (it->second->toDelete)
+        if (!it->second)
         {
-            nodeboard->rem(it->second.get());
             it = icol.erase(it);
         }
-        else if (!it->second)
+        else if (it->second->toDelete)
         {
+            nodeboard->rem(it->second.get());
             it = icol.erase(it);
         }
         else
@@ -204,6 +204,24 @@ void UiSignalNodeBoard::initializePreviews()
     {
         if (!it->second) continue;
         it->second->initializePreview();
+    }
+}
+
+void UiSignalNodeBoard::updatePreviews()
+{
+    if(RenderInterface::getTime() - _lastUpdateTime < 0.0) return;
+    _lastUpdateTime = RenderInterface::getTime();
+
+    auto& icol = imageOperations.operations;
+    if(_lastUpdatedPreview < icol.size())
+    {
+        if (icol[_lastUpdatedPreview])
+            icol[_lastUpdatedPreview]->updatePreview();
+        _lastUpdatedPreview = (_lastUpdatedPreview + 1) % icol.size();
+    }
+    else
+    {
+        _lastUpdatedPreview = 0;
     }
 }
 
@@ -252,42 +270,39 @@ void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
     auto* node1 = a->parentNode;
     auto* node2 = b->parentNode;
 
-    if(dynamic_cast<ImageNode*>(node1) && dynamic_cast<ImageNode*>(node2))
+    auto asImage1 = dynamic_cast<ImageNode*>(node1);
+    auto asImage2 = dynamic_cast<ImageNode*>(node2);
+    auto asSignal1 = dynamic_cast<SignalNode*>(node1);
+    auto asSignal2 = dynamic_cast<SignalNode*>(node2);
+
+    if(asImage1 && asImage2)
     {
         bool node1_is_src = !a->isInput;
 
         if(node1_is_src && node2)
         {
             int node2_index = (int)node2->getIndex(b);
-            auto* opnode = dynamic_cast<ImageNode*>(node2);
-            if (opnode)
-                ImageOperation::remConnection(opnode->getOperation(), node2_index);
+            ImageOperation::remConnection(asImage2->getOperation(), node2_index);
         }
         if(!node1_is_src && node1)
         {
             int node1_index = (int)node1->getIndex(a);
-            auto* opnode = dynamic_cast<ImageNode*>(node1);
-            if (opnode)
-                ImageOperation::remConnection(opnode->getOperation(), node1_index);
+            ImageOperation::remConnection(asImage1->getOperation(), node1_index);
         }
     }
-    else if(dynamic_cast<SignalNode*>(node1) && dynamic_cast<SignalNode*>(node2))
+    else if(asSignal1 && asSignal2)
     {
         bool node1_is_src = !a->isInput;
 
         if(node1_is_src && node2)
         {
             int node2_index = (int)node2->getIndex(b);
-            auto* opnode = dynamic_cast<SignalNode*>(node2);
-            if (opnode)
-                SignalOperation::remConnection(opnode->getOperation(), node2_index);
+            SignalOperation::remConnection(asSignal2->getOperation(), node2_index);
         }
         if(!node1_is_src && node1)
         {
             int node1_index = (int)node1->getIndex(a);
-            auto* opnode = dynamic_cast<SignalNode*>(node1);
-            if (opnode)
-                SignalOperation::remConnection(opnode->getOperation(), node1_index);
+            SignalOperation::remConnection(asSignal1->getOperation(), node1_index);
         }
     }
     else

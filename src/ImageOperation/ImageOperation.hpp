@@ -139,15 +139,17 @@ struct ImagePreview
     // float maxVal = 1.0;
     size_t glResource = 0;
     size_t glProgram = 0;
-    size_t res = 512;
+    size_t res = 256;
     bool initialized = false;
     bool hasChange = true;
+    bool toRecompile = true;
 
     std::string opCode;
 
     ~ImagePreview();
 
-    void dirty();
+    void dirty(bool recompile);
+    void initialize(ImageOperation* operation);
     void compute(ImageOperation* operation);
 };
 
@@ -158,7 +160,7 @@ struct ImageOperation
     {
         vec2 uv = {0.0f,0.0f};
         vec2 coord = {0.0f,0.0f};
-        vec2 size = {512.0f, 512.0f};
+        vec2 size = {256.0f, 256.0f};
         mutable ImageOperation* dstOp = nullptr;
     };
 
@@ -221,7 +223,9 @@ struct ImageOperation
 
     virtual void uiProperties();
 
-    void dirty();
+    void dirty(bool recompile = false);
+
+    qb::ImageOperationType getNodeType() const;
 
     ImagePreview preview;
 

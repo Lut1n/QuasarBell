@@ -93,7 +93,7 @@ void ColorInput::uiProperties()
     if (ImGui::ColorEdit4("color", (float*)&color))
     {
         r = color.x; g = color.y; b = color.z; a = color.w;
-        dirty();
+        dirty(false);
     }
 }
 
@@ -352,20 +352,23 @@ bool BlurFilter::sample(size_t index, const Time& t, ImageOperationVisitor& data
     if(inputValid)
     {
         size_t op_id = data.getContext().getNextOperationId();
+        size_t input_id = data.global.pushUniform({(float)radius, 0.0, 0.0, 0.0});
         size_t uvId = data.getContext().getUvId();
 
         std::string rid = std::string("r") + std::to_string(op_id);
+        std::string dvname = std::string("dv") + std::to_string(op_id);
         std::string code;
-        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/512.0f;\n");
-        code += std::string("    int ") + rid + std::string(" = ") + std::to_string(radius) + std::string(";\n");
+        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
+        code += std::string("    int ") + rid + std::string(" = int(") + qb::inputName(input_id) + std::string(".x)") + qb::opEnd();
         code += std::string("    for(int i=-") + rid + std::string("; i<=") + rid + std::string("; ++i)\n");
         code += std::string("    for(int j=-") + rid + std::string("; j<=") + rid + std::string("; ++j)\n");
 
         std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,0.0,0.0)") + qb::opEnd();
         opcode += code;
-        opcode += std::string("        ") + qb::varName(op_id) + std::string(" += ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(i,j)*s") + std::to_string(op_id)}) + qb::opEnd();
-        int dv = qb::max(radius*2+1, 3);
-        opcode += std::string("    ") + qb::varName(op_id) + std::string("/=") + std::to_string(dv*dv) + std::string(".0f") + qb::opEnd();
+        opcode +=  std::string("        ") + qb::varName(op_id) + std::string(" += ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(i,j)*s") + std::to_string(op_id)}) + qb::opEnd();
+        opcode += std::string("    ") + std::string("float ") + dvname + std::string(" = max(") + rid + std::string("*2.0f+1.0f, 3.0f)") + qb::opEnd(); 
+        opcode += std::string("    ") + dvname + std::string(" = ") + dvname + std::string(" * ") + dvname + qb::opEnd(); 
+        opcode += std::string("    ") + qb::varName(op_id) + std::string("/=") + dvname + qb::opEnd();
 
         data.getContext().pushOperation(op_id, opcode);
 
@@ -378,7 +381,7 @@ bool BlurFilter::sample(size_t index, const Time& t, ImageOperationVisitor& data
     return false;
 }
 //--------------------------------------------------------------
-/*BumpToNormal::BumpToNormal()
+BumpToNormal::BumpToNormal()
     : ImageOperation(qb::ImageOperationType_BumpToNormal)
 {
     makeInput("bump", ImageDataType_Float);
@@ -389,28 +392,40 @@ bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationVisitor& da
 {
     t.dstOp = this;
 
-    size_t op_id = data.getContext().collectedOperations.size();
-    size_t uvId = 0; if (data.getContext().uvStack.size() > 0) uvId = data.getContext().uvStack.back();
-    std::string opcode = qb::varNew(op_id) + qb::funCall("bump_to_normal", {qb::uvName(uvId)}) + qb::opEnd();
+    size_t context_id = data.pushContext();
+    bool inputValid = sampleInput(0, t, data);
+    data.popContext();
 
-    data.getContext().collectedOperations.push_back(opcode);
-    data.getContext().unusedVars.push_back(op_id);
-    data.global.useUV = true;
+    std::string contextName = qb::ctxtName(context_id);
 
-    addOperationCode(data);
+    if(inputValid)
+    {
+        size_t op_id = data.getContext().getNextOperationId();
+        // size_t input_id = data.global.pushUniform({1.0, 0.0, 0.0, 0.0});
+        size_t uvId = data.getContext().getUvId();
 
-    return true;
+        std::string code;
+        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
+
+        std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,1.0,1.0)") + qb::opEnd();
+        opcode += code;
+        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".x = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".x -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(-1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".y = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".y -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,-1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+
+        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".xy *= 0.5f") + qb::opEnd();
+
+        data.getContext().pushOperation(op_id, opcode);
+
+        addOperationCode(data);
+        data.global.useUV = true;
+
+        return true;
+    }
+
+    return false;
 }
-//--------------------------------------------------------------
-std::string BumpToNormal::getOperationCode() const
-{
-    static constexpr std::string_view code =
-    "vec4 bump_to_normal(vec2 uv){\n"
-    "    float r = rand_wnoise(uv);\n"
-    "    return vec4(r,r,r,1.0f);\n"
-    "}\n";
-    return std::string(code);
-}*/
 //--------------------------------------------------------------
 PerlinNoise::PerlinNoise()
     : ImageOperation(qb::ImageOperationType_Perlin)

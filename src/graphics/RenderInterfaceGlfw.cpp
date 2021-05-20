@@ -446,6 +446,11 @@ void RenderInterface::updateCustomProgram(unsigned customId, const std::string& 
     s_CustomPrograms[customId]->setFragCode(fragCode);
 }
 
+void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4)
+{
+    s_CustomPrograms[customId]->setUniform(uniformId, v4);
+}
+
 void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br)
 {
     vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);

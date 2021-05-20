@@ -28,6 +28,8 @@ struct UiNode : public UiFrame
 
     size_t getIndex(UiPin* pin) const;
 
+    void disconnectAllPins();
+
 protected:
     void startMove(const vec2& mousePos) override;
     void endMove(const vec2& mousePos) override;

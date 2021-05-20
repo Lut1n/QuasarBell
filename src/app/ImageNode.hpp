@@ -14,12 +14,15 @@
 struct ImageNode : public UiNode
 {
     ImageNode(const std::string& title, size_t nodetypeId);
+    ~ImageNode();
 
     void setOperation(ImageOperation* op);
     ImageOperation* getOperation();
 
     void displayProperties() override;
     void initializePreview();
+    void updatePreview();
+
     void drawPreview(const Rect& previewArea) override;
 
     size_t nodeTypeId() const;

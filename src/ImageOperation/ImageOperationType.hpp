@@ -20,7 +20,7 @@ namespace qb
         ImageOperationType_UvDistortion,
         ImageOperationType_UvMap,
         ImageOperationType_BlurFilter,
-        // ImageOperationType_BumpToNormal,
+        ImageOperationType_BumpToNormal,
 
         ImageOperationType_Count,
 

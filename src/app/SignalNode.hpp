@@ -14,6 +14,7 @@
 struct SignalNode : public UiNode
 {
     SignalNode(const std::string& title, size_t nodetypeId);
+    ~SignalNode();
 
     void setOperation(SignalOperation* op);
     SignalOperation* getOperation();

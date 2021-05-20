@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "Core/Math.hpp"
+
 struct GlCustomProgram
 {
     unsigned vertex_shader;
@@ -29,6 +31,8 @@ struct GlCustomProgram
     void unbindAttributes();
     
     void use();
+
+    void setUniform(size_t id, const vec4& v4);
     
     void setup();
 };
