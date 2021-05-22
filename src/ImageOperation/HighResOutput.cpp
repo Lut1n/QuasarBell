@@ -401,20 +401,18 @@ bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationVisitor& da
     if(inputValid)
     {
         size_t op_id = data.getContext().getNextOperationId();
-        // size_t input_id = data.global.pushUniform({1.0, 0.0, 0.0, 0.0});
         size_t uvId = data.getContext().getUvId();
 
-        std::string code;
-        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
-
         std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,1.0,1.0)") + qb::opEnd();
-        opcode += code;
-        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".x = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".x -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(-1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".y = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".y -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,-1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
+        opcode += std::string("    ") + qb::varName(op_id) + std::string(".x = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(-1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode += std::string("    ") + qb::varName(op_id) + std::string(".x -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode += std::string("    ") + qb::varName(op_id) + std::string(".y = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,-1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        opcode += std::string("    ") + qb::varName(op_id) + std::string(".y -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
 
-        opcode +=  std::string("    ") + qb::varName(op_id) + std::string(".xy *= 0.5f") + qb::opEnd();
+        opcode += "vec3 va" + std::to_string(op_id) + " = normalize(vec3(2.0,0.0," + qb::varName(op_id) + ".x))" + qb::opEnd();
+        opcode += "vec3 vb" + std::to_string(op_id) + " = normalize(vec3(0.0,2.0," + qb::varName(op_id) + ".y))" + qb::opEnd();
+        opcode += qb::varName(op_id) + ".xyz = cross(va" + std::to_string(op_id) + ",vb" + std::to_string(op_id) + ")" + qb::opEnd();
 
         data.getContext().pushOperation(op_id, opcode);
 

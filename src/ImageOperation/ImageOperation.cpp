@@ -118,7 +118,7 @@ void ImagePreview::compute(ImageOperation* operation)
             RenderInterface::clear(0x0000FFFF);
             RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
         }
-        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " recompiled" << std::endl;
+        // std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " recompiled" << std::endl;
 
         toRecompile = false;
     }
@@ -138,6 +138,7 @@ void ImagePreview::compute(ImageOperation* operation)
             for(size_t i=0; i<visitor.global.collectedUniforms.size(); ++i)
             {
                 RenderInterface::setInputCustomProgram(glProgram, i, visitor.global.collectedUniforms[i]);
+                // std::cout << qb::getImageOperationName(operation->getNodeType()) << " -> u" << i << std::endl;
             }
         }
 
@@ -146,7 +147,7 @@ void ImagePreview::compute(ImageOperation* operation)
         RenderInterface::clear(0x0000FFFF);
         RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
 
-        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " uniforms updated" << std::endl;
+        // std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " uniforms updated" << std::endl;
     }
         
     hasChange = false;
@@ -408,7 +409,9 @@ bool ImageOperation::hasCustomData() const
 void ImageOperation::uiProperties()
 {
     uiPreview();
+    ImGui::BeginChild("##properties");
     for(size_t i=0; i<getPropertyCount(); ++i) uiProperty((int)i);
+    ImGui::EndChild();
 }
 //--------------------------------------------------------------
 void ImageOperation::uiPreview()

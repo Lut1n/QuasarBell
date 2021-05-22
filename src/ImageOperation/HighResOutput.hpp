@@ -96,6 +96,18 @@ struct BumpToNormal : public ImageOperation
 };
 
 //--------------------------------------------------------------
+/*struct DirectionalSignal : public ImageOperation
+{
+    DirectionalSignal();
+    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+
+    float directionX = 1.0f;
+    float directionY = 1.0f;
+    float frequency = 4.0f;
+    float amplitude = 1.0f;
+};*/
+
+//--------------------------------------------------------------
 struct PerlinNoise : public ImageOperation
 {
     PerlinNoise();
@@ -107,6 +119,7 @@ struct PerlinNoise : public ImageOperation
     float frequency = 2.0f;
     float persistance = 0.7f;
     float smoothness = 1.0f;
+    float breaking = 0.0f;
 };
 
 //--------------------------------------------------------------

@@ -433,22 +433,26 @@ unsigned RenderInterface::createCustomProgram()
 {
     unsigned id = s_CustomPrograms.size();
     s_CustomPrograms.push_back(new GlCustomProgram());
+    GL_CHECKERROR("customProgram: create");
     return id;
 }
 void RenderInterface::destroyCustomProgram(unsigned id)
 {
     delete s_CustomPrograms[id];
+    GL_CHECKERROR("customProgram: delete");
     s_CustomPrograms[id] = nullptr;
 }
 
 void RenderInterface::updateCustomProgram(unsigned customId, const std::string& fragCode)
 {
     s_CustomPrograms[customId]->setFragCode(fragCode);
+    GL_CHECKERROR("customProgram: update");
 }
 
 void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4)
 {
     s_CustomPrograms[customId]->setUniform(uniformId, v4);
+    GL_CHECKERROR("customProgram: set uniform (maybe unused)");
 }
 
 void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br)
@@ -460,6 +464,9 @@ void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, cons
     s_sprite->update(tl, size, vec2(0.0f,0.0f), vec2(1.0f,1.0f), vp);
     GL_CHECKERROR("custom::update --- bindAttrib");
     s_CustomPrograms[customId]->bindAttributes();
+    GL_CHECKERROR("customProgram: bindAttrib");
     s_sprite->draw();
+    GL_CHECKERROR("customProgram: draw");
     s_CustomPrograms[customId]->unbindAttributes();
+    GL_CHECKERROR("customProgram: unbindAttrib");
 }
