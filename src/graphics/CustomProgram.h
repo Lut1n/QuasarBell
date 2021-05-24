@@ -17,6 +17,7 @@ struct GlCustomProgram
     unsigned uv_location;
     // unsigned tex_location;
 
+    bool bindUv = false;
     std::string fragShaderCode;
 
     GlCustomProgram();

@@ -9,6 +9,7 @@
 #include <list>
 
 #include "ImageOperation/ImageOperationType.hpp"
+#include "ImageOperation/GlslBuilder.hpp"
 
 #include "Core/Math.hpp"
 #include "Core/Vec2.h"
@@ -23,100 +24,6 @@ enum ImageOperationDataType
     ImageDataType_Float,
     
     ImageDataType_Count
-};
-
-//--------------------------------------------------------------
-struct ImageOperationContext
-{
-    std::vector<std::string> collectedOperations; // uv + op
-    std::list<size_t> unusedVars;
-    std::vector<size_t> uvIndexes;
-    std::list<size_t> uvStack;
-    
-    size_t getUvId()
-    {
-        if(uvStack.size() > 0)
-            return uvStack.back();
-        return 0;
-    }
-
-    void pushUv(size_t uvid, const std::string& code)
-    {
-        collectedOperations.push_back(code);
-        uvIndexes.push_back(uvid);
-        uvStack.push_back(uvid);
-    }
-
-    size_t getNextUvId()
-    {
-        return uvIndexes.size() + 1;
-    }
-
-    void popUv()
-    {
-        uvStack.pop_back();
-    }
-
-    void pushOperation(size_t result_id, const std::string& opcode)
-    {
-        unusedVars.push_back(result_id);
-        collectedOperations.push_back(opcode);
-    }
-
-    size_t popResultId()
-    {
-        size_t id = unusedVars.front(); unusedVars.pop_front();
-        return id;
-    }
-
-    size_t getNextOperationId()
-    {
-        return collectedOperations.size();
-    }
-};
-
-//--------------------------------------------------------------
-struct ImageOperationGlobal
-{
-    std::vector<vec4> collectedUniforms;
-    std::unordered_map<qb::ImageOperationType, std::string> functions;
-    bool useUV = false;
-
-    size_t pushUniform(const vec4& v4)
-    {
-        size_t id = collectedUniforms.size();
-        collectedUniforms.push_back(v4);
-        return id;
-    }
-};
-
-//--------------------------------------------------------------
-struct ImageOperationVisitor
-{
-    ImageOperationGlobal global;
-    ImageOperationContext mainContext;
-    std::vector<ImageOperationContext> subContexts;
-    std::list<size_t> contextStack;
-
-    ImageOperationContext& getContext()
-    {
-        if(contextStack.size() > 0)
-            return subContexts[contextStack.back()];
-        return mainContext;
-    }
-
-    size_t pushContext()
-    {
-        size_t idx = subContexts.size();
-        subContexts.push_back(ImageOperationContext());
-        contextStack.push_back(idx);
-        return idx;
-    }
-
-    void popContext()
-    {
-        contextStack.pop_back();
-    }
 };
 
 //--------------------------------------------------------------
@@ -187,13 +94,13 @@ struct ImageOperation
     ImageOperation* getInputOperation(size_t index);
 
     void update();
-    bool sampleInput(size_t index, const Time& t, ImageOperationVisitor& data);
+    bool sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
 
     void startSamplingGraph();
 
     virtual std::string name() const;
     virtual void startSampling();
-    virtual bool sample(size_t index, const Time& t, ImageOperationVisitor& data);
+    virtual bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
     
     size_t getInputCount() const;
     size_t getOutputCount() const;
@@ -239,7 +146,6 @@ protected:
     void uiProperty(int index);
     bool _hasCustomData = false;
 
-    void addOperationCode(ImageOperationVisitor& data);
     virtual std::string getOperationCode() const;
     const qb::ImageOperationType _operationType;
 

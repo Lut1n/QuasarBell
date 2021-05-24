@@ -94,18 +94,22 @@ void GlCustomProgram::bindAttributes()
     size_t attribSize = v2Size*2;
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) 0);
     GL_CHECKERROR("custom program bind attrib (pos ptr)");
-    glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) v2Size);
-    GL_CHECKERROR("custom program bind attrib (uv ptr)");
     glEnableVertexAttribArray(vpos_location);
     GL_CHECKERROR("custom program bind attrib (vpos)");
-    glEnableVertexAttribArray(uv_location);
-    GL_CHECKERROR("custom program bind attrib (uv)");
+    if(bindUv)
+    {
+        glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, (GLsizei) attribSize, (void*) v2Size);
+        GL_CHECKERROR("custom program bind attrib (uv ptr)");
+        glEnableVertexAttribArray(uv_location);
+        GL_CHECKERROR("custom program bind attrib (uv)");
+    }
 }
 
 void GlCustomProgram::unbindAttributes()
 {
     glDisableVertexAttribArray(vpos_location);
-    glDisableVertexAttribArray(uv_location);
+    if(bindUv)
+        glDisableVertexAttribArray(uv_location);
     GL_CHECKERROR("custom program unbind attrib");
 }
 

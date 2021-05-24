@@ -201,6 +201,9 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         ImGui::CreateContext();
         ImGui::StyleColorsDark();
 
+        ImGuiIO& io = ImGui::GetIO();
+        io.WantCaptureMouse = true;
+
         // Setup Platform/Renderer bindings
         const char* glsl_version = "#version 130";
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -443,8 +446,9 @@ void RenderInterface::destroyCustomProgram(unsigned id)
     s_CustomPrograms[id] = nullptr;
 }
 
-void RenderInterface::updateCustomProgram(unsigned customId, const std::string& fragCode)
+void RenderInterface::updateCustomProgram(unsigned customId, const std::string& fragCode, bool bindUv)
 {
+    s_CustomPrograms[customId]->bindUv = bindUv;
     s_CustomPrograms[customId]->setFragCode(fragCode);
     GL_CHECKERROR("customProgram: update");
 }

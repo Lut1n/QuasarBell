@@ -69,49 +69,12 @@ void ImagePreview::compute(ImageOperation* operation)
         time.dstOp = operation;
 
         opCode.clear();
-        ImageOperationVisitor visitor;
+        qb::GlslBuilderVisitor visitor;
         if(operation->sample(0, time, visitor))
         {
-            opCode += std::string("#version 330\n");
+            opCode = visitor.getCurrentFrame().compile();
 
-            for(size_t i=0; i<visitor.global.collectedUniforms.size(); ++i)
-            {
-                opCode += std::string("uniform vec4 ") + std::string("u") + std::to_string(i) + std::string(" = ") + std::string("vec4(") + 
-                std::to_string(visitor.global.collectedUniforms[i].x) + std::string(",") + 
-                std::to_string(visitor.global.collectedUniforms[i].y) + std::string(",") + 
-                std::to_string(visitor.global.collectedUniforms[i].z) + std::string(",") + 
-                std::to_string(visitor.global.collectedUniforms[i].w) + std::string(");\n");
-            }
-
-            if (visitor.global.useUV) opCode += "in vec2 uv0;\n";
-            opCode += "out vec4 fragColor;\n";
-
-            for(auto funcIt : visitor.global.functions) opCode += funcIt.second;
-
-            int contextId = visitor.subContexts.size() - 1;
-            for(auto ctxtIt = visitor.subContexts.rbegin(); ctxtIt != visitor.subContexts.rend(); ++ctxtIt)
-            {
-                auto& subCtxt = *ctxtIt;
-                opCode += std::string("vec4 context_") + std::to_string(contextId) + std::string("(vec2 uv0){\n");
-
-                for(size_t i=0; i<subCtxt.collectedOperations.size(); ++i)
-                    opCode += std::string("    ") + subCtxt.collectedOperations[i];
-
-                opCode += std::string("    ") + std::string("return ") + std::string("v") + std::to_string(subCtxt.collectedOperations.size()-1) + std::string(";\n");
-                opCode += std::string("};\n");
-
-                contextId--;
-            }
-
-            opCode += std::string("void main(){\n");
-
-            for(size_t i=0; i<visitor.mainContext.collectedOperations.size(); ++i)
-                opCode += std::string("    ") + visitor.mainContext.collectedOperations[i];
-
-            opCode += std::string("    ") + std::string("fragColor = ") + std::string("v") + std::to_string(visitor.mainContext.collectedOperations.size()-1) + std::string(";\n");
-            opCode += std::string("};\n");
-
-            RenderInterface::updateCustomProgram(glProgram, opCode);
+            RenderInterface::updateCustomProgram(glProgram, opCode, visitor.getCurrentFrame().hasUv);
 
             Rect surface = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(res,res));
             RenderInterface::setTarget(glResource);
@@ -132,13 +95,15 @@ void ImagePreview::compute(ImageOperation* operation)
         time.uv = {0.0f, 0.0f};
         time.dstOp = operation;
 
-        ImageOperationVisitor visitor;
+        qb::GlslBuilderVisitor visitor;
         if(operation->sample(0, time, visitor))
         {
-            for(size_t i=0; i<visitor.global.collectedUniforms.size(); ++i)
+            size_t inId = 0;
+            for(auto& input : visitor.getCurrentFrame().inputs)
             {
-                RenderInterface::setInputCustomProgram(glProgram, i, visitor.global.collectedUniforms[i]);
+                RenderInterface::setInputCustomProgram(glProgram, inId, input);
                 // std::cout << qb::getImageOperationName(operation->getNodeType()) << " -> u" << i << std::endl;
+                inId++;
             }
         }
 
@@ -204,12 +169,12 @@ void ImageOperation::startSamplingGraph()
     startSampling();
 }
 //--------------------------------------------------------------
-bool ImageOperation::sampleInput(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ImageOperation::sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto* co = getInput(index);
     if (co->operation)
     {
-        return co->operation->sample(inputs[index].index, t, data);
+        return co->operation->sample(inputs[index].index, t, visitor);
     }
     else
         return false;
@@ -293,16 +258,11 @@ void ImageOperation::startSampling()
 {
     // to implement by children
 }
-void ImageOperation::addOperationCode(ImageOperationVisitor& data)
-{
-    if(data.global.functions.find(_operationType) == data.global.functions.end())
-        data.global.functions[_operationType] = getOperationCode();
-}
 //--------------------------------------------------------------
-bool ImageOperation::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ImageOperation::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     // to implement by children
-    // addOperationCode(data);
+    // frame.setFunctions(getNodeType(), getOperationCode());
     return false;
 }
 std::string ImageOperation::getOperationCode() const

@@ -45,6 +45,7 @@ add_executable(
     src/SignalOperation/Waveform.hpp
     src/SignalOperation/KeySampler.hpp
     src/SignalOperation/Harmonics.hpp
+    src/ImageOperation/GlslBuilder.hpp
     src/ImageOperation/HighResOutput.hpp
     src/ImageOperation/ImageOperation.hpp
     src/ImageOperation/ImageOperationType.hpp
@@ -113,6 +114,7 @@ add_executable(
     src/SignalOperation/Waveform.cpp
     src/SignalOperation/KeySampler.cpp
     src/SignalOperation/Harmonics.cpp
+    src/ImageOperation/GlslBuilder.cpp
     src/ImageOperation/HighResOutput.cpp
     src/ImageOperation/ImageOperation.cpp
     src/ImageOperation/ImageOperationType.cpp

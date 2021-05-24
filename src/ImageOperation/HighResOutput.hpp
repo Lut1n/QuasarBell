@@ -8,7 +8,7 @@
 struct ColorInput : public ImageOperation
 {
     ColorInput();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 
@@ -19,21 +19,21 @@ struct ColorInput : public ImageOperation
 struct ImageAdd : public ImageOperation
 {
     ImageAdd();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 struct ImageMult : public ImageOperation
 {
     ImageMult();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 struct ImageMix : public ImageOperation
 {
     ImageMix();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     float delta;
 };
@@ -42,7 +42,7 @@ struct ImageMix : public ImageOperation
 struct Dynamics : public ImageOperation
 {
     Dynamics();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -54,7 +54,7 @@ struct Dynamics : public ImageOperation
 struct WhiteNoise : public ImageOperation
 {
     WhiteNoise();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -63,14 +63,14 @@ struct WhiteNoise : public ImageOperation
 struct UvMap : public ImageOperation
 {
     UvMap();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 struct UvDistortion : public ImageOperation
 {
     UvDistortion();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -83,7 +83,7 @@ struct UvDistortion : public ImageOperation
 struct BlurFilter : public ImageOperation
 {
     BlurFilter();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     int radius = 1;
 };
@@ -92,14 +92,14 @@ struct BlurFilter : public ImageOperation
 struct BumpToNormal : public ImageOperation
 {
     BumpToNormal();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 /*struct DirectionalSignal : public ImageOperation
 {
     DirectionalSignal();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     float directionX = 1.0f;
     float directionY = 1.0f;
@@ -111,7 +111,7 @@ struct BumpToNormal : public ImageOperation
 struct PerlinNoise : public ImageOperation
 {
     PerlinNoise();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -126,7 +126,7 @@ struct PerlinNoise : public ImageOperation
 struct HighResOutput : public ImageOperation
 {
     HighResOutput();
-    bool sample(size_t index, const Time& t, ImageOperationVisitor& data) override;
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     int res = 1024;
 };

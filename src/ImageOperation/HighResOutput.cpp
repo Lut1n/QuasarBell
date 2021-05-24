@@ -1,60 +1,11 @@
 #include "ImageOperation/HighResOutput.hpp"
+#include "ImageOperation/GlslBuilder.hpp"
 
 #include <array>
 #include <string>
 #include "imgui.h"
 
 #include "Ui/UiSystem.h"
-
-
-namespace qb
-{
-    std::string varName(size_t i)
-    {
-        return std::string("v") + std::to_string(i);
-    }
-    std::string uvName(size_t i)
-    {
-        return std::string("uv") + std::to_string(i);
-    }
-    std::string ctxtName(size_t i)
-    {
-        return std::string("context_") + std::to_string(i);
-    }
-
-    std::string inputName(size_t i)
-    {
-        return std::string("u") + std::to_string(i);
-    }
-
-    std::string opEnd()
-    {
-        return std::string(";\n");
-    }
-
-    std::string funCall(const std::string& name, const std::vector<std::string>& args)
-    {
-        std::string ret = name + std::string("(");
-        bool first = true;
-        for(auto& arg : args)
-        {
-            if (!first) ret += std::string(",");
-            else first = false;
-            ret += arg;
-        }
-        ret += std::string(")");
-        return ret;
-    }
-
-    std::string varNew(size_t i)
-    {
-        return std::string("vec4 ") + varName(i) + std::string(" = ");
-    }
-    std::string uvNew(size_t i)
-    {
-        return std::string("vec2 ") + uvName(i) + std::string(" = ");
-    }
-};
 
 //--------------------------------------------------------------
 ColorInput::ColorInput()
@@ -71,17 +22,22 @@ ColorInput::ColorInput()
     makeProperty("alpha", &a, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool ColorInput::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ColorInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
 
-    size_t input_id = data.global.pushUniform({r,g,b,a});
-    size_t op_id = data.getContext().getNextOperationId();
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    std::string opcode = qb::varNew(op_id) + qb::inputName(input_id) + qb::opEnd();
+    size_t inId = frame.pushInput({r,g,b,a});
+    size_t opId = context.getNextVa();
 
-    data.getContext().pushOperation(op_id, opcode);
-    addOperationCode(data);
+    std::string glsl = "vec4 $1 = $2;\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(inId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
 
     return true;
 }
@@ -106,19 +62,25 @@ ImageMult::ImageMult()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool ImageMult::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ImageMult::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
     
-    if(!sampleInput(0, t, data)) return false;
-    size_t var1 = data.getContext().popResultId();
-    if(!sampleInput(1, t, data)) return false;
-    size_t var2 = data.getContext().popResultId();
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    
+    if(!sampleInput(0, t, visitor)) return false;
+    size_t v1 = context.popVa();
+    if(!sampleInput(1, t, visitor)) return false;
+    size_t v2 = context.popVa();
 
-    size_t op_id = data.getContext().getNextOperationId();
-    std::string opcode = qb::varNew(op_id) + qb::varName(var1) + std::string(" * ") + qb::varName(var2) + qb::opEnd();
-    data.getContext().pushOperation(op_id, opcode);
-    addOperationCode(data);
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = $2 * $3;\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1), qb::va(v2)});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
     return true;
 }
 
@@ -131,19 +93,25 @@ ImageAdd::ImageAdd()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool ImageAdd::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ImageAdd::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
     
-    if(!sampleInput(0, t, data)) return false;
-    size_t var1 = data.getContext().popResultId();
-    if(!sampleInput(1, t, data)) return false;
-    size_t var2 = data.getContext().popResultId();
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    
+    if(!sampleInput(0, t, visitor)) return false;
+    size_t v1 = context.popVa();
+    if(!sampleInput(1, t, visitor)) return false;
+    size_t v2 = context.popVa();
 
-    size_t op_id = data.getContext().getNextOperationId();
-    std::string opcode = qb::varNew(op_id) + qb::varName(var1) + std::string(" + ") + qb::varName(var2) + qb::opEnd();
-    data.getContext().pushOperation(op_id, opcode);
-    addOperationCode(data);
+    size_t opId = context.getNextVa();
+    
+    std::string glsl = "vec4 $1 = $2 + $3;\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1), qb::va(v2)});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
     return true;
 }
 //--------------------------------------------------------------
@@ -157,31 +125,39 @@ ImageMix::ImageMix()
     makeProperty("delta", &delta, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool ImageMix::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool ImageMix::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    if(!sampleInput(0, t, data)) return false;
-    size_t var1 = data.getContext().popResultId();
-    if(!sampleInput(1, t, data)) return false;
-    size_t var2 = data.getContext().popResultId();
+    if(!sampleInput(0, t, visitor)) return false;
+    size_t v1 = context.popVa();
+    if(!sampleInput(1, t, visitor)) return false;
+    size_t v2 = context.popVa();
 
+    bool inputValid =sampleInput(2, t, visitor);
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = mix($2, $3, $4);\n";
     std::vector<std::string> args;
-    if (sampleInput(2, t, data))
+
+    if(inputValid)
     {
-        size_t var3 = data.getContext().popResultId();
-        args = {qb::varName(var1), qb::varName(var2), qb::varName(var3)};
+        size_t v3 = context.popVa();
+        args = {qb::va(opId), qb::va(v1), qb::va(v2), qb::va(v3)};
     }
     else
     {
-        std::string vec4str = std::string("vec4(") + std::to_string(delta) + std::string(")");
-        args = {qb::varName(var1), qb::varName(var2), vec4str};
+        size_t v3 = frame.pushInput({delta,delta,delta,delta});
+        args = {qb::va(opId), qb::va(v1), qb::va(v2), qb::in(v3)};
     }
     
-    size_t op_id = data.getContext().getNextOperationId();
-    std::string opcode = qb::varNew(op_id) + qb::funCall("mix", args) + qb::opEnd();
-    data.getContext().pushOperation(op_id, opcode);
-    addOperationCode(data);
+    glsl = qb::replaceArgs(glsl, args);
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
     return true;
 }
 //--------------------------------------------------------------
@@ -194,18 +170,23 @@ Dynamics::Dynamics()
     makeProperty("contrast", &contrast, 0.0f, 10.0f);
 }
 //--------------------------------------------------------------
-bool Dynamics::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool Dynamics::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
     
-    if(sampleInput(0, t, data))
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    
+    if(sampleInput(0, t, visitor))
     {
-        size_t var1 = data.getContext().popResultId();
-        size_t input_id = data.global.pushUniform({brightness,contrast,0.0f,0.0f});
-        size_t op_id = data.getContext().getNextOperationId();
-        std::string opcode = qb::varNew(op_id) + qb::funCall("dynamics", {qb::varName(var1), qb::inputName(input_id)}) + qb::opEnd();
-        data.getContext().pushOperation(op_id, opcode);
-        addOperationCode(data);
+        size_t v1 = context.popVa();
+        size_t in1 = frame.pushInput({brightness,contrast,0.0f,0.0f});
+        size_t opId = context.getNextVa();
+        std::string glsl = "vec4 $1 = dynamics($2, $3);\n";
+        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1), qb::in(in1)});
+        context.pushVa(opId);
+        context.pushCode(glsl);
+        frame.setFunctions(getNodeType(), getOperationCode());
         return true;
     }
     return false;
@@ -227,18 +208,23 @@ WhiteNoise::WhiteNoise()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool WhiteNoise::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool WhiteNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    size_t op_id = data.getContext().getNextOperationId();
-    size_t uvId = data.getContext().getUvId();
-    std::string opcode = qb::varNew(op_id) + qb::funCall("white_noise", {qb::uvName(uvId)}) + qb::opEnd();
+    size_t opId = context.getNextVa();
+    size_t uvId = context.getUvId();
+    std::string glsl = "vec4 $1 = white_noise($2);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::uv(uvId)});
 
-    data.getContext().pushOperation(op_id, opcode);
-    data.global.useUV = true;
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.hasUv = true;
 
-    addOperationCode(data);
+    frame.setFunctions(getNodeType(), getOperationCode());
 
     return true;
 }
@@ -262,17 +248,22 @@ UvMap::UvMap()
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool UvMap::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool UvMap::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
 
-    size_t op_id = data.getContext().getNextOperationId();
-    std::string opcode = qb::varNew(op_id) + std::string("vec4(uv0,0.0f,1.0f)") + qb::opEnd();
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    data.getContext().pushOperation(op_id, opcode);
-    data.global.useUV = true;
+    size_t opId = context.getNextVa();
+    std::string glsl = "vec4 $1 = vec4(uv0,0.0,1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId)});
 
-    addOperationCode(data);
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.hasUv = true;
+
+    frame.setFunctions(getNodeType(), getOperationCode());
     
     return true;
 }
@@ -289,36 +280,43 @@ UvDistortion::UvDistortion()
     makeProperty("v factor", &vFct, 0.0001f, 10.0f);
 }
 //--------------------------------------------------------------
-bool UvDistortion::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    size_t uv_id;
-    std::string opcode;
+    size_t uvId2;
+    std::string glsl;
 
-    if(sampleInput(1, t, data)) // uv map
+    if(sampleInput(1, t, visitor)) // uv map
     {
-        size_t var1 = data.getContext().popResultId();
+        size_t v1 = context.popVa();
         
-        uv_id = data.getContext().getNextUvId();
-        size_t uvId = data.getContext().getUvId();
-        opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), std::string("vec4(") + qb::varName(var1) + std::string(".xy") + std::string("-uv0, 1.0f, 1.0f)")}) + qb::opEnd();
+        uvId2 = context.getNextUv();
+        size_t uvId = context.getUvId();
+        glsl = "vec2 $1 = distortion($2,vec4($3.xy-uv0, 1.0,1.0));\n";
+        glsl = qb::replaceArgs(glsl, {qb::uv(uvId2), qb::uv(uvId), qb::va(v1)});
     }
     else
     {
-        size_t input_id = data.global.pushUniform({uOft, vOft, uFct, vFct});
+        size_t in1 = frame.pushInput({uOft, vOft, uFct, vFct});
 
-        uv_id = data.getContext().getNextUvId();
-        size_t uvId = data.getContext().getUvId();
-        opcode = qb::uvNew(uv_id) + qb::funCall("distortion", {qb::uvName(uvId), qb::inputName(input_id)}) + qb::opEnd();
+        uvId2 = context.getNextUv();
+        size_t uvId = context.getUvId();
+        
+        glsl = "vec2 $1 = distortion($2,$3);\n";
+        glsl = qb::replaceArgs(glsl, {qb::uv(uvId2), qb::uv(uvId), qb::in(in1)});
     }
     
-    addOperationCode(data);
-    data.global.useUV = true;
+    frame.setFunctions(getNodeType(), getOperationCode());
+    frame.hasUv = true;
 
-    data.getContext().pushUv(uv_id, opcode);
-    bool ret = sampleInput(0, t, data);
-    data.getContext().popUv();
+    context.pushUv(uvId2);
+    context.pushCode(glsl);
+    bool ret = sampleInput(0, t, visitor);
+    context.popUv();
     return ret;
 }
 //--------------------------------------------------------------
@@ -339,41 +337,40 @@ BlurFilter::BlurFilter()
     makeProperty("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
-bool BlurFilter::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    size_t context_id = data.pushContext();
-    bool inputValid = sampleInput(0, t, data);
-    data.popContext();
-
-    std::string contextName = qb::ctxtName(context_id);
+    size_t ctx = frame.pushContext();
+    bool inputValid = sampleInput(0, t, visitor);
+    frame.popContext();
 
     if(inputValid)
     {
-        size_t op_id = data.getContext().getNextOperationId();
-        size_t input_id = data.global.pushUniform({(float)radius, 0.0, 0.0, 0.0});
-        size_t uvId = data.getContext().getUvId();
+        size_t opId = context.getNextVa();
+        size_t in1 = frame.pushInput({(float)radius, 0.0, 0.0, 0.0});
+        size_t uvId = context.getUvId();
 
-        std::string rid = std::string("r") + std::to_string(op_id);
-        std::string dvname = std::string("dv") + std::to_string(op_id);
-        std::string code;
-        code += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
-        code += std::string("    int ") + rid + std::string(" = int(") + qb::inputName(input_id) + std::string(".x)") + qb::opEnd();
-        code += std::string("    for(int i=-") + rid + std::string("; i<=") + rid + std::string("; ++i)\n");
-        code += std::string("    for(int j=-") + rid + std::string("; j<=") + rid + std::string("; ++j)\n");
+        std::string glsl =
+        "vec4 v$1 = vec4(0.0);\n"
+        "float s$1 = 1.0/256.0;\n"
+        "int r$1 = int($2.x);\n"
+        "for(int i=-r$1; i<=r$1; ++i)\n"
+        "    for(int j=-r$1; j<=r$1; ++j)\n"
+        "        v$1 += $3($4 + vec2(i,j)*s$1);\n"
+        "float dv$1 = max(r$1*2.0+1.0, 3.0);\n"
+        "dv$1 = dv$1 * dv$1;\n"
+        "v$1 /= dv$1;\n";
 
-        std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,0.0,0.0)") + qb::opEnd();
-        opcode += code;
-        opcode +=  std::string("        ") + qb::varName(op_id) + std::string(" += ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(i,j)*s") + std::to_string(op_id)}) + qb::opEnd();
-        opcode += std::string("    ") + std::string("float ") + dvname + std::string(" = max(") + rid + std::string("*2.0f+1.0f, 3.0f)") + qb::opEnd(); 
-        opcode += std::string("    ") + dvname + std::string(" = ") + dvname + std::string(" * ") + dvname + qb::opEnd(); 
-        opcode += std::string("    ") + qb::varName(op_id) + std::string("/=") + dvname + qb::opEnd();
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::fu(ctx), qb::uv(uvId)});
+        context.pushVa(opId);
+        context.pushCode(glsl);
 
-        data.getContext().pushOperation(op_id, opcode);
-
-        addOperationCode(data);
-        data.global.useUV = true;
+        frame.setFunctions(getNodeType(), getOperationCode());
+        frame.hasUv = true;
 
         return true;
     }
@@ -388,36 +385,37 @@ BumpToNormal::BumpToNormal()
     makeOutput("normal", ImageDataType_Float);
 }
 //--------------------------------------------------------------
-bool BumpToNormal::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool BumpToNormal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    size_t context_id = data.pushContext();
-    bool inputValid = sampleInput(0, t, data);
-    data.popContext();
-
-    std::string contextName = qb::ctxtName(context_id);
+    size_t ctx = frame.pushContext();
+    bool inputValid = sampleInput(0, t, visitor);
+    frame.popContext();
 
     if(inputValid)
     {
-        size_t op_id = data.getContext().getNextOperationId();
-        size_t uvId = data.getContext().getUvId();
+        size_t opId = context.getNextVa();
+        size_t uvId = context.getUvId();
 
-        std::string opcode = qb::varNew(op_id) + std::string("vec4(0.0,0.0,1.0,1.0)") + qb::opEnd();
-        opcode += std::string("    float s") + std::to_string(op_id) + std::string(" = 1.0f/256.0f;\n");
-        opcode += std::string("    ") + qb::varName(op_id) + std::string(".x = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(-1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode += std::string("    ") + qb::varName(op_id) + std::string(".x -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(1,0)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode += std::string("    ") + qb::varName(op_id) + std::string(".y = ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,-1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
-        opcode += std::string("    ") + qb::varName(op_id) + std::string(".y -= ") + qb::funCall(contextName, {qb::uvName(uvId) + std::string(" + vec2(0,1)*s") + std::to_string(op_id)}) + std::string(".x") + qb::opEnd();
+        std::string glsl =
+        "vec4 v$1 = vec4(0,0,0,1);\n"
+        "float s$1 = 1.0/256.0;\n"
+        "float a$1 = $2($3 + vec2(-1,0)*s$1).x - $2($3 + vec2(1,0)*s$1).x;\n"
+        "float b$1 = $2($3 + vec2(0,-1)*s$1).x - $2($3 + vec2(0,1)*s$1).x;\n"
+        "vec3 va$1 = normalize(vec3(2,0,a$1));\n"
+        "vec3 vb$1 = normalize(vec3(0,2,b$1));\n"
+        "v$1.xyz = cross(va$1,vb$1);\n";
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::fu(ctx), qb::uv(uvId)});
 
-        opcode += "vec3 va" + std::to_string(op_id) + " = normalize(vec3(2.0,0.0," + qb::varName(op_id) + ".x))" + qb::opEnd();
-        opcode += "vec3 vb" + std::to_string(op_id) + " = normalize(vec3(0.0,2.0," + qb::varName(op_id) + ".y))" + qb::opEnd();
-        opcode += qb::varName(op_id) + ".xyz = cross(va" + std::to_string(op_id) + ",vb" + std::to_string(op_id) + ")" + qb::opEnd();
+        context.pushVa(opId);
+        context.pushCode(glsl);
 
-        data.getContext().pushOperation(op_id, opcode);
-
-        addOperationCode(data);
-        data.global.useUV = true;
+        frame.setFunctions(getNodeType(), getOperationCode());
+        frame.hasUv = true;
 
         return true;
     }
@@ -435,19 +433,25 @@ PerlinNoise::PerlinNoise()
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool PerlinNoise::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool PerlinNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     t.dstOp = this;
     
-    size_t op_id = data.getContext().getNextOperationId();
-    size_t input_id = data.global.pushUniform({(float)octaves, frequency, persistance, smoothness});
-    size_t uvId = data.getContext().getUvId();
-    std::string opcode = qb::varNew(op_id) + qb::funCall("perlin", {qb::inputName(input_id), {qb::uvName(uvId)}}) + qb::opEnd();
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    
+    size_t opId = context.getNextVa();
+    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
+    size_t uvId = context.getUvId();
 
-    data.getContext().pushOperation(op_id, opcode);
+    std::string glsl = "vec4 $1 = perlin($2, $3);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
 
-    addOperationCode(data);
-    data.global.useUV = true;
+    context.pushVa(opId);
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+    frame.hasUv = true;
 
     return true;
 }
@@ -497,26 +501,31 @@ HighResOutput::HighResOutput()
     makeProperty("res", ImageDataType_Int, &res);
 }
 //--------------------------------------------------------------
-bool HighResOutput::sample(size_t index, const Time& t, ImageOperationVisitor& data)
+bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    size_t op_id;
-    std::string opcode;
+    size_t opId;
+    
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
 
-    if(sampleInput(0, t, data))
+    std::string glsl = "vec4 $1 = $2;\n";
+
+    if(sampleInput(0, t, visitor))
     {
-        size_t var1 = data.getContext().popResultId();
-        op_id = data.getContext().getNextOperationId();
-        opcode = qb::varNew(op_id) + qb::varName(var1) + qb::opEnd();
+        size_t v1 = context.popVa();
+        opId = context.getNextVa();
+        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1)});
     }
     else
     {
-        size_t input_id = data.global.pushUniform({1.0f,1.0f,1.0f,1.0f});
-        op_id = data.getContext().getNextOperationId();
-        opcode = qb::varNew(op_id) + qb::inputName(input_id-1) + qb::opEnd();
+        size_t in1 = frame.pushInput({1.0f,1.0f,1.0f,1.0f});
+        opId = context.getNextVa();
+        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1)});
     }
-    data.getContext().pushOperation(op_id, opcode);
+    context.pushVa(opId);
+    context.pushCode(glsl);
 
-    addOperationCode(data);
+    frame.setFunctions(getNodeType(), getOperationCode());
 
     return true;
 }
