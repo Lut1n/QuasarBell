@@ -75,10 +75,14 @@ void UiConnections::updateLink(std::uint64_t id, UiPin* a, UiPin* b)
 
 void UiConnections::deleteLink(std::uint64_t id)
 {
-    if (links.find(id) == links.end()) return;
+    if (links.find(id) == links.end())
+    {
+        std::cout << "error: cannot find link to delete" << std::endl;
+        return;
+    }
 
     auto& link = links[id];
-    std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << std::endl;
+    std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << "]" << std::endl;
     if(handler) handler->onDisconnect(link.first,link.second);
 
     link.first->remConnectionId(id);

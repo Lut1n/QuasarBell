@@ -24,7 +24,7 @@ ColorInput::ColorInput()
 //--------------------------------------------------------------
 bool ColorInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
 
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -64,7 +64,7 @@ ImageMult::ImageMult()
 //--------------------------------------------------------------
 bool ImageMult::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -95,7 +95,7 @@ ImageAdd::ImageAdd()
 //--------------------------------------------------------------
 bool ImageAdd::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -127,7 +127,7 @@ ImageMix::ImageMix()
 //--------------------------------------------------------------
 bool ImageMix::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -172,7 +172,7 @@ Dynamics::Dynamics()
 //--------------------------------------------------------------
 bool Dynamics::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -210,7 +210,7 @@ WhiteNoise::WhiteNoise()
 //--------------------------------------------------------------
 bool WhiteNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -250,7 +250,7 @@ UvMap::UvMap()
 //--------------------------------------------------------------
 bool UvMap::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
 
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -282,7 +282,7 @@ UvDistortion::UvDistortion()
 //--------------------------------------------------------------
 bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -336,7 +336,7 @@ BlurFilter::BlurFilter()
 //--------------------------------------------------------------
 bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -384,7 +384,7 @@ BumpToNormal::BumpToNormal()
 //--------------------------------------------------------------
 bool BumpToNormal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -432,7 +432,7 @@ PerlinNoise::PerlinNoise()
 //--------------------------------------------------------------
 bool PerlinNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    
     
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();

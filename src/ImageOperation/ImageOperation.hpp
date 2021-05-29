@@ -64,13 +64,7 @@ struct ImagePreview
 //--------------------------------------------------------------
 struct ImageOperation
 {
-    struct Time
-    {
-        vec2 uv = {0.0f,0.0f};
-        vec2 coord = {0.0f,0.0f};
-        vec2 size = {256.0f, 256.0f};
-        mutable ImageOperation* dstOp = nullptr;
-    };
+    struct Time {};
 
     union MinMaxVal
     {

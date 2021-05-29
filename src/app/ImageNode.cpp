@@ -20,6 +20,8 @@ ImageNode::~ImageNode()
 void ImageNode::setOperation(ImageOperation* op)
 {
     _operation = op;
+    if (!_operation) return;
+
     for(size_t i=0; i<_operation->getInputCount(); ++i)
     {
         auto input = _operation->getInput(i);

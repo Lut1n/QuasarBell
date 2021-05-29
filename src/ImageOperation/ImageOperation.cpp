@@ -61,10 +61,6 @@ void ImagePreview::compute(ImageOperation* operation)
 
     operation->startSamplingGraph();
     ImageOperation::Time time;
-    time.size = {(float)res,(float)res};
-    time.coord = {0.0f,0.0f};
-    time.uv = {0.0f, 0.0f};
-    time.dstOp = operation;
 
     qb::GlslBuilderVisitor visitor;
     bool opValid = operation->sample(0, time, visitor);
@@ -177,8 +173,6 @@ void ImageOperation::makeInput(const std::string& name, ImageOperationDataType t
     ImageOperationConnection input;
     input.name = name;
     input.type = type;
-    // input.operation = nullptr;
-    // input.index = 0;
     inputs.push_back(input);
 }
 //--------------------------------------------------------------
@@ -187,8 +181,6 @@ void ImageOperation::makeOutput(const std::string& name, ImageOperationDataType 
     ImageOperationConnection output;
     output.name = name;
     output.type = type;
-    // output.operation = nullptr;
-    // output.index = 0;
     outputs.push_back(output);
 }
 //--------------------------------------------------------------
@@ -220,11 +212,12 @@ void ImageOperation::remConnection(ImageOperation* dst, size_t dstIdx)
         auto index = dst->inputs[dstIdx].refs[0].index;
         if(op && index < op->outputs.size())
         {
+            auto& outRefs = op->outputs[index].refs;
             ImageOperationConnection::Ref toErase{dst, dstIdx};
-            auto it = std::find_if(op->outputs[index].refs.begin(), op->outputs[index].refs.end(), [toErase](ImageOperationConnection::Ref& ref){
+            auto it = std::find_if(outRefs.begin(), outRefs.end(), [toErase](ImageOperationConnection::Ref& ref){
                 return ref.operation == toErase.operation && ref.index == toErase.index;
             });
-            op->outputs[index].refs.erase(it);
+            outRefs.erase(it);
         }
         dst->inputs[dstIdx].refs.clear();
     }

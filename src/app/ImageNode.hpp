@@ -40,6 +40,9 @@ struct TypedImageNode : public ImageNode
         title->text = qb::getImageOperationName(OpType);
         setOperation(&imageOperation);
     }
+
+    // Early disconnection before destroying imageOperation
+    ~TypedImageNode() { disconnectAllPins(); setOperation(nullptr); }
 private:
     OpObject imageOperation;
 };

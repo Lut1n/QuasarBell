@@ -257,12 +257,12 @@ void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
     {
         bool node1_is_src = !a->isInput;
 
-        if(node1_is_src && node2)
+        if(node1_is_src)
         {
             int node2_index = (int)node2->getIndex(b);
             ImageOperation::remConnection(asImage2->getOperation(), node2_index);
         }
-        if(!node1_is_src && node1)
+        if(!node1_is_src)
         {
             int node1_index = (int)node1->getIndex(a);
             ImageOperation::remConnection(asImage1->getOperation(), node1_index);
@@ -272,12 +272,12 @@ void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
     {
         bool node1_is_src = !a->isInput;
 
-        if(node1_is_src && node2)
+        if(node1_is_src)
         {
             int node2_index = (int)node2->getIndex(b);
             SignalOperation::remConnection(asSignal2->getOperation(), node2_index);
         }
-        if(!node1_is_src && node1)
+        if(!node1_is_src)
         {
             int node1_index = (int)node1->getIndex(a);
             SignalOperation::remConnection(asSignal1->getOperation(), node1_index);
