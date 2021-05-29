@@ -39,6 +39,7 @@ struct RenderInterface
     static void updateCustomProgram(unsigned customId, const std::string& fragCode, bool bindUv);
     static void setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4);
     static void applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br);
+    static void resetCustomProgram(unsigned customId);
     
     static double getTime();
 

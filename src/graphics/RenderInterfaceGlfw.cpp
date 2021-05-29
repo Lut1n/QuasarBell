@@ -100,6 +100,9 @@ static UiEvent::State s_buttonStates[3] = {UiEvent::STATE_RELEASED,UiEvent::STAT
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+    // imgui has priority
+    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) return;
+
     UiEvent evn;
     evn.type = UiEvent::TYPE_MOUSE_BUTTON;
     
@@ -202,7 +205,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         ImGui::StyleColorsDark();
 
         ImGuiIO& io = ImGui::GetIO();
-        io.WantCaptureMouse = true;
+        io.WantCaptureMouse = false;
 
         // Setup Platform/Renderer bindings
         const char* glsl_version = "#version 130";
@@ -473,4 +476,10 @@ void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, cons
     GL_CHECKERROR("customProgram: draw");
     s_CustomPrograms[customId]->unbindAttributes();
     GL_CHECKERROR("customProgram: unbindAttrib");
+}
+
+void RenderInterface::resetCustomProgram(unsigned customId)
+{
+    s_CustomPrograms[customId]->bindUv = false;
+    s_CustomPrograms[customId]->resetFragCode();
 }

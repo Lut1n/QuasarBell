@@ -23,6 +23,7 @@ struct GlCustomProgram
     GlCustomProgram();
     ~GlCustomProgram();
 
+    void resetFragCode();
     void setFragCode(const std::string& fragCode);
     void cleanup();
     void compile();

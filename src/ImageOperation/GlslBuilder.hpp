@@ -28,8 +28,8 @@ namespace qb
         std::list<size_t> vaStack;
         std::list<size_t> uvStack;
 
-        size_t nextUvId = 0;
-        size_t nextVaId = 1;
+        size_t nextUvId = 1;
+        size_t nextVaId = 0;
 
         void pushUv(size_t id);
         void popUv();

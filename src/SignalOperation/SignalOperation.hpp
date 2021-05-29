@@ -83,8 +83,6 @@ struct SignalOperation
     SignalOperationConnection* getInput(size_t index);
     SignalOperationConnection* getOutput(size_t index);
 
-    SignalOperation* getInputOperation(size_t index);
-
     void update();
     OperationData sampleInput(size_t index, const Time& t);
 

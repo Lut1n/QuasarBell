@@ -18,7 +18,7 @@ static const char* default_frag_shader_text =
 "in vec2 uv0;\n"
 "void main()\n"
 "{\n"
-"    gl_FragColor = vec4(1.0f,1.0f,1.0f,1.0f);\n"
+"    gl_FragColor = vec4(0.0f,0.0f,0.0f,1.0f);\n"
 "}\n";
 
 
@@ -31,6 +31,11 @@ GlCustomProgram::GlCustomProgram()
 GlCustomProgram::~GlCustomProgram()
 {
     cleanup();
+}
+
+void GlCustomProgram::resetFragCode()
+{
+    setFragCode(default_frag_shader_text);
 }
 
 void GlCustomProgram::setFragCode(const std::string& fragCode)

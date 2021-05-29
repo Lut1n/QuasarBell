@@ -33,17 +33,18 @@ class JsonValue;
 //--------------------------------------------------------------
 struct ImageOperationConnection
 {
-    ImageOperation* operation = nullptr;
-    size_t index = 0;
-    size_t count = 0;
+    struct Ref 
+    {
+        ImageOperation* operation = nullptr;
+        size_t index = 0;
+    };
+    std::vector<Ref> refs;
     ImageOperationDataType type = ImageDataType_Undefined;
     std::string name;
 };
 
 struct ImagePreview
 {
-    // std::array<float, 32> data;
-    // float maxVal = 1.0;
     size_t glResource = 0;
     size_t glProgram = 0;
     size_t res = 256;
@@ -90,8 +91,6 @@ struct ImageOperation
 
     ImageOperationConnection* getInput(size_t index);
     ImageOperationConnection* getOutput(size_t index);
-
-    ImageOperation* getInputOperation(size_t index);
 
     void update();
     bool sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
@@ -144,6 +143,7 @@ protected:
     void makeProperty(const std::string& name, int* ptr, int minVal, int maxVal);
     void uiPreview();
     void uiProperty(int index);
+    void uiDebugIo();
     bool _hasCustomData = false;
 
     virtual std::string getOperationCode() const;

@@ -137,7 +137,7 @@ bool ImageMix::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     if(!sampleInput(1, t, visitor)) return false;
     size_t v2 = context.popVa();
 
-    bool inputValid =sampleInput(2, t, visitor);
+    bool inputValid = sampleInput(2, t, visitor);
     size_t opId = context.getNextVa();
 
     std::string glsl = "vec4 $1 = mix($2, $3, $4);\n";
@@ -287,25 +287,22 @@ bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    size_t uvId2;
     std::string glsl;
 
-    if(sampleInput(1, t, visitor)) // uv map
+    bool inputValid = sampleInput(1, t, visitor); // uv map
+
+    size_t uvId2 = context.getNextUv();
+    size_t uvId = context.getUvId();
+
+    if(inputValid)
     {
         size_t v1 = context.popVa();
-        
-        uvId2 = context.getNextUv();
-        size_t uvId = context.getUvId();
         glsl = "vec2 $1 = distortion($2,vec4($3.xy-uv0, 1.0,1.0));\n";
         glsl = qb::replaceArgs(glsl, {qb::uv(uvId2), qb::uv(uvId), qb::va(v1)});
     }
     else
     {
         size_t in1 = frame.pushInput({uOft, vOft, uFct, vFct});
-
-        uvId2 = context.getNextUv();
-        size_t uvId = context.getUvId();
-        
         glsl = "vec2 $1 = distortion($2,$3);\n";
         glsl = qb::replaceArgs(glsl, {qb::uv(uvId2), qb::uv(uvId), qb::in(in1)});
     }
@@ -313,8 +310,8 @@ bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     frame.setFunctions(getNodeType(), getOperationCode());
     frame.hasUv = true;
 
-    context.pushUv(uvId2);
     context.pushCode(glsl);
+    context.pushUv(uvId2);
     bool ret = sampleInput(0, t, visitor);
     context.popUv();
     return ret;

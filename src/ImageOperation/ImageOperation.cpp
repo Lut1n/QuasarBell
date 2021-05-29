@@ -45,7 +45,7 @@ void ImagePreview::initialize(ImageOperation* operation)
     {
         glResource = RenderInterface::createTarget(res,res,false);    
         RenderInterface::setTarget(glResource);
-        RenderInterface::clear(0x0000FFFF);
+        RenderInterface::clear(0x000000FF);
 
         glProgram = RenderInterface::createCustomProgram();
 
@@ -57,63 +57,43 @@ void ImagePreview::initialize(ImageOperation* operation)
 void ImagePreview::compute(ImageOperation* operation)
 {
     if(!initialized) initialize(operation);
-    if(!hasChange) return;
+    if(!hasChange && !toRecompile) return;
+
+    operation->startSamplingGraph();
+    ImageOperation::Time time;
+    time.size = {(float)res,(float)res};
+    time.coord = {0.0f,0.0f};
+    time.uv = {0.0f, 0.0f};
+    time.dstOp = operation;
+
+    qb::GlslBuilderVisitor visitor;
+    bool opValid = operation->sample(0, time, visitor);
 
     if(toRecompile)
     {
-        operation->startSamplingGraph();
-        ImageOperation::Time time;
-        time.size = {(float)res,(float)res};
-        time.coord = {0.0f,0.0f};
-        time.uv = {0.0f, 0.0f};
-        time.dstOp = operation;
-
         opCode.clear();
-        qb::GlslBuilderVisitor visitor;
-        if(operation->sample(0, time, visitor))
+        if(opValid)
         {
             opCode = visitor.getCurrentFrame().compile();
-
             RenderInterface::updateCustomProgram(glProgram, opCode, visitor.getCurrentFrame().hasUv);
-
-            Rect surface = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(res,res));
-            RenderInterface::setTarget(glResource);
-            RenderInterface::clear(0x0000FFFF);
-            RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
         }
-        // std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " recompiled" << std::endl;
-
+        else
+        {
+            RenderInterface::resetCustomProgram(glProgram);
+        }
         toRecompile = false;
     }
-    else
-    // update uniforms
+    else if(opValid)
     {
-        operation->startSamplingGraph();
-        ImageOperation::Time time;
-        time.size = {(float)res,(float)res};
-        time.coord = {0.0f,0.0f};
-        time.uv = {0.0f, 0.0f};
-        time.dstOp = operation;
-
-        qb::GlslBuilderVisitor visitor;
-        if(operation->sample(0, time, visitor))
-        {
-            size_t inId = 0;
-            for(auto& input : visitor.getCurrentFrame().inputs)
-            {
-                RenderInterface::setInputCustomProgram(glProgram, inId, input);
-                // std::cout << qb::getImageOperationName(operation->getNodeType()) << " -> u" << i << std::endl;
-                inId++;
-            }
-        }
-
-        Rect surface = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(res,res));
-        RenderInterface::setTarget(glResource);
-        RenderInterface::clear(0x0000FFFF);
-        RenderInterface::applyCustomProgram(glProgram, surface.p0, surface.p1);
-
-        // std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " uniforms updated" << std::endl;
+        // Update uniforms
+        size_t inId = 0;
+        for(auto& input : visitor.getCurrentFrame().inputs)
+            RenderInterface::setInputCustomProgram(glProgram, inId++, input);
     }
+
+    RenderInterface::setTarget(glResource);
+    RenderInterface::clear(0x000000FF);
+    RenderInterface::applyCustomProgram(glProgram, vec2(0.0f,0.0f), vec2(res,res));
         
     hasChange = false;
 }
@@ -140,11 +120,6 @@ void ImageOperation::setOuput(size_t index, ImageOperation* dst, size_t dstIndex
     setConnection(this, index, dst, dstIndex);
 }
 //--------------------------------------------------------------
-ImageOperation* ImageOperation::getInputOperation(size_t index)
-{
-    return inputs[index].operation;
-}
-//--------------------------------------------------------------
 ImageOperationConnection* ImageOperation::getInput(size_t index)
 {
     if (index < inputs.size())
@@ -163,8 +138,8 @@ void ImageOperation::startSamplingGraph()
 { 
     for (auto input : inputs)
     {
-        if (input.operation)
-            input.operation->startSamplingGraph();
+        for(auto& ref : input.refs)
+            if (ref.operation) ref.operation->startSamplingGraph();
     }
     startSampling();
 }
@@ -172,9 +147,9 @@ void ImageOperation::startSamplingGraph()
 bool ImageOperation::sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto* co = getInput(index);
-    if (co->operation)
+    if (co->refs.size() > 0 && co->refs[0].operation)
     {
-        return co->operation->sample(inputs[index].index, t, visitor);
+        return co->refs[0].operation->sample(co->refs[0].index, t, visitor);
     }
     else
         return false;
@@ -202,8 +177,8 @@ void ImageOperation::makeInput(const std::string& name, ImageOperationDataType t
     ImageOperationConnection input;
     input.name = name;
     input.type = type;
-    input.operation = nullptr;
-    input.index = 0;
+    // input.operation = nullptr;
+    // input.index = 0;
     inputs.push_back(input);
 }
 //--------------------------------------------------------------
@@ -212,8 +187,8 @@ void ImageOperation::makeOutput(const std::string& name, ImageOperationDataType 
     ImageOperationConnection output;
     output.name = name;
     output.type = type;
-    output.operation = nullptr;
-    output.index = 0;
+    // output.operation = nullptr;
+    // output.index = 0;
     outputs.push_back(output);
 }
 //--------------------------------------------------------------
@@ -223,29 +198,35 @@ void ImageOperation::setConnection(ImageOperation* src, size_t srcIdx, ImageOper
     
     if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
     {
-        src->outputs[srcIdx].operation = dst;
-        src->outputs[srcIdx].index = dstIdx;
+        ImageOperationConnection::Ref ref;
+        ref.operation = dst;
+        ref.index = dstIdx;
+        src->outputs[srcIdx].refs.push_back(ref);
         
-        dst->inputs[dstIdx].operation = src;
-        dst->inputs[dstIdx].index = srcIdx;
-        dst->preview.dirty(true);
+        ref.operation = src;
+        ref.index = srcIdx;
+        dst->inputs[dstIdx].refs.push_back(ref);
+        // dst->inputs[dstIdx].refs = {ref};
+        dst->dirty(true);
     }
 }
 //--------------------------------------------------------------
 void ImageOperation::remConnection(ImageOperation* dst, size_t dstIdx)
 {
-    if (dst && dstIdx < dst->inputs.size())
+    if (dst && dstIdx < dst->inputs.size() && dst->inputs[dstIdx].refs.size() > 0)
     {
-        auto op = dst->inputs[dstIdx].operation;
-        auto index = dst->inputs[dstIdx].index;
+        dst->dirty(true);
+        auto op = dst->inputs[dstIdx].refs[0].operation;
+        auto index = dst->inputs[dstIdx].refs[0].index;
         if(op && index < op->outputs.size())
         {
-            op->outputs[index].operation = nullptr;
-            op->outputs[index].index = 0;
+            ImageOperationConnection::Ref toErase{dst, dstIdx};
+            auto it = std::find_if(op->outputs[index].refs.begin(), op->outputs[index].refs.end(), [toErase](ImageOperationConnection::Ref& ref){
+                return ref.operation == toErase.operation && ref.index == toErase.index;
+            });
+            op->outputs[index].refs.erase(it);
         }
-        dst->inputs[dstIdx].operation = nullptr;
-        dst->inputs[dstIdx].index = 0;
-        dst->preview.dirty(true);
+        dst->inputs[dstIdx].refs.clear();
     }
 }
 //--------------------------------------------------------------
@@ -385,6 +366,8 @@ void ImageOperation::uiPreview()
         ImGui::Text(preview.opCode.c_str());
     }
     ImGui::Separator();
+    uiDebugIo();
+    ImGui::Separator();
 }
 //--------------------------------------------------------------
 void ImageOperation::uiProperty(int index)
@@ -419,12 +402,51 @@ void ImageOperation::uiProperty(int index)
     if (changed) dirty(false);
 }
 
+void ImageOperation::uiDebugIo()
+{
+    if(ImGui::CollapsingHeader("io"))
+    {
+        ImGui::Columns(2);
+        ImGui::Text("in");
+        ImGui::NextColumn();
+        ImGui::Text("out");
+        ImGui::NextColumn();
+        ImGui::Separator();
+
+        for(size_t i=0; i<getInputCount(); ++i)
+        {
+            auto* input = getInput(i);
+            ImGui::Text(input->name.c_str());
+            for(auto& ref : input->refs)
+            {
+                std::string sid = std::to_string(ref.index) + " ";
+                ImGui::Text(sid.c_str());
+            }
+        }
+        ImGui::NextColumn();
+        for(size_t i=0; i<getOutputCount(); ++i)
+        {
+            auto* output = getOutput(i);
+            ImGui::Text(output->name.c_str());
+            for(auto& ref : output->refs)
+            {
+                std::string sid = std::to_string(ref.index) + " ";
+                ImGui::Text(sid.c_str());
+            }
+        }
+        ImGui::NextColumn();
+
+        ImGui::Columns(1);
+    }
+}
+
 void ImageOperation::dirty(bool recompile)
 {
     preview.dirty(recompile);
     for(auto& output : outputs)
     {
-        if(output.operation) output.operation->dirty(recompile);
+        for(auto& ref : output.refs)
+            ref.operation->dirty(recompile);
     }
 }
 

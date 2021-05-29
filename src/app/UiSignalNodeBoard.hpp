@@ -22,21 +22,6 @@ struct ImageOperationCollection
 };
 
 //--------------------------------------------------------------
-struct ImageOperationConnections
-{
-    struct Entry
-    {
-        int src;
-        int src_index;
-        int dst;
-        int dst_index;
-    };
-    std::vector<Entry> entries;
-
-    void fill(UiConnections* ui, const ImageOperationCollection& coll);
-};
-
-//--------------------------------------------------------------
 struct OperationCollection
 {
     std::unordered_map<size_t, std::unique_ptr<SignalNode>> operations;

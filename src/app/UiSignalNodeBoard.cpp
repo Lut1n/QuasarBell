@@ -33,24 +33,6 @@ void OperationConnections::fill(UiConnections* ui, const OperationCollection& co
             entries.push_back(Entry{id1,idx1,id2,idx2});
     }
 }
-
-void ImageOperationConnections::fill(UiConnections* ui, const ImageOperationCollection& coll)
-{
-    for (auto link : ui->links)
-    {
-        auto co = link.second;
-        auto pin1 = co.first;
-        auto pin2 = co.second;
-        int id1 = (int)coll.getId(dynamic_cast<ImageNode*>(pin1->parentNode));
-        int id2 = (int)coll.getId(dynamic_cast<ImageNode*>(pin2->parentNode));
-        int idx1 = (int)pin1->parentNode->getIndex(pin1);
-        int idx2 = (int)pin2->parentNode->getIndex(pin2);
-        if (pin1->isInput)
-            entries.push_back(Entry{id2,idx2,id1,idx1});
-        else
-            entries.push_back(Entry{id1,idx1,id2,idx2});
-    }
-}
 //--------------------------------------------------------------
 void UiSignalNodeBoard::update(float t)
 {
@@ -145,10 +127,6 @@ void UiSignalNodeBoard::update(float t)
         if (it->second->toDelete)
         {
             nodeboard->rem(it->second.get());
-            it = col.erase(it);
-        }
-        else if (!it->second)
-        {
             it = col.erase(it);
         }
         else

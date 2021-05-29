@@ -71,11 +71,6 @@ void SignalOperation::setOuput(size_t index, SignalOperation* dst, size_t dstInd
     setConnection(this, index, dst, dstIndex);
 }
 //--------------------------------------------------------------
-SignalOperation* SignalOperation::getInputOperation(size_t index)
-{
-    return inputs[index].operation;
-}
-//--------------------------------------------------------------
 SignalOperationConnection* SignalOperation::getInput(size_t index)
 {
     if (index < inputs.size())

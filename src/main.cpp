@@ -1,6 +1,5 @@
 #include "App/AppInterface.hpp"
 #include "App/UiSignalNodeBoard.hpp"
-#include "App/UiImageNodeBoard.hpp"
 
 #include "Graphics/RenderInterface.h"
 #include "Font/GlyphRenderer.h"

@@ -13,7 +13,6 @@ find_package(OpenAL REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     src/App/UiSignalNodeBoard.hpp
-    src/App/UiImageNodeBoard.hpp
     src/App/AppInterface.hpp
     src/App/UserFileInput.hpp
     src/App/SignalNode.hpp
@@ -84,7 +83,6 @@ add_executable(
     
     src/main.cpp
     src/App/UiSignalNodeBoard.cpp
-    src/App/UiImageNodeBoard.cpp
     src/App/AppInterface.cpp
     src/App/UserFileInput.cpp
     src/App/SignalNode.cpp
