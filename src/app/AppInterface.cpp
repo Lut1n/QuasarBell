@@ -65,23 +65,29 @@ void AppInterface::display()
         ImGui::Text("New Node");
         ImGui::Separator();
         ImGui::Spacing();
-        for(size_t i=0; i<operationNames.size(); ++i)
+        if (ImGui::BeginMenu("Audio"))
         {
-            if(ImGui::MenuItem(operationNames[i].c_str()))
+            for(size_t i=0; i<operationNames.size(); ++i)
             {
-                nodeToCreateCategory = NodeCategory_Signal;
-                nodeToCreateType = i;
+                if(ImGui::MenuItem(operationNames[i].c_str()))
+                {
+                    nodeToCreateCategory = NodeCategory_Signal;
+                    nodeToCreateType = i;
+                }
             }
+            ImGui::EndMenu();
         }
-        ImGui::Separator();
-        ImGui::Spacing();
-        for(size_t i=0; i<imageOperationNames.size(); ++i)
+        if (ImGui::BeginMenu("Image"))
         {
-            if(ImGui::MenuItem(imageOperationNames[i].c_str()))
+            for(size_t i=0; i<imageOperationNames.size(); ++i)
             {
-                nodeToCreateCategory = NodeCategory_Image;
-                nodeToCreateType = i;
+                if(ImGui::MenuItem(imageOperationNames[i].c_str()))
+                {
+                    nodeToCreateCategory = NodeCategory_Image;
+                    nodeToCreateType = i;
+                }
             }
+            ImGui::EndMenu();
         }
         ImGui::EndPopup();
     }

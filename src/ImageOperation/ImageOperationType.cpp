@@ -9,15 +9,21 @@ namespace qb
     {
         {ImageOperationType_HighResOutput, "highres-output"},
         {ImageOperationType_Color, "color"},
-        {ImageOperationType_Mult, "mult"},
         {ImageOperationType_Add, "add"},
+        {ImageOperationType_Sub, "sub"},
+        {ImageOperationType_Mult, "mult"},
+        {ImageOperationType_Div, "div"},
         {ImageOperationType_WhiteNoise, "white-noise"},
         {ImageOperationType_Perlin, "perlin"},
+        {ImageOperationType_Voronoi, "voronoi"},
         {ImageOperationType_Dynamics, "dynamics"},
         {ImageOperationType_UvDistortion, "uv-distortion"},
-        {ImageOperationType_UvMap, "uv-map"},
+        {ImageOperationType_UvMapping, "uv-mapping"},
+        {ImageOperationType_UvInput, "uv-input"},
         {ImageOperationType_BlurFilter, "blur-filter"},
         {ImageOperationType_BumpToNormal, "bump-to-normal"},
+        {ImageOperationType_DirSignal, "dir-signal"},
+        {ImageOperationType_RadSignal, "rad-signal"},
         {ImageOperationType_Mix, "mix"}
     };
 }

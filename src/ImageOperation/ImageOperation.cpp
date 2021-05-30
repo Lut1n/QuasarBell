@@ -50,7 +50,6 @@ void ImagePreview::initialize(ImageOperation* operation)
         glProgram = RenderInterface::createCustomProgram();
 
         initialized = true;
-        std::cout << "operation " << qb::getImageOperationName(operation->getNodeType()) << " intialized" << std::endl;
     }
 }
 //--------------------------------------------------------------

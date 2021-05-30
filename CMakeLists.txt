@@ -46,6 +46,10 @@ add_executable(
     src/SignalOperation/Harmonics.hpp
     src/ImageOperation/GlslBuilder.hpp
     src/ImageOperation/HighResOutput.hpp
+    src/ImageOperation/ImageNoises.hpp
+    src/ImageOperation/ImageSampling.hpp
+    src/ImageOperation/ImageUvOperations.hpp
+    src/ImageOperation/ImageBasicOperators.hpp
     src/ImageOperation/ImageOperation.hpp
     src/ImageOperation/ImageOperationType.hpp
     src/Core/Vec2.h
@@ -114,6 +118,10 @@ add_executable(
     src/SignalOperation/Harmonics.cpp
     src/ImageOperation/GlslBuilder.cpp
     src/ImageOperation/HighResOutput.cpp
+    src/ImageOperation/ImageNoises.cpp
+    src/ImageOperation/ImageSampling.cpp
+    src/ImageOperation/ImageUvOperations.cpp
+    src/ImageOperation/ImageBasicOperators.cpp
     src/ImageOperation/ImageOperation.cpp
     src/ImageOperation/ImageOperationType.cpp
     src/Core/Vec2.cpp

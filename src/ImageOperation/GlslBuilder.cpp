@@ -153,8 +153,9 @@ std::string qb::GlslFrame::compile()
 
     // sub contexts
     int contextId = subContexts.size() - 1;
-    for(auto& context : subContexts)
+    for(auto rit=subContexts.rbegin(); rit!=subContexts.rend(); rit++)
     {
+        auto& context = *rit;
         std::string contextTemplate = "vec4 $1(vec2 uv0){\n$2return $3;\n}\n";
         glsl += replaceArgs(contextTemplate, {fu(contextId), context.code, va(context.getVa())});
         contextId--;

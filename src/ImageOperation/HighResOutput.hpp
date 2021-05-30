@@ -16,20 +16,6 @@ struct ColorInput : public ImageOperation
 };
 
 //--------------------------------------------------------------
-struct ImageAdd : public ImageOperation
-{
-    ImageAdd();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
-struct ImageMult : public ImageOperation
-{
-    ImageMult();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
 struct ImageMix : public ImageOperation
 {
     ImageMix();
@@ -49,54 +35,8 @@ struct Dynamics : public ImageOperation
     float brightness = 0.0f;
     float contrast = 1.0f;
 };
-
 //--------------------------------------------------------------
-struct WhiteNoise : public ImageOperation
-{
-    WhiteNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    std::string getOperationCode() const override;
-};
-
-//--------------------------------------------------------------
-struct UvMap : public ImageOperation
-{
-    UvMap();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
-struct UvDistortion : public ImageOperation
-{
-    UvDistortion();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    std::string getOperationCode() const override;
-
-    float uOft = 0.0f;
-    float vOft = 0.0f;
-    float uFct = 1.0f;
-    float vFct = 1.0f;
-};
-
-struct BlurFilter : public ImageOperation
-{
-    BlurFilter();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    int radius = 1;
-};
-
-//--------------------------------------------------------------
-struct BumpToNormal : public ImageOperation
-{
-    BumpToNormal();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
-/*struct DirectionalSignal : public ImageOperation
+struct DirectionalSignal : public ImageOperation
 {
     DirectionalSignal();
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
@@ -105,23 +45,18 @@ struct BumpToNormal : public ImageOperation
     float directionY = 1.0f;
     float frequency = 4.0f;
     float amplitude = 1.0f;
-};*/
-
+};
 //--------------------------------------------------------------
-struct PerlinNoise : public ImageOperation
+struct RadialSignal : public ImageOperation
 {
-    PerlinNoise();
+    RadialSignal();
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
-    std::string getOperationCode() const override;
-
-    int octaves = 4;
-    float frequency = 2.0f;
-    float persistance = 0.7f;
-    float smoothness = 1.0f;
-    float breaking = 0.0f;
+    float centerX = 1.0f;
+    float centerY = 1.0f;
+    float frequency = 4.0f;
+    float amplitude = 1.0f;
 };
-
 //--------------------------------------------------------------
 struct HighResOutput : public ImageOperation
 {
