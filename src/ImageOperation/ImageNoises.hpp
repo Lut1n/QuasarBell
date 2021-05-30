@@ -37,7 +37,7 @@ struct VoronoiNoise : public ImageOperation
     int octaves = 4;
     float frequency = 2.0f;
     float persistance = 0.7f;
-    float smoothness = 1.0f;
+    int mode = 0;
 };
 
 #endif // QUASAR_BELL_IMAGE_NOISES_HPP

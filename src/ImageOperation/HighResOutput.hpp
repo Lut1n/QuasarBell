@@ -25,6 +25,16 @@ struct ImageMix : public ImageOperation
 };
 
 //--------------------------------------------------------------
+struct ImageClamp : public ImageOperation
+{
+    ImageClamp();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    float edge0 = 0.0f;
+    float edge1 = 1.0f;
+};
+
+//--------------------------------------------------------------
 struct Dynamics : public ImageOperation
 {
     Dynamics();

@@ -60,7 +60,6 @@ public:
     void updatePreviews();
 
 private:
-    size_t _lastUpdatedPreview = 0;
     double _lastUpdateTime = 0.0;
     bool _ready = false;
 

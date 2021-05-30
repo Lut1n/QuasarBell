@@ -110,10 +110,10 @@ bool RadialSignal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 ImageMix::ImageMix()
     : ImageOperation(qb::ImageOperationType_Mix)
 {
-    makeInput("input1", ImageDataType_Float);
-    makeInput("input2", ImageDataType_Float);
+    makeInput("in1", ImageDataType_Float);
+    makeInput("in2", ImageDataType_Float);
     makeInput("delta", ImageDataType_Float);
-    makeOutput("output", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
     makeProperty("delta", &delta, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
@@ -144,6 +144,47 @@ bool ImageMix::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
         args = {qb::va(opId), qb::va(v1), qb::va(v2), qb::in(v3)};
     }
     glsl = qb::replaceArgs(glsl, args);
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
+//--------------------------------------------------------------
+ImageClamp::ImageClamp()
+    : ImageOperation(qb::ImageOperationType_Clamp)
+{
+    makeInput("in", ImageDataType_Float);
+    makeInput("edge0", ImageDataType_Float);
+    makeInput("edge1", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
+    makeProperty("edge0", ImageDataType_Float, &edge0);
+    makeProperty("edge1", ImageDataType_Float, &edge1);
+}
+//--------------------------------------------------------------
+bool ImageClamp::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    if(!sampleInput(0, t, visitor)) return false;
+    size_t v1 = context.popVa();
+
+    std::string edge1Id, edge2Id;
+
+    if (sampleInput(1, t, visitor))
+        edge1Id = qb::va(context.popVa());
+    else
+        edge1Id = qb::in(frame.pushInput({edge0,edge0,edge0,edge0}));
+
+    if (sampleInput(2, t, visitor))
+        edge2Id = qb::va(context.popVa());
+    else
+        edge2Id = qb::in(frame.pushInput({edge1,edge1,edge1,edge1}));
+
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = vec4(clamp($2.xyz, $3.xyz, $4.xyz),1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1), edge1Id, edge2Id});
     context.pushVa(opId);
     context.pushCode(glsl);
     frame.setFunctions(getNodeType(), getOperationCode());

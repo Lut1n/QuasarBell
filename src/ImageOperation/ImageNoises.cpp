@@ -87,8 +87,8 @@ std::string PerlinNoise::getOperationCode() const
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
     "    float per = res.z;\n"
-    "    float ret = 0.0f;\n"
     "    float w = 0.0f;\n"
+    "    float ret = 0.0f;\n"
     "    for(int i=0; i<10; ++i){\n"
     "        vec2 oft = vec2(0.0f, 1.0f);\n"
     "        vec2 iuv = floor(uv * f);\n"
@@ -121,7 +121,7 @@ VoronoiNoise::VoronoiNoise()
     makeProperty("octaves", &octaves, 1, 10);
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
-    makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+    makeProperty("mode", &mode, 0, 2);
 }
 //--------------------------------------------------------------
 bool VoronoiNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
@@ -129,7 +129,7 @@ bool VoronoiNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
+    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, (float)mode});
     size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = voronoi($2, $3);\n";
@@ -151,32 +151,51 @@ std::string VoronoiNoise::getOperationCode() const
     "float rand_voronoi(vec2 uv){\n"
     "    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
     "}\n"
+    "vec2 rand2_voronoi(vec2 uv){\n"
+    "    vec2 ret;\n"
+    "    ret.x = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
+    "    ret.y = fract(sin(dot(uv, vec2(97.1836, 23.672))) * 65347.3216);\n"
+    "    return ret;\n"
+    "}\n"
     "vec4 voronoi(vec4 res, vec2 uv){\n"
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
     "    float per = res.z;\n"
-    "    float ret = 0.0f;\n"
     "    float w = 0.0f;\n"
+    "    vec3 ret;\n"
     "    for(int i=0; i<10; ++i){\n"
-    "        vec2 oft = vec2(0.0f, 1.0f);\n"
-    "        vec2 iuv = floor(uv * f);\n"
-    "        vec2 fuv = fract(uv * f);\n"
-    "        fuv = res.w * fuv * fuv * (3.f - 2.f * fuv);\n"
-    "        float s1 = rand_voronoi(iuv + oft.xx);\n"
-    "        float s2 = rand_voronoi(iuv + oft.yx);\n"
-    "        float s3 = rand_voronoi(iuv + oft.xy);\n"
-    "        float s4 = rand_voronoi(iuv + oft.yy);\n"
-    "        float s12 = mix(s1,s2,fuv.x);\n"
-    "        float s34 = mix(s3,s4,fuv.x);\n"
-    "        float s1234 = mix(s12,s34,fuv.y);\n"
-    "        ret += s1234 * per;\n"
+    "        vec2 pos = uv * f;"
+    "        float minCellDist = 10.0f;\n"
+    "        vec2 cell = floor(uv * f);\n"
+    "        vec2 closestcell;\n"
+    "        vec2 closestcellpos;\n"
+    "        for(int x=-1; x<=1; x++){\n"
+    "        for(int y=-1; y<=1; y++){\n"
+    "            vec2 cellpos = cell + vec2(x,y) + rand2_voronoi(cell + vec2(x,y));\n"
+    "            float d = distance(cellpos, pos);\n"
+    "            if(d < minCellDist) {minCellDist = d; closestcell = cell + vec2(x,y); closestcellpos = cellpos;}\n"
+    "        }}\n"
+    "        \n"
+    "        float minEdgeDist = 10;\n"
+    "        for(int x=-1; x<=1; x++){\n"
+    "        for(int y=-1; y<=1; y++){\n"
+    "            vec2 curcell = cell + vec2(x,y);\n"
+    "            if(curcell == closestcell) continue;\n"
+    "            vec2 cellpos = curcell + rand2_voronoi(cell + vec2(x,y));\n"
+    "            vec2 edgecenter = mix(closestcellpos, cellpos, 0.5);\n"
+    "            vec2 celldir = normalize(cellpos - closestcellpos);\n"
+    "            float d = dot(edgecenter - pos, celldir);\n"
+    "            minEdgeDist = min(minEdgeDist, d);\n"
+    "        }}\n"
+    "        \n"
+    "        ret += vec3(minCellDist, rand_voronoi(closestcell), minEdgeDist) * per;\n"
     "        w += per;\n"
     "        f *= 2.0f;\n"
     "        per *= res.z;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
     "    ret = ret / max(0.1f, w);\n"
-    "    return vec4(ret,ret,ret,1.0f);\n"
+    "    return vec4(vec3(ret[int(res.w)]),1.0f);\n"
     "}\n";
     return std::string(code);
 }

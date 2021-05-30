@@ -191,16 +191,7 @@ void UiSignalNodeBoard::updatePreviews()
     _lastUpdateTime = RenderInterface::getTime();
 
     auto& icol = imageOperations.operations;
-    if(_lastUpdatedPreview < icol.size())
-    {
-        if (icol[_lastUpdatedPreview])
-            icol[_lastUpdatedPreview]->updatePreview();
-        _lastUpdatedPreview = (_lastUpdatedPreview + 1) % icol.size();
-    }
-    else
-    {
-        _lastUpdatedPreview = 0;
-    }
+    for (auto& op : icol) op.second->updatePreview();
 }
 
 void UiSignalNodeBoard::onConnect(UiPin* a, UiPin* b)

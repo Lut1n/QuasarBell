@@ -13,6 +13,8 @@ namespace qb
         {ImageOperationType_Sub, "sub"},
         {ImageOperationType_Mult, "mult"},
         {ImageOperationType_Div, "div"},
+        {ImageOperationType_Mix, "mix"},
+        {ImageOperationType_Clamp, "clamp"},
         {ImageOperationType_WhiteNoise, "white-noise"},
         {ImageOperationType_Perlin, "perlin"},
         {ImageOperationType_Voronoi, "voronoi"},
@@ -23,8 +25,7 @@ namespace qb
         {ImageOperationType_BlurFilter, "blur-filter"},
         {ImageOperationType_BumpToNormal, "bump-to-normal"},
         {ImageOperationType_DirSignal, "dir-signal"},
-        {ImageOperationType_RadSignal, "rad-signal"},
-        {ImageOperationType_Mix, "mix"}
+        {ImageOperationType_RadSignal, "rad-signal"}
     };
 }
 //--------------------------------------------------------------
