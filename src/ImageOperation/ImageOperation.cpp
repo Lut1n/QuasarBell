@@ -207,8 +207,9 @@ void ImageOperation::remConnection(ImageOperation* dst, size_t dstIdx)
     if (dst && dstIdx < dst->inputs.size() && dst->inputs[dstIdx].refs.size() > 0)
     {
         dst->dirty(true);
-        auto op = dst->inputs[dstIdx].refs[0].operation;
-        auto index = dst->inputs[dstIdx].refs[0].index;
+        auto& inRefs = dst->inputs[dstIdx].refs[0];
+        auto op = inRefs.operation;
+        auto index = inRefs.index;
         if(op && index < op->outputs.size())
         {
             auto& outRefs = op->outputs[index].refs;

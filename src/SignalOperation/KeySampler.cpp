@@ -96,7 +96,7 @@ void KeySampler::uiProperties()
     if (ImGui::Button(typeNames[interpo]))
     {
         interpo = (interpo+1) % typeCount;
-        preview.dirty();
+        dirty();
     }
 
     if (ImGui::InputInt("count", &count))
@@ -104,7 +104,7 @@ void KeySampler::uiProperties()
         if (count < 1) count = 1;
         if (count > 10) count = 10;
         keys.resize(count);
-        preview.dirty();
+        dirty();
     }
     
     ImGui::Columns(2);
@@ -118,9 +118,9 @@ void KeySampler::uiProperties()
     {
         std::string keytext = std::string("##key") + std::to_string(index);
         std::string valtext = std::string("##val") + std::to_string(index);
-        if (ImGui::InputFloat(keytext.c_str(), &kv.first)) preview.dirty();
+        if (ImGui::InputFloat(keytext.c_str(), &kv.first)) dirty();
         ImGui::NextColumn();
-        if (ImGui::InputFloat(valtext.c_str(), &kv.second)) preview.dirty();
+        if (ImGui::InputFloat(valtext.c_str(), &kv.second)) dirty();
         ImGui::NextColumn();
         index++;
     }

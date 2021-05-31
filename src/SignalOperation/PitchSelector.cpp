@@ -71,8 +71,8 @@ void PitchSelector::uiProperties()
         return output;
     };
 
-    if (ImGui::InputInt("octave", &octave)) preview.dirty();
-    if (ImGui::InputInt("semitone", &semitone)) preview.dirty();
+    if (ImGui::InputInt("octave", &octave)) dirty();
+    if (ImGui::InputInt("semitone", &semitone)) dirty();
     if (ImGui::Button("Play"))
     {
         auto& sound = *SoundNode::getDefault();

@@ -89,8 +89,8 @@ void SignalOperation::startSamplingGraph()
 { 
     for (auto input : inputs)
     {
-        if (input.operation)
-            input.operation->startSamplingGraph();
+        if (!input.refs.empty())
+            input.refs[0].operation->startSamplingGraph();
     }
     startSampling();
 }
@@ -98,9 +98,10 @@ void SignalOperation::startSamplingGraph()
 OperationData SignalOperation::sampleInput(size_t index, const Time& t)
 {
     auto* co = getInput(index);
-    if (co->operation)
+    if (!co->refs.empty())
     {
-        return co->operation->sample(inputs[index].index, t);
+        auto& ref = co->refs[0];
+        return ref.operation->sample(ref.index, t);
     }
     else
         return OperationData{DataType_Error};
@@ -116,8 +117,6 @@ void SignalOperation::makeInput(const std::string& name, OperationDataType type)
     SignalOperationConnection input;
     input.name = name;
     input.type = type;
-    input.operation = nullptr;
-    input.index = 0;
     inputs.push_back(input);
 }
 //--------------------------------------------------------------
@@ -126,8 +125,6 @@ void SignalOperation::makeOutput(const std::string& name, OperationDataType type
     SignalOperationConnection output;
     output.name = name;
     output.type = type;
-    output.operation = nullptr;
-    output.index = 0;
     outputs.push_back(output);
 }
 //--------------------------------------------------------------
@@ -137,29 +134,37 @@ void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalO
     
     if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
     {
-        src->outputs[srcIdx].operation = dst;
-        src->outputs[srcIdx].index = dstIdx;
+        SignalOperationConnection::Ref ref;
+        ref.operation = dst;
+        ref.index = dstIdx;
+        src->outputs[srcIdx].refs.push_back(ref);
         
-        dst->inputs[dstIdx].operation = src;
-        dst->inputs[dstIdx].index = srcIdx;
-        dst->preview.dirty();
+        ref.operation = src;
+        ref.index = srcIdx;
+        dst->inputs[dstIdx].refs.push_back(ref);
+        // dst->inputs[dstIdx].refs = {ref};
+        dst->dirty();
     }
 }
 //--------------------------------------------------------------
 void SignalOperation::remConnection(SignalOperation* dst, size_t dstIdx)
 {
-    if (dst && dstIdx < dst->inputs.size())
+    if (dst && dstIdx < dst->inputs.size() && !dst->inputs[dstIdx].refs.empty())
     {
-        auto op = dst->inputs[dstIdx].operation;
-        auto index = dst->inputs[dstIdx].index;
+        dst->dirty();
+        auto& inRefs = dst->inputs[dstIdx].refs[0];
+        auto op = inRefs.operation;
+        auto index = inRefs.index;
         if(op && index < op->outputs.size())
         {
-            op->outputs[index].operation = nullptr;
-            op->outputs[index].index = 0;
+            auto& outRefs = op->outputs[index].refs;
+            SignalOperationConnection::Ref toErase{dst, dstIdx};
+            auto it = std::find_if(outRefs.begin(), outRefs.end(), [toErase](SignalOperationConnection::Ref& ref){
+                return ref.operation == toErase.operation && ref.index == toErase.index;
+            });
+            outRefs.erase(it);
         }
-        dst->inputs[dstIdx].operation = nullptr;
-        dst->inputs[dstIdx].index = 0;
-        dst->preview.dirty();
+        dst->inputs[dstIdx].refs.clear();
     }
 }
 //--------------------------------------------------------------
@@ -283,5 +288,15 @@ void SignalOperation::uiProperty(int index)
     else if (type == DataType_Bool)
         changed = ImGui::Checkbox(name.c_str(), (bool*)std::get<2>(propDescs[index]));
 
-    if (changed) preview.dirty();
+    if (changed) dirty();
+}
+//--------------------------------------------------------------
+void SignalOperation::dirty()
+{
+    preview.dirty();
+    for(auto& output : outputs)
+    {
+        for(auto& ref : output.refs)
+            ref.operation->dirty();
+    }
 }

@@ -38,8 +38,12 @@ class JsonValue;
 //--------------------------------------------------------------
 struct SignalOperationConnection
 {
-    SignalOperation* operation = nullptr;
-    size_t index = 0;
+    struct Ref
+    {
+        SignalOperation* operation = nullptr;
+        size_t index = 0;
+    };
+    std::vector<Ref> refs;
     size_t count = 0;
     OperationDataType type = DataType_Undefined;
     std::string name;
@@ -117,6 +121,7 @@ struct SignalOperation
     static void remConnection(SignalOperation* op, size_t index);
 
     virtual void uiProperties();
+    void dirty();
 
     SignalPreview preview;
 

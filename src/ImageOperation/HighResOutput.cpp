@@ -191,6 +191,105 @@ bool ImageClamp::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
     return true;
 }
 //--------------------------------------------------------------
+ImageDot::ImageDot()
+    : ImageOperation(qb::ImageOperationType_Dot)
+{
+    makeInput("in1", ImageDataType_Float);
+    makeInput("in2", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool ImageDot::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in1Id, in2Id;
+
+    if (!sampleInput(0, t, visitor)) return false;
+    in1Id = qb::va(context.popVa());
+
+    if (!sampleInput(1, t, visitor)) return false;
+    in2Id = qb::va(context.popVa());
+
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = vec4(vec3(dot($2.xyz, $3.xyz)),1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), in1Id, in2Id});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
+//--------------------------------------------------------------
+ImageCross::ImageCross()
+    : ImageOperation(qb::ImageOperationType_Cross)
+{
+    makeInput("in1", ImageDataType_Float);
+    makeInput("in2", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool ImageCross::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in1Id, in2Id;
+
+    if (!sampleInput(0, t, visitor)) return false;
+    in1Id = qb::va(context.popVa());
+
+    if (!sampleInput(1, t, visitor)) return false;
+    in2Id = qb::va(context.popVa());
+
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = vec4(cross($2.xyz, $3.xyz),1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), in1Id, in2Id});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
+//--------------------------------------------------------------
+ImageStep::ImageStep()
+    : ImageOperation(qb::ImageOperationType_Step)
+{
+    makeInput("edge", ImageDataType_Float);
+    makeInput("value", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
+    makeProperty("edge", ImageDataType_Float, &edge);
+    makeProperty("value", ImageDataType_Float, &value);
+}
+//--------------------------------------------------------------
+bool ImageStep::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string edgeId, valueId;
+
+    if (sampleInput(0, t, visitor))
+        edgeId = qb::va(context.popVa());
+    else
+        edgeId = qb::in(frame.pushInput({edge,edge,edge,edge}));
+
+    if (sampleInput(1, t, visitor))
+        valueId = qb::va(context.popVa());
+    else
+        valueId = qb::in(frame.pushInput({value,value,value,value}));
+
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = vec4(step($2.xyz, $3.xyz),1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), edgeId, valueId});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
+//--------------------------------------------------------------
 Dynamics::Dynamics()
     : ImageOperation(qb::ImageOperationType_Dynamics)
 {

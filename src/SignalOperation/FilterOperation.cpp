@@ -54,11 +54,11 @@ OperationData FreqFilter::sample(size_t index, const Time& t)
 
 void FreqFilter::uiProperties()
 {
-    if (ImGui::InputFloat("offset", &offset)) preview.dirty();
-    if (ImGui::InputFloat("length", &length)) preview.dirty();
-    if (ImGui::InputFloat("minGain", &minGain)) preview.dirty();
-    if (ImGui::InputFloat("maxGain", &maxGain)) preview.dirty();
-    if (ImGui::InputFloat("factor", &factor)) preview.dirty();
+    if (ImGui::InputFloat("offset", &offset)) dirty();
+    if (ImGui::InputFloat("length", &length)) dirty();
+    if (ImGui::InputFloat("minGain", &minGain)) dirty();
+    if (ImGui::InputFloat("maxGain", &maxGain)) dirty();
+    if (ImGui::InputFloat("factor", &factor)) dirty();
     
     ImGui::Separator();
     ImGui::Text("Preview");

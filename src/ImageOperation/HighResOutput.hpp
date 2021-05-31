@@ -35,6 +35,30 @@ struct ImageClamp : public ImageOperation
 };
 
 //--------------------------------------------------------------
+struct ImageDot : public ImageOperation
+{
+    ImageDot();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+};
+
+//--------------------------------------------------------------
+struct ImageCross : public ImageOperation
+{
+    ImageCross();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+};
+
+//--------------------------------------------------------------
+struct ImageStep : public ImageOperation
+{
+    ImageStep();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    float edge = 0.5f;
+    float value = 0.0f;
+};
+
+//--------------------------------------------------------------
 struct Dynamics : public ImageOperation
 {
     Dynamics();

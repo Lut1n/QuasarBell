@@ -99,21 +99,21 @@ void Waveform::uiProperties()
     ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
     ImGui::Separator();
 
-    if (ImGui::InputFloat("period", &period)) preview.dirty();
-    if (ImGui::InputFloat("min", &minVal)) preview.dirty();
-    if (ImGui::InputFloat("max", &maxVal)) preview.dirty();
+    if (ImGui::InputFloat("period", &period)) dirty();
+    if (ImGui::InputFloat("min", &minVal)) dirty();
+    if (ImGui::InputFloat("max", &maxVal)) dirty();
 
     constexpr size_t count = 4;
     constexpr std::array<const char*, count> typeNames = {"sin", "saw", "square", "noise"};
     if (ImGui::Button(typeNames[type]))
     {
         type = (type+1) % count;
-        preview.dirty();
+        dirty();
     }
 
     if (type == 3)
     {
-        if (ImGui::InputInt("noise seed", &noiseSeed)) preview.dirty();
-        if (ImGui::InputInt("noise size", &noiseSamples)) preview.dirty();
+        if (ImGui::InputInt("noise seed", &noiseSeed)) dirty();
+        if (ImGui::InputInt("noise size", &noiseSamples)) dirty();
     }
 }

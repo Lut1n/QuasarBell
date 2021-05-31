@@ -206,10 +206,10 @@ void PolynomialSampler::uiProperties()
         if (count < 1) count = 1;
         if (count > 10) count = 10;
         coefs.resize(count);
-        preview.dirty();
+        dirty();
     }
 
-    if (ImGui::InputFloat("reset", &reset)) preview.dirty();
+    if (ImGui::InputFloat("reset", &reset)) dirty();
     
     ImGui::Text("Coefs");
     ImGui::Separator();
@@ -217,7 +217,7 @@ void PolynomialSampler::uiProperties()
     for(auto& coef : coefs)
     {
         std::string textid = std::string("##") + std::to_string(index);
-        if (ImGui::InputFloat(textid.c_str(), &coef)) preview.dirty();
+        if (ImGui::InputFloat(textid.c_str(), &coef)) dirty();
         index++;
     }
 }
