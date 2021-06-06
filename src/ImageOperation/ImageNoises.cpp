@@ -86,7 +86,7 @@ std::string PerlinNoise::getOperationCode() const
     "vec4 perlin(vec4 res, vec2 uv){\n"
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
-    "    float per = res.z;\n"
+    "    float per = 0.5;\n"
     "    float w = 0.0f;\n"
     "    float ret = 0.0f;\n"
     "    for(int i=0; i<10; ++i){\n"

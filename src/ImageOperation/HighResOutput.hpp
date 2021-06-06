@@ -59,6 +59,34 @@ struct ImageStep : public ImageOperation
 };
 
 //--------------------------------------------------------------
+struct ImagePow : public ImageOperation
+{
+    ImagePow();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    float value = 0.0f;
+    float powVal = 1.0f;
+};
+
+//--------------------------------------------------------------
+struct ImageSqrt : public ImageOperation
+{
+    ImageSqrt();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    float value = 0.0f;
+};
+
+//--------------------------------------------------------------
+struct ImageAbs : public ImageOperation
+{
+    ImageAbs();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    float value = 0.0f;
+};
+
+//--------------------------------------------------------------
 struct Dynamics : public ImageOperation
 {
     Dynamics();
