@@ -140,6 +140,7 @@ static GlQuad* s_quad = nullptr;
 static GlSprite* s_sprite = nullptr;
 static GlSpriteShader* s_spriteShader = nullptr;
 static GlQuadShader* s_quadShader = nullptr;
+static GlLineShader* s_lineShader = nullptr;
 
 void RenderInterface::deleteTarget(unsigned id)
 {
@@ -194,6 +195,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         s_sprite = new GlSprite();
         s_spriteShader = new GlSpriteShader();
         s_quadShader = new GlQuadShader();
+        s_lineShader = new GlLineShader();
         GL_CHECKERROR("create window");
         
         glDisable(GL_DEPTH_TEST);
@@ -294,25 +296,42 @@ void RenderInterface::setPrecision(unsigned precision)
     s_precision = precision;
 }
 
-void RenderInterface::line(float x1, float y1, float x2, float y2)
+void RenderInterface::line(float x1, float y1, float x2, float y2, bool smooth)
 {
-    line(vec2(x1,y1), vec2(x2,y2));
+    line(vec2(x1,y1), vec2(x2,y2), smooth);
 }
 
-void RenderInterface::line(const vec2& p1, const vec2& p2)
+void RenderInterface::line(const vec2& p1, const vec2& p2, bool smooth)
 {
     vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     vec2 d = p2-p1;
+
+    vec2 p1s = p1/vp * 2.0 - vec2(1.0,1.0);
+    p1s = p1s * vec2(1.0,-1.0);
+    vec2 p2s = p2/vp * 2.0 - vec2(1.0,1.0);
+    p2s = p2s * vec2(1.0,-1.0);
     
     float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
-    s_quadShader->setup(colorf);
-    GL_CHECKERROR("quad::setup --- quad::update");
+    float p1p2f[4] = {p1s.x,p1s.y,p2s.x,p2s.y};
+    float thicknessf[4] = {s_thickness/vp.x,s_thickness/vp.y,s_thickness/vp.x,s_thickness/vp.y};
+    
+    if(smooth)
+        s_lineShader->setup(colorf, p1p2f, thicknessf);
+    else
+        s_quadShader->setup(colorf);
+    GL_CHECKERROR("line::setup --- line::update");
     s_quad->update(p1, vec2(d.length(), s_thickness), vec2(0.0f, s_thickness*0.5f), d.angle(), vp);
-    GL_CHECKERROR("quad::update --- bindAttrib");
-    s_quadShader->bindAttributes();
-    GL_CHECKERROR("quad::bindAttrib --- draw");
+    GL_CHECKERROR("line::update --- bindAttrib");
+    if(smooth)
+        s_lineShader->bindAttributes();
+    else
+        s_quadShader->bindAttributes();
+    GL_CHECKERROR("line::bindAttrib --- draw");
     s_quad->draw();
-    s_quadShader->unbindAttributes();
+    if(smooth)
+        s_lineShader->unbindAttributes();
+    else
+        s_quadShader->unbindAttributes();
 }
 void RenderInterface::dot(const vec2& p)
 {

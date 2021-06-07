@@ -152,8 +152,6 @@ void UiConnections::draw()
         vec2 p1 = pair.first->parentPosition + pair.first->position + pair.first->size * 0.5;
         vec2 p2 = pair.second->parentPosition + pair.second->position + pair.second->size * 0.5;
 
-        RenderInterface::setColor(0xFFFFFFFF);
-        RenderInterface::setThickness(2.0f);
         drawLink(p1, p2);
     }
 
@@ -161,14 +159,17 @@ void UiConnections::draw()
     {
         vec2 p1 = partialLink.first->parentPosition + partialLink.first->position + partialLink.first->size * 0.5;
 
-        RenderInterface::setColor(0xFFFFFFFF);
-        RenderInterface::setThickness(2.0f);
         drawLink(p1, partialLink.second);
     }
 }
 
 void UiConnections::drawLink(vec2 p1, vec2 p2)
 {
+    bool smooth = true;
+
+    RenderInterface::setColor(0xFFFFFFFF);
+    RenderInterface::setThickness(smooth ? 4.0f : 2.0f);
+    
     auto quintic = [](float t)
     {
         float t3 = t*t*t;
@@ -194,7 +195,7 @@ void UiConnections::drawLink(vec2 p1, vec2 p2)
         vec2 l2;
         l2.x = (p2.x-p1.x) * x + p1.x;
         l2.y = (p2.y-p1.y) * y + p1.y;
-        RenderInterface::line(l1, l2);
+        RenderInterface::line(l1, l2, smooth);
         l1 = l2;
     }
 }

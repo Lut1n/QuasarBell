@@ -22,8 +22,8 @@ struct RenderInterface
     static void setColor(unsigned color);
     static void setThickness(float th);
     static void setPrecision(unsigned precision);
-    static void line(float x1, float y1, float x2, float y2);
-    static void line(const vec2& p1, const vec2& p2);
+    static void line(float x1, float y1, float x2, float y2, bool smooth = false);
+    static void line(const vec2& p1, const vec2& p2, bool smooth = false);
     static void dot(const vec2& p);
     static void arc(const vec2& center, float r, float a1 , float a2);
     static void rect(const vec2& tl, const vec2& br);
