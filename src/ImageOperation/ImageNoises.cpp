@@ -46,8 +46,8 @@ std::string WhiteNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-PerlinNoise::PerlinNoise()
-    : ImageOperation(qb::ImageOperationType_Perlin)
+ValueNoise::ValueNoise()
+    : ImageOperation(qb::ImageOperationType_ValueNoise)
 {
     makeOutput("output", ImageDataType_Float);
     makeProperty("octaves", &octaves, 1, 10);
@@ -56,7 +56,7 @@ PerlinNoise::PerlinNoise()
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool PerlinNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ValueNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -77,7 +77,7 @@ bool PerlinNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vi
 }
 
 //--------------------------------------------------------------
-std::string PerlinNoise::getOperationCode() const
+std::string ValueNoise::getOperationCode() const
 {
     static constexpr std::string_view code =
     "float rand_perlin(vec2 uv){\n"
@@ -87,7 +87,7 @@ std::string PerlinNoise::getOperationCode() const
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
     "    float per = 0.5;\n"
-    "    float w = 0.0f;\n"
+    "    //float w = 0.0f;\n"
     "    float ret = 0.0f;\n"
     "    for(int i=0; i<10; ++i){\n"
     "        vec2 oft = vec2(0.0f, 1.0f);\n"
@@ -102,13 +102,86 @@ std::string PerlinNoise::getOperationCode() const
     "        float s34 = mix(s3,s4,fuv.x);\n"
     "        float s1234 = mix(s12,s34,fuv.y);\n"
     "        ret += s1234 * per;\n"
-    "        w += per;\n"
+    "        //w += per;\n"
     "        f *= 2.0f;\n"
     "        per *= res.z;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
-    "    ret = ret / max(0.1f, w);\n"
-    "    return vec4(ret,ret,ret,1.0f);\n"
+    "    //ret = ret / max(0.1f, w);\n"
+    "    return vec4(vec3(ret),1.0f);\n"
+    "}\n";
+    return std::string(code);
+}
+
+
+//--------------------------------------------------------------
+GradientNoise::GradientNoise()
+    : ImageOperation(qb::ImageOperationType_GradientNoise)
+{
+    makeOutput("output", ImageDataType_Float);
+    makeProperty("octaves", &octaves, 1, 10);
+    makeProperty("frequency", &frequency, 1.0f, 32.0f);
+    makeProperty("persistance", &persistance, 0.0f, 1.0f);
+    makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+}
+//--------------------------------------------------------------
+bool GradientNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    size_t opId = context.getNextVa();
+    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
+    size_t uvId = context.getUvId();
+
+    std::string glsl = "vec4 $1 = perlin_grad($2, $3);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+    frame.hasUv = true;
+
+    return true;
+}
+
+//--------------------------------------------------------------
+std::string GradientNoise::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec2 rand2_perlin_grad(vec2 uv){\n"
+    "    vec2 ret;\n"
+    "    ret.x = -1.0 + 2.0*fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
+    "    ret.y = -1.0 + 2.0*fract(sin(dot(uv, vec2(269.1836, 183.672))) * 65347.3216);\n"
+    "    return ret;\n"
+    "}\n"
+    "vec4 perlin_grad(vec4 res, vec2 uv){\n"
+    "    int octaves = int(res.x);\n"
+    "    vec2 f = res.yy;\n"
+    "    float per = 0.5;\n"
+    "    //float w = 0.0f;\n"
+    "    float ret = 0.0f;\n"
+    "    for(int i=0; i<10; ++i){\n"
+    "        vec2 oft = vec2(0.0f, 1.0f);\n"
+    "        vec2 iuv = floor(uv * f);\n"
+    "        vec2 fra = fract(uv * f);\n"
+    "        vec2 fuv = res.w * fra * fra * (3.f - 2.f * fra);\n"
+    "        float s1 = dot(fra - oft.xx, (rand2_perlin_grad(iuv + oft.xx)));\n"
+    "        float s2 = dot(fra - oft.yx, (rand2_perlin_grad(iuv + oft.yx)));\n"
+    "        float s3 = dot(fra - oft.xy, (rand2_perlin_grad(iuv + oft.xy)));\n"
+    "        float s4 = dot(fra - oft.yy, (rand2_perlin_grad(iuv + oft.yy)));\n"
+    "        float s12 = mix(s1,s2,fuv.x);\n"
+    "        float s34 = mix(s3,s4,fuv.x);\n"
+    "        float s1234 = mix(s12,s34,fuv.y);\n"
+    "        ret += s1234 * per;\n"
+    "        //w += per * sign(s1234);\n"
+    "        f *= 2.0f;\n"
+    "        per *= res.z;\n"
+    "        if (i>=octaves-1) break;\n"
+    "    }\n"
+    "    ret = ret*0.5+0.5;"
+    "    //ret = ret / max(0.1f, w);\n"
+    "    return vec4(vec3(ret),1.0f);\n"
     "}\n";
     return std::string(code);
 }

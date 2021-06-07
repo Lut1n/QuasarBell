@@ -13,9 +13,23 @@ struct WhiteNoise : public ImageOperation
 };
 
 //--------------------------------------------------------------
-struct PerlinNoise : public ImageOperation
+struct ValueNoise : public ImageOperation
 {
-    PerlinNoise();
+    ValueNoise();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    int octaves = 4;
+    float frequency = 2.0f;
+    float persistance = 0.7f;
+    float smoothness = 1.0f;
+};
+
+//--------------------------------------------------------------
+struct GradientNoise : public ImageOperation
+{
+    GradientNoise();
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
