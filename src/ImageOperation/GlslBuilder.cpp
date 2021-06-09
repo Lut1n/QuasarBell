@@ -21,6 +21,11 @@ std::string qb::fu(size_t i)
 {
     return std::string("func_") + std::to_string(i);
 }
+//--------------------------------------------------------------
+std::string qb::sa(size_t i)
+{
+    return std::string("frame") + std::to_string(i);
+}
 
 std::string qb::glslVec4(const vec4& v4)
 {
@@ -143,6 +148,9 @@ std::string qb::GlslFrame::compile()
     // uniforms
     for(size_t i=0; i<inputs.size(); ++i)
         glsl += replaceArgs("uniform vec4 $1 = $2;\n", {in(i), glslVec4(inputs[i])});
+
+    for(size_t i=0; i<frames.size(); ++i)
+        glsl += replaceArgs("uniform sampler2D $1;\n", {sa(i)});
     
     // in/out
     if (hasUv) glsl += "in vec2 uv0;\n";
@@ -171,16 +179,16 @@ std::string qb::GlslFrame::compile()
 //--------------------------------------------------------------
 qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
 {
-    if(frameStack.size() == 0) pushFrame();
-    return frames[frameStack.back()];
+    if(frameStack.size() > 0)
+        return *frameStack.back();
+    return mainFrame;
 }
 //--------------------------------------------------------------
-size_t qb::GlslBuilderVisitor::pushFrame()
+void qb::GlslBuilderVisitor::pushFrame()
 {
-    size_t idx = frames.size();
+    auto& frames = getCurrentFrame().frames;
     frames.push_back(GlslFrame());
-    frameStack.push_back(idx);
-    return idx;
+    frameStack.push_back(&frames.back());
 }
 //--------------------------------------------------------------
 void qb::GlslBuilderVisitor::popFrame()

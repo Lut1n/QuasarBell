@@ -45,19 +45,31 @@ struct ImageOperationConnection
 
 struct ImagePreview
 {
-    size_t glResource = 0;
-    size_t glProgram = 0;
+    struct RenderFrame
+    {
+        size_t glResource = 0;
+        size_t glProgram = 0;
+        size_t firstFrameUniformId = 0;
+        std::vector<std::unique_ptr<RenderFrame>> frames;
+        std::string opCode;
+
+        RenderFrame();
+        ~RenderFrame();
+
+        void reset();
+        void compute(qb::GlslFrame& frame);
+        void updateUniforms(qb::GlslFrame& frame);
+        void render();
+    };
+
     size_t res = 256;
     bool initialized = false;
     bool hasChange = true;
     bool toRecompile = true;
 
-    std::string opCode;
-
-    ~ImagePreview();
+    std::unique_ptr<RenderFrame> renderFrame;
 
     void dirty(bool recompile);
-    void initialize(ImageOperation* operation);
     void compute(ImageOperation* operation);
 };
 

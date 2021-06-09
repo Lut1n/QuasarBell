@@ -16,6 +16,7 @@ namespace qb
     std::string va(size_t i);
     std::string in(size_t i);
     std::string fu(size_t i);
+    std::string sa(size_t i);
     std::string glslVec4(const vec4& v4);
 
     void replaceAll(std::string& glsl, const std::string& key, const std::string& val);
@@ -48,6 +49,7 @@ namespace qb
     {
         bool hasUv = false;
         std::vector<vec4> inputs;
+        std::vector<GlslFrame> frames;
         std::unordered_map<ImageOperationType, std::string> functions;
 
         GlslContext mainContext;
@@ -68,12 +70,12 @@ namespace qb
 
     struct GlslBuilderVisitor
     {
-        std::vector<GlslFrame> frames;
-        std::list<size_t> frameStack;
+        GlslFrame mainFrame;
+        std::list<GlslFrame*> frameStack;
 
         GlslFrame& getCurrentFrame();
 
-        size_t pushFrame();
+        void pushFrame();
         void popFrame();
     };
 };

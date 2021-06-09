@@ -14,7 +14,7 @@ struct RenderableTexture
     void clear(float* color);
     
     void bind();
-    void bindAsTexture();
+    void bindAsTexture(unsigned texUnit = 0);
     
     static void bindWindow();
 };

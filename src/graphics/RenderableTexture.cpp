@@ -54,8 +54,10 @@ void RenderableTexture::bind()
     GL_CHECKERROR("framebuffer bind");
 }
 
-void RenderableTexture::bindAsTexture()
+void RenderableTexture::bindAsTexture(unsigned texUnit)
 {
+    glActiveTexture(GL_TEXTURE0 + texUnit);
+    GL_CHECKERROR("active texture unit");
     glBindTexture(GL_TEXTURE_2D, tex);
     GL_CHECKERROR("texture bind");
 }

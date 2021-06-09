@@ -86,5 +86,6 @@ void GlSpriteShader::setup(float* col, unsigned /*tex*/)
 {
     use();
     glUniform4fv(vCol_location, 1, col);
+    glUniform1i(tex_location, 0);
     GL_CHECKERROR("quad shader uniform");
 }

@@ -478,7 +478,12 @@ void RenderInterface::updateCustomProgram(unsigned customId, const std::string& 
 void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4)
 {
     s_CustomPrograms[customId]->setUniform(uniformId, v4);
-    GL_CHECKERROR("customProgram: set uniform (maybe unused)");
+}
+
+void RenderInterface::setInputFrameCustomProgram(unsigned customId, size_t srcId, size_t textureUnit, size_t uniformId)
+{
+    s_targets[srcId].texture->bindAsTexture(textureUnit);
+    s_CustomPrograms[customId]->setSampler(uniformId, textureUnit);
 }
 
 void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br)
@@ -501,4 +506,9 @@ void RenderInterface::resetCustomProgram(unsigned customId)
 {
     s_CustomPrograms[customId]->bindUv = false;
     s_CustomPrograms[customId]->resetFragCode();
+}
+
+void RenderInterface::debugCheck(const char* msg)
+{
+    GL_CHECKERROR(msg);
 }

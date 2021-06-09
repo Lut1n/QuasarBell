@@ -35,6 +35,7 @@ struct GlCustomProgram
     void use();
 
     void setUniform(size_t id, const vec4& v4);
+    void setSampler(size_t id, size_t textureUnit);
     
     void setup();
 };

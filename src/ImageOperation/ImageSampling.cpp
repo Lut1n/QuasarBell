@@ -20,9 +20,10 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
 {
     auto& frame = visitor.getCurrentFrame();
 
-    size_t ctx = frame.pushContext();
+    size_t inputFrame = 0;
+    visitor.pushFrame();
     bool inputValid = sampleInput(0, t, visitor);
-    frame.popContext();
+    visitor.popFrame();
 
     if(inputValid)
     {
@@ -40,13 +41,15 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
         "int c$1 = r$1 * r$1;\n"
         "int i$1=-d$1,j$1=-d$1;\n"
         "for(int k=0; k<c$1; ++k){\n"
-        "    v$1 += $3($4 + vec2(i$1,j$1)*s$1);\n"
+        "    vec2 kuv$1 = $4 + vec2(i$1,j$1)*s$1;\n"
+        "    kuv$1.y = 1.0 - kuv$1.y;\n"
+        "    v$1 += texture2D($3,kuv$1);\n"
         "    j$1++;\n"
         "    if(j$1>d$1) { i$1++; j$1=-d$1; }\n"
         "}\n"
         "v$1 /= c$1;\n";
 
-        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::fu(ctx), qb::uv(uvId)});
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId)});
         context.pushVa(opId);
         context.pushCode(glsl);
 

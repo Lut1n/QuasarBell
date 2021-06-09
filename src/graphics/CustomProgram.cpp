@@ -88,9 +88,17 @@ void GlCustomProgram::use()
 void GlCustomProgram::setUniform(size_t id, const vec4& v4)
 {
     use();
-    // size_t loc = glGetUniformLocation(program, std::string("u")+std::to_string(id));
-    size_t loc = id;
+    size_t loc = glGetUniformLocation(program, (std::string("u")+std::to_string(id)).c_str());
     glUniform4fv(loc, 1, v4.v);
+    GL_CHECKERROR("customProgram: set uniform (maybe unused)");
+}
+
+void GlCustomProgram::setSampler(size_t id, size_t textureUnit)
+{
+    use();
+    size_t loc = glGetUniformLocation(program, (std::string("frame")+std::to_string(id)).c_str());
+    glUniform1i(loc, textureUnit);
+    GL_CHECKERROR("customProgram: set sampler uniform (maybe unused)");
 }
 
 void GlCustomProgram::bindAttributes()

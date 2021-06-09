@@ -51,7 +51,7 @@ void ImageNode::displayProperties()
 //--------------------------------------------------------------
 void ImageNode::initializePreview()
 {
-    _operation->preview.initialize(_operation);
+    //_operation->preview.initialize(_operation);
 }
 //--------------------------------------------------------------
 void ImageNode::updatePreview()
@@ -62,8 +62,11 @@ void ImageNode::updatePreview()
 void ImageNode::drawPreview(const Rect& previewArea)
 {
     auto& preview = _operation->preview;
+
     Rect src = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(preview.res,preview.res));
     Rect target = previewArea + parentPosition + position;
     RenderInterface::setColor(0xFFFFFFFF);
-    RenderInterface::copy(preview.glResource, src, target);
+    
+    if(preview.renderFrame)
+        RenderInterface::copy(preview.renderFrame->glResource, src, target);
 }
