@@ -29,7 +29,9 @@ namespace qb
         {ImageOperationType_UvDistortion, "uv-distortion"},
         {ImageOperationType_UvMapping, "uv-mapping"},
         {ImageOperationType_UvInput, "uv-input"},
-        {ImageOperationType_BlurFilter, "blur-filter"},
+        {ImageOperationType_Blur, "blur"},
+        {ImageOperationType_Sharpen, "sharpen"},
+        {ImageOperationType_Morpho, "morpho"},
         {ImageOperationType_BumpToNormal, "bump-to-normal"},
         {ImageOperationType_DirSignal, "dir-signal"},
         {ImageOperationType_RadSignal, "rad-signal"}

@@ -480,6 +480,11 @@ void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId,
     s_CustomPrograms[customId]->setUniform(uniformId, v4);
 }
 
+void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId, const Kernel& kernel)
+{
+    s_CustomPrograms[customId]->setUniform(uniformId, kernel.data);
+}
+
 void RenderInterface::setInputFrameCustomProgram(unsigned customId, size_t srcId, size_t textureUnit, size_t uniformId)
 {
     s_targets[srcId].texture->bindAsTexture(textureUnit);

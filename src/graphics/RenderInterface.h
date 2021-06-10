@@ -39,6 +39,7 @@ struct RenderInterface
     static void updateCustomProgram(unsigned customId, const std::string& fragCode, bool bindUv);
     static void setInputFrameCustomProgram(unsigned customId, size_t srcId, size_t textureUnit, size_t uniformId);
     static void setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4);
+    static void setInputCustomProgram(unsigned customId, size_t uniformId, const Kernel& kernel);
     static void applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br);
     static void resetCustomProgram(unsigned customId);
 

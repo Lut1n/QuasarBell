@@ -17,6 +17,11 @@ std::string qb::in(size_t i)
     return std::string("u") + std::to_string(i);
 }
 //--------------------------------------------------------------
+std::string qb::ke(size_t i)
+{
+    return std::string("k") + std::to_string(i);
+}
+//--------------------------------------------------------------
 std::string qb::fu(size_t i)
 {
     return std::string("func_") + std::to_string(i);
@@ -120,6 +125,13 @@ size_t qb::GlslFrame::pushInput(const vec4& v4)
     return id;
 }
 //--------------------------------------------------------------
+size_t qb::GlslFrame::pushKernel(const Kernel& ke)
+{
+    size_t id = kernels.size();
+    kernels.push_back(ke);
+    return id;
+}
+//--------------------------------------------------------------
 qb::GlslContext& qb::GlslFrame::getContext()
 {
     if(contextStack.size() > 0)
@@ -148,6 +160,9 @@ std::string qb::GlslFrame::compile()
     // uniforms
     for(size_t i=0; i<inputs.size(); ++i)
         glsl += replaceArgs("uniform vec4 $1 = $2;\n", {in(i), glslVec4(inputs[i])});
+        
+    for(size_t i=0; i<kernels.size(); ++i)
+        glsl += replaceArgs("uniform float $1[512];\n", {ke(i)});
 
     for(size_t i=0; i<frames.size(); ++i)
         glsl += replaceArgs("uniform sampler2D $1;\n", {sa(i)});

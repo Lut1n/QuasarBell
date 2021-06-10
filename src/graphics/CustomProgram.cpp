@@ -93,6 +93,14 @@ void GlCustomProgram::setUniform(size_t id, const vec4& v4)
     GL_CHECKERROR("customProgram: set uniform (maybe unused)");
 }
 
+void GlCustomProgram::setUniform(size_t id, const std::vector<float>& fv)
+{
+    use();
+    size_t loc = glGetUniformLocation(program, (std::string("k")+std::to_string(id)).c_str());
+    glUniform1fv(loc, fv.size(), fv.data());
+    GL_CHECKERROR("customProgram: set kernel uniform (maybe unused)");
+}
+
 void GlCustomProgram::setSampler(size_t id, size_t textureUnit)
 {
     use();

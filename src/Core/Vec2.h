@@ -1,6 +1,9 @@
 #ifndef VEC2_H
 #define VEC2_H
 
+#include <vector>
+#include <initializer_list>
+
 float mix(float a, float b, float f);
 
 struct vec2
@@ -58,6 +61,29 @@ struct Rect
     bool outside(const Rect& other) const;
     bool inside(const Rect& other) const;
     bool over(const Rect& other) const;
+};
+
+
+
+
+
+struct Kernel
+{
+    int w=0,h=0;
+    std::vector<float> data;
+
+    Kernel(int w, int h);
+    Kernel(std::initializer_list<float> initData);
+
+    float& operator()(size_t x, size_t y);
+    float operator()(size_t x, size_t y) const;
+
+    void operator=(std::initializer_list<float> initData);
+
+    Kernel resize(size_t nw, size_t nh);
+
+    static void display(const Kernel& k);
+    static Kernel convProduct(const Kernel& k1, const Kernel& k2);
 };
 
 #endif // VEC2_H

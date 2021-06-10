@@ -6,6 +6,7 @@
 #include <list>
 #include <unordered_map>
 
+#include "Core/Vec2.h"
 #include "Core/Math.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
 
@@ -15,6 +16,7 @@ namespace qb
     std::string uv(size_t i);
     std::string va(size_t i);
     std::string in(size_t i);
+    std::string ke(size_t i);
     std::string fu(size_t i);
     std::string sa(size_t i);
     std::string glslVec4(const vec4& v4);
@@ -49,6 +51,7 @@ namespace qb
     {
         bool hasUv = false;
         std::vector<vec4> inputs;
+        std::vector<Kernel> kernels;
         std::vector<GlslFrame> frames;
         std::unordered_map<ImageOperationType, std::string> functions;
 
@@ -60,6 +63,7 @@ namespace qb
         void setFunctions(ImageOperationType operationType, const std::string& functionCode);
 
         size_t pushInput(const vec4& v4);
+        size_t pushKernel(const Kernel& ke);
         GlslContext& getContext();
 
         size_t pushContext();

@@ -1,6 +1,8 @@
 #include "Core/Vec2.h"
 
 #include <cmath>
+#include <iostream>
+#include <cassert>
 
 float mix(float a, float b, float f)
 {
@@ -190,4 +192,118 @@ bool Rect::inside(const Rect& other) const
 bool Rect::over(const Rect& other) const
 {
     return !outside(other);
+}
+
+
+
+
+Kernel::Kernel(int w, int h) : w(w), h(h)
+{
+    data.resize(w*h);
+}
+
+Kernel::Kernel(std::initializer_list<float> initData)
+{
+    size_t size = std::sqrt(initData.size());
+    w = size;
+    h = size;
+    data.resize(w*h);
+    assert(data.size() == initData.size());
+    data = initData;
+}
+
+float& Kernel::operator()(size_t x, size_t y)
+{
+    assert(x<w && y <h);
+    size_t index = h*x + y;
+    return data[index];
+}
+
+float Kernel::operator()(size_t x, size_t y) const
+{
+    assert(x<w && y <h);
+    size_t index = h*x + y;
+    return data[index];
+}
+
+void Kernel::operator=(std::initializer_list<float> initData)
+{
+    assert(data.size() == initData.size());
+    data = initData;
+}
+
+Kernel Kernel::resize(size_t nw, size_t nh)
+{
+    auto& src = *this;
+    Kernel ret(nw,nh);
+    int oft_x = (nw-w)/2;
+    int oft_y = (nh-h)/2;
+
+    for(size_t y=0; y<h; ++y)
+    {
+        for(size_t x=0; x<w; ++x)
+        {
+            int yy = y+oft_y;
+            int xx = x+oft_x;
+            if(xx>=0 && xx<nw && yy>=0 && yy<nh)
+                ret(xx,yy) = src(x,y);
+        }
+    }
+    return ret;
+}
+
+
+void Kernel::display(const Kernel& k)
+{
+    float total = 0.0;
+    std::cout << "kernel[" << k.w << ";" << k.h << "]" << std::endl;
+    for(size_t y=0; y<k.h; ++y)
+    {
+        for(size_t x=0; x<k.w; ++x)
+        {
+            std::cout << k(x,y) << ";";
+            total += k(x,y);
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "total: " << total << std::endl;
+}
+
+Kernel Kernel::convProduct(const Kernel& k1, const Kernel& k2)
+{
+    size_t w = k2.w + k1.w - 1;
+    size_t h = k2.h + k1.h - 1;
+    Kernel ret(w,h);
+
+    size_t oft_x1 = (k1.w-1)/2;
+    size_t oft_y1 = (k1.h-1)/2;
+    size_t oft_x2 = k1.w-1;
+    size_t oft_y2 = k1.h-1;
+    for(size_t y=0; y<ret.h; ++y)
+    {
+        for(size_t x=0; x<ret.w; ++x)
+        {
+            ret(x,y) = 0.0f;
+            for(size_t y1=0; y1<k1.h; ++y1)
+            {
+                for(size_t x1=0; x1<k1.w; ++x1)
+                {
+                    float v2 = 0.0;
+                    float v1 = 0.0;
+                    int yy = y+y1-oft_y1;
+                    int xx = x+x1-oft_x1;
+                    int y2 = y+y1-oft_y2;
+                    int x2 = x+x1-oft_x2;
+
+                    if(y2 >= 0 && y2 < k2.h && x2 >= 0 && x2 < k2.w)
+                        v2 = k2(x2,y2);
+                    if(yy >= 0 && yy < ret.h && xx >= 0 && xx < ret.w)
+                        v1 = k1(x1,y1);
+                    
+                    ret(x,y) += v1*v2;
+                }
+            }
+        }
+    }
+    return ret;
 }

@@ -2,6 +2,7 @@
 #define GL_CUSTOM_PROGRAM_H
 
 #include <string>
+#include <vector>
 
 #include "Core/Math.hpp"
 
@@ -35,6 +36,7 @@ struct GlCustomProgram
     void use();
 
     void setUniform(size_t id, const vec4& v4);
+    void setUniform(size_t id, const std::vector<float>& fv);
     void setSampler(size_t id, size_t textureUnit);
     
     void setup();

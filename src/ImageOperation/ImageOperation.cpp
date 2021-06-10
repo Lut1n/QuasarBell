@@ -69,7 +69,7 @@ void ImagePreview::RenderFrame::compute(qb::GlslFrame& frame)
 
     RenderInterface::debugCheck("operation test B");
 
-    // updateUniforms(frame);
+    updateUniforms(frame);
 }
 
 //--------------------------------------------------------------
@@ -84,6 +84,14 @@ void ImagePreview::RenderFrame::updateUniforms(qb::GlslFrame& frame)
         RenderInterface::debugCheck("Before update uniforms");
         RenderInterface::setInputCustomProgram(glProgram, inId++, input);
         RenderInterface::debugCheck("After update uniforms");
+    }
+    
+    size_t keId = 0;
+    for(auto& kernel : frame.kernels)
+    {
+        RenderInterface::debugCheck("Before update kernel");
+        RenderInterface::setInputCustomProgram(glProgram, keId++, kernel);
+        RenderInterface::debugCheck("After update kernel");
     }
 }
 
