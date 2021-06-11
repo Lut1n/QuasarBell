@@ -195,7 +195,10 @@ void UiConnections::drawLink(vec2 p1, vec2 p2)
         vec2 l2;
         l2.x = (p2.x-p1.x) * x + p1.x;
         l2.y = (p2.y-p1.y) * y + p1.y;
-        RenderInterface::line(l1, l2, smooth);
+
+        bool clipped = parentClippingRect.outside(l1) && parentClippingRect.outside(l2);
+        if(!clipped)
+            RenderInterface::line(l1, l2, smooth);
         l1 = l2;
     }
 }

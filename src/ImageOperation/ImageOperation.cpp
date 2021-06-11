@@ -22,10 +22,10 @@ namespace qb
 };
 
 //--------------------------------------------------------------
-ImagePreview::RenderFrame::RenderFrame()
+ImagePreview::RenderFrame::RenderFrame(int resolution)
+    : resolution(resolution)
 {
-    int res = 256;
-    glResource = RenderInterface::createTarget(res,res,false);    
+    glResource = RenderInterface::createTarget(resolution,resolution,false);    
     RenderInterface::setTarget(glResource);
     RenderInterface::clear(0x000000FF);
 
@@ -57,7 +57,7 @@ void ImagePreview::RenderFrame::compute(qb::GlslFrame& frame)
     frames.resize(frame.frames.size());
     for(auto& f2 : frame.frames)
     {
-        frames[frameId].reset(new RenderFrame());
+        frames[frameId].reset(new RenderFrame(resolution));
         frames[frameId]->compute(f2);
         frameId++;
     }
@@ -111,7 +111,7 @@ void ImagePreview::RenderFrame::render()
 
     RenderInterface::setTarget(glResource);
     RenderInterface::clear(0x000000FF);
-    RenderInterface::applyCustomProgram(glProgram, vec2(0.0f,0.0f), vec2(256.0,256.0));
+    RenderInterface::applyCustomProgram(glProgram, vec2(0.0f,0.0f), vec2(resolution,resolution));
 }
 
 //--------------------------------------------------------------
@@ -130,7 +130,7 @@ void ImagePreview::compute(ImageOperation* operation)
 {
     if(!initialized)
     {
-        renderFrame.reset(new RenderFrame());
+        renderFrame.reset(new RenderFrame(resolution));
         initialized = true;
     }
     if(!renderFrame) return;
@@ -140,6 +140,7 @@ void ImagePreview::compute(ImageOperation* operation)
     ImageOperation::Time time;
 
     qb::GlslBuilderVisitor visitor;
+    visitor.mainFrame.resolution = resolution;
     bool opValid = operation->sample(0, time, visitor);
 
     if(toRecompile)
@@ -422,7 +423,17 @@ void ImageOperation::uiPreview()
     ImGui::Text("Preview:");
     float avail = ImGui::GetContentRegionAvail().x * 0.5f;
     if(preview.renderFrame)
+    {
         ImGui::Image(RenderInterface::getTargetResource(preview.renderFrame->glResource), ImVec2(avail, avail), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
+        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+            ImGui::OpenPopup("Bigger preview");
+        
+        if(ImGui::BeginPopup("Bigger preview"))
+        {
+            ImGui::Image(RenderInterface::getTargetResource(preview.renderFrame->glResource), ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
+            ImGui::EndPopup();
+        }
+    }
 
     if(ImGui::CollapsingHeader("glsl"))
     {

@@ -1,10 +1,10 @@
 #include "App/ImageNode.hpp"
 
 //--------------------------------------------------------------
-namespace qb::imgui
+/*namespace qb::imgui
 {
     static int s_sampler2d_size = 256;
-}
+}*/
 //--------------------------------------------------------------
 ImageNode::ImageNode(const std::string& title, size_t nodeTypeId)
     : UiNode(title, vec2(0.0,0.0), vec2(70,70))
@@ -63,10 +63,10 @@ void ImageNode::drawPreview(const Rect& previewArea)
 {
     auto& preview = _operation->preview;
 
-    Rect src = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(preview.res,preview.res));
-    Rect target = previewArea + parentPosition + position;
+    Rect src = Rect::fromPosAndSize(vec2(0.0f,0.0f), vec2(preview.resolution,preview.resolution));
+    // Rect target = previewArea + parentPosition + position;
     RenderInterface::setColor(0xFFFFFFFF);
     
     if(preview.renderFrame)
-        RenderInterface::copy(preview.renderFrame->glResource, src, target);
+        RenderInterface::copy(preview.renderFrame->glResource, src, previewArea);
 }

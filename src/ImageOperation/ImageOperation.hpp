@@ -47,13 +47,14 @@ struct ImagePreview
 {
     struct RenderFrame
     {
+        int resolution = 256;
         size_t glResource = 0;
         size_t glProgram = 0;
         size_t firstFrameUniformId = 0;
         std::vector<std::unique_ptr<RenderFrame>> frames;
         std::string opCode;
 
-        RenderFrame();
+        RenderFrame(int resolution = 256);
         ~RenderFrame();
 
         void reset();
@@ -62,7 +63,7 @@ struct ImagePreview
         void render();
     };
 
-    size_t res = 256;
+    int resolution = 256;
     bool initialized = false;
     bool hasChange = true;
     bool toRecompile = true;

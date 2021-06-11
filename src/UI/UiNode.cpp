@@ -133,7 +133,14 @@ void UiNode::draw()
     float padding = 5.0;
     previewArea.p0 = vec2(padding, padding + title->position.y + title->getTextSize().y);
     previewArea.p1 = size - vec2(padding, padding);
-    drawPreview(previewArea);
+
+    previewArea = previewArea + parentPosition + position;
+    bool clipped = parentClippingRect.outside(previewArea);
+    if(!clipped)
+    {
+        previewArea = previewArea.clampTo(parentClippingRect);
+        drawPreview(previewArea);
+    }
 
     float step_y = size.y / (1+inputs.size());
     float y = step_y - PinSize * 0.5f;

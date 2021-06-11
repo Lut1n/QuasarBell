@@ -49,6 +49,7 @@ namespace qb
 
     struct GlslFrame
     {
+        int resolution = 256;
         bool hasUv = false;
         std::vector<vec4> inputs;
         std::vector<Kernel> kernels;

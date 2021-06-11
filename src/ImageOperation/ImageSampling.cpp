@@ -52,7 +52,7 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
 
         std::string glsl =
         "vec4 v$1 = vec4(vec3(0.0),1.0);\n"
-        "float s$1 = 1.0/256.0;\n"
+        "float s$1 = 1.0/resolution;\n"
         "int r$1 = int($2.x);\n"
         "float c$1 = (r$1*2.0+1.0);\n"
         "c$1 = c$1*c$1;\n"
@@ -113,7 +113,7 @@ bool SharpenFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
 
         std::string glsl =
         "vec4 v$1 = vec4(vec3(0.0),1.0);\n"
-        "float s$1 = 1.0/256.0;\n"
+        "float s$1 = 1.0/resolution;\n"
         "int r$1 = int($2.x);\n"
         "float c$1 = (r$1*2.0+1.0);\n"
         "c$1 = c$1*c$1;\n"
@@ -165,7 +165,7 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 
         std::string glsl =
         "vec4 v$1 = vec4(vec3(1.0-$2.y),1.0);\n"
-        "float s$1 = 1.0/256.0;\n"
+        "float s$1 = 1.0/resolution;\n"
         "int r$1 = int($2.x);\n"
         "for(int i=-r$1; i<=r$1; ++i){\n"
         "for(int j=-r$1; j<=r$1; ++j){\n"
@@ -214,11 +214,11 @@ bool BumpToNormal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 
         std::string glsl =
         "vec4 v$1 = vec4(0,0,0,1);\n"
-        "float s$1 = 1.0/256.0;\n"
+        "float s$1 = 1.0/resolution;\n"
         "float a$1 = $2($3 + vec2(-1,0)*s$1).x - $2($3 + vec2(1,0)*s$1).x;\n"
         "float b$1 = $2($3 + vec2(0,-1)*s$1).x - $2($3 + vec2(0,1)*s$1).x;\n"
-        "vec3 va$1 = normalize(vec3(2,0,a$1 * 256.0));\n"
-        "vec3 vb$1 = normalize(vec3(0,2,b$1 * 256.0));\n"
+        "vec3 va$1 = normalize(vec3(2,0,a$1 * resolution));\n"
+        "vec3 vb$1 = normalize(vec3(0,2,b$1 * resolution));\n"
         "v$1.xyz = cross(va$1,vb$1) * 0.5 + 0.5;\n";
         glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::fu(ctx), qb::uv(uvId)});
 

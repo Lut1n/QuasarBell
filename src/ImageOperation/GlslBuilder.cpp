@@ -171,6 +171,8 @@ std::string qb::GlslFrame::compile()
     if (hasUv) glsl += "in vec2 uv0;\n";
     glsl += "out vec4 fragColor;\n";
 
+    glsl += "int resolution = " + std::to_string(resolution) + ";\n";
+
     // functions
     for(auto& func : functions) glsl += func.second;
 
@@ -203,6 +205,7 @@ void qb::GlslBuilderVisitor::pushFrame()
 {
     auto& frames = getCurrentFrame().frames;
     frames.push_back(GlslFrame());
+    frames.back().resolution = mainFrame.resolution;
     frameStack.push_back(&frames.back());
 }
 //--------------------------------------------------------------

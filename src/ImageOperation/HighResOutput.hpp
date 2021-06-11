@@ -125,7 +125,9 @@ struct HighResOutput : public ImageOperation
     HighResOutput();
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
-    int res = 1024;
+    void uiProperties() override;
+
+    int resolution = 10;
 };
 
 

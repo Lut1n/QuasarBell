@@ -428,8 +428,9 @@ std::string Dynamics::getOperationCode() const
 HighResOutput::HighResOutput()
     : ImageOperation(qb::ImageOperationType_HighResOutput)
 {
+    preview.resolution = (int)std::pow(2.0,(float)resolution);
     makeInput("input", ImageDataType_Float);
-    makeProperty("res", ImageDataType_Int, &res);
+    makeProperty("resolution", ImageDataType_Int, &resolution);
 }
 //--------------------------------------------------------------
 bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
@@ -458,4 +459,17 @@ bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
     frame.setFunctions(getNodeType(), getOperationCode());
 
     return true;
+}
+//--------------------------------------------------------------
+void HighResOutput::uiProperties()
+{
+    uiPreview();
+    if (ImGui::SliderInt("power", &resolution, 0, 12))
+    {
+        preview.resolution = (int)std::pow(2.0,(float)resolution);
+        preview.initialized = false;
+        dirty(true);
+    }
+    int res = (int)std::pow(2.0,(float)resolution);
+    ImGui::InputInt("resolution", &res);
 }
