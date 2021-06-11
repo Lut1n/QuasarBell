@@ -272,3 +272,54 @@ std::string VoronoiNoise::getOperationCode() const
     "}\n";
     return std::string(code);
 }
+
+
+//--------------------------------------------------------------
+Mandelbrot::Mandelbrot()
+    : ImageOperation(qb::ImageOperationType_Mandelbrot)
+{
+    makeOutput("out", ImageDataType_Float);
+    makeProperty("iterations", &iterations, 1, 300);
+    makeProperty("oftx", &oftx, -2.0f, 2.0f);
+    makeProperty("ofty", &ofty, -2.0f, 2.0f);
+    makeProperty("scale", &scale, 0.01f, 10.0f);
+}
+//--------------------------------------------------------------
+bool Mandelbrot::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    size_t opId = context.getNextVa();
+    size_t in1 = frame.pushInput({(float)iterations, oftx, ofty, scale});
+    size_t uvId = context.getUvId();
+
+    std::string glsl = "vec4 $1 = mandelbrot($2, $3);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+    frame.hasUv = true;
+
+    return true;
+}
+
+//--------------------------------------------------------------
+std::string Mandelbrot::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec4 mandelbrot(vec4 res, vec2 uv){\n"
+    "    int iterations = int(res.x);\n"
+    "    vec2 oft = vec2(res.y,res.z);\n"
+    "    vec2 scale = vec2(res.w);\n"
+    "    uv = uv * scale -oft;\n"
+    "    vec2 d = vec2(0.0);\n"
+    "    vec2 z0 = vec2(0.0);\n"
+    "    for(int k=0; k<iterations; ++k){\n"
+    "        d = vec2(d.x*d.x - d.y*d.y, 2.0*d.x*d.y) + uv;\n"
+    "    };\n"
+    "    return vec4(vec3(length(d)),1.0);\n"
+    "}\n";
+    return std::string(code);
+}

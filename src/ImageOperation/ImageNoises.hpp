@@ -54,4 +54,18 @@ struct VoronoiNoise : public ImageOperation
     int mode = 0;
 };
 
+//--------------------------------------------------------------
+struct Mandelbrot : public ImageOperation
+{
+    Mandelbrot();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    int iterations = 20;
+    float oftx = 1.7f;
+    float ofty = 1.0f;
+    float scale = 2.0f;
+};
+
 #endif // QUASAR_BELL_IMAGE_NOISES_HPP
