@@ -15,8 +15,8 @@ ImageBasicOperators::ImageBasicOperators(qb::ImageOperationType type, const std:
     makeInput("in1", ImageDataType_Float);
     makeInput("in2", ImageDataType_Float);
     makeOutput("out", ImageDataType_Float);
-    makeProperty("in1", &_in1, 0.0f, 1.0f);
-    makeProperty("in2", &_in2, 0.0f, 1.0f);
+    makeProperty("in1", &_in1, 0.0f, 10.0f);
+    makeProperty("in2", &_in2, 0.0f, 10.0f);
 }
 //--------------------------------------------------------------
 bool ImageBasicOperators::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
