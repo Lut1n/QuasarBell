@@ -256,6 +256,14 @@ void* RenderInterface::getTargetResource(unsigned target)
     return (void*)0;
 }
 
+qb::ImageData RenderInterface::downloadTargetImage(unsigned id)
+{
+    qb::ImageData ret;
+    if(!s_targets[id].isWindow)
+        ret = s_targets[id].texture->getImage();
+    return ret;
+}
+
 float comp(unsigned color, int c)
 {
     unsigned r = (color & 0xFF000000) >> 24;

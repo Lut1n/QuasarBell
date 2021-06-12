@@ -1,6 +1,8 @@
 #ifndef GL_RENDERABLE_TEXTURE_H
 #define GL_RENDERABLE_TEXTURE_H
 
+#include "Graphics/TgaExporter.hpp"
+
 struct RenderableTexture
 {
     unsigned fbo = 0;
@@ -15,6 +17,8 @@ struct RenderableTexture
     
     void bind();
     void bindAsTexture(unsigned texUnit = 0);
+
+    qb::ImageData getImage();
     
     static void bindWindow();
 };

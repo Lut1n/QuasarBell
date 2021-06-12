@@ -14,7 +14,8 @@ public:
         Nothing,
         Save_Prj,
         Load_Prj,
-        Export_Wav
+        Export_Wav,
+        Export_Tga
     };
     
     UserFileInput(const std::string& title, const std::string& ext, const std::string& defaultPath);

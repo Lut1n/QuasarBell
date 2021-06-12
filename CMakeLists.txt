@@ -67,6 +67,7 @@ add_executable(
     src/Graphics/CustomProgram.h
     src/Graphics/RenderableTexture.h
     src/Graphics/RenderInterface.h
+    src/Graphics/TgaExporter.hpp
     src/Graphics/imgui_impl_glfw.h
     src/Graphics/imgui_impl_opengl3.h
     src/Ui/UiEvent.h
@@ -136,6 +137,7 @@ add_executable(
     src/Graphics/CustomProgram.cpp
     src/Graphics/RenderableTexture.cpp
     src/Graphics/RenderInterfaceGlfw.cpp
+    src/Graphics/TgaExporter.cpp
     src/Graphics/imgui_impl_glfw.cpp
     src/Graphics/imgui_impl_opengl3.cpp
     src/Ui/UiSystem.cpp

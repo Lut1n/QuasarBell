@@ -166,11 +166,14 @@ struct TimeInput : public ImageOperation
 struct HighResOutput : public ImageOperation
 {
     HighResOutput();
+    ~HighResOutput();
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 
     int resolution = 10;
+
+    static HighResOutput* defaultOutput;
 };
 
 

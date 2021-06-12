@@ -13,6 +13,7 @@ namespace qb
 AppInterface::AppInterface()
     : fileInput("project path", ".json", "./save/my_project.json")
     , waveInput("wav path", ".wav", "./exported/output.wav")
+    , tgaInput("tga path", ".tga", "./exported/output.tga")
 {
     operationNames = qb::getOperationNames();
     imageOperationNames = qb::getImageOperationNames();
@@ -36,6 +37,7 @@ void AppInterface::display()
         if(ImGui::BeginMenu("Export"))
         {
             waveInput.displayItem("As WAV", UserFileInput::Export_Wav);
+            tgaInput.displayItem("As TGA", UserFileInput::Export_Tga);
             ImGui::EndMenu();
         }
         if(ImGui::MenuItem("About"))
@@ -94,6 +96,7 @@ void AppInterface::display()
 
     fileInput.display();
     waveInput.display();
+    tgaInput.display();
     _aboutPanel.display();
 }
 

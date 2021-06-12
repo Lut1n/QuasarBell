@@ -5,6 +5,7 @@
 
 #include "Core/Math.hpp"
 #include "Core/Vec2.h"
+#include "Graphics/TgaExporter.hpp"
 
 struct RenderInterface
 {
@@ -20,6 +21,7 @@ struct RenderInterface
     static vec2 getCurrentTargetSize();
     static void setTarget(unsigned target);
     static void* getTargetResource(unsigned target);
+    static qb::ImageData downloadTargetImage(unsigned id);
     static void clear(unsigned color);
     static void setColor(unsigned color);
     static void setThickness(float th);

@@ -68,3 +68,15 @@ void RenderableTexture::bindWindow()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+qb::ImageData RenderableTexture::getImage()
+{
+    qb::ImageData ret;
+    ret.width = width;
+    ret.height = height;
+    ret.channels = 3;
+    ret.data.resize(width * height * 3);
+    bindAsTexture(0);
+    glGetTexImage( GL_TEXTURE_2D, 0, GL_BGR, GL_BYTE, ret.data.data());
+    return ret;
+}

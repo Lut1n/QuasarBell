@@ -40,6 +40,7 @@ public:
     UiNodeBoard* nodeboard = nullptr;
     UserFileInput fileInput;
     UserFileInput waveInput;
+    UserFileInput tgaInput;
 
     vec2 nodeToCreatePos;
     NodeCategory nodeToCreateCategory = NodeCategory_None;

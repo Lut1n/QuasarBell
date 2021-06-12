@@ -7,6 +7,8 @@
 
 #include "Ui/UiSystem.h"
 
+HighResOutput* HighResOutput::defaultOutput = nullptr;
+
 //--------------------------------------------------------------
 ColorInput::ColorInput()
     : ImageOperation(qb::ImageOperationType_Color)
@@ -558,6 +560,13 @@ HighResOutput::HighResOutput()
     preview.resolution = (int)std::pow(2.0,(float)resolution);
     makeInput("input", ImageDataType_Float);
     makeProperty("resolution", ImageDataType_Int, &resolution);
+
+    if (defaultOutput == nullptr) defaultOutput = this;
+}
+//--------------------------------------------------------------
+HighResOutput::~HighResOutput()
+{
+    if (defaultOutput == this) defaultOutput = nullptr;
 }
 //--------------------------------------------------------------
 bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
@@ -591,6 +600,16 @@ bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
 void HighResOutput::uiProperties()
 {
     uiPreview();
+    
+    if (defaultOutput == this)
+    {
+        ImGui::Text("Default output");
+    }
+    else if (ImGui::Button("Set as default output"))
+    {
+        defaultOutput = this;
+    }
+    
     if (ImGui::SliderInt("power", &resolution, 0, 12))
     {
         preview.resolution = (int)std::pow(2.0,(float)resolution);

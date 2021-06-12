@@ -16,6 +16,8 @@
 #include "ImageOperation/ImageOperationType.hpp"
 #include "ImageOperation/ImageOperation.hpp"
 
+#include "ImageOperation/HighResOutput.hpp"
+
 void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll)
 {
     for (auto link : ui->links)
@@ -123,6 +125,24 @@ void UiSignalNodeBoard::update(float t)
         }
         app.waveInput.request = UserFileInput::Nothing;
         app.waveInput.confirmed = false;
+    }
+    if(app.tgaInput.confirmed)
+    {
+        if(HighResOutput::defaultOutput == nullptr)
+        {
+            std::cout << "Error: You must set an audio output node as default" << std::endl;
+        }
+        else if(app.tgaInput.request == UserFileInput::Export_Tga)
+        {
+            auto frame = HighResOutput::defaultOutput->preview.renderFrame.get();
+            if(frame)
+            {
+                qb::ImageData image = RenderInterface::downloadTargetImage(frame->glResource);
+                qb::exportTGA(app.tgaInput.filepath, image);
+            }
+        }
+        app.tgaInput.request = UserFileInput::Nothing;
+        app.tgaInput.confirmed = false;
     }
 
     auto& col = operations.operations;
@@ -344,7 +364,7 @@ void OperationCollection::centerNodes(const Rect& area)
 {
     Rect nodeBox = getBoundingBox();
     vec2 oft = (area.size() - nodeBox.size()) * 0.5f;
-    for(auto& op : operations) op.second->position += oft;
+    for(auto& op : operations) op.second->position += oft - nodeBox.p0 + area.p0;
 }
 
 //--------------------------------------------------------------

@@ -424,8 +424,6 @@ void ImageOperation::uiPreview()
     float avail = ImGui::GetContentRegionAvail().x * 0.5f;
     if(preview.renderFrame)
     {
-        /*ImGui::Dummy(ImVec2(avail*0.5f,avail));
-        ImGui::SameLine();*/
         ImVec2 cursor = ImGui::GetCursorPos();
 
         ImGui::SetCursorPos(ImVec2(ImGui::GetContentRegionAvail().x * 0.25, cursor.y));
