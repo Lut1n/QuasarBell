@@ -87,7 +87,7 @@ std::string ValueNoise::getOperationCode() const
     "    int octaves = int(res.x);\n"
     "    vec2 f = res.yy;\n"
     "    float per = 0.5;\n"
-    "    //float w = 0.0f;\n"
+    "    float w = 0.0f;\n"
     "    float ret = 0.0f;\n"
     "    for(int i=0; i<10; ++i){\n"
     "        vec2 oft = vec2(0.0f, 1.0f);\n"
@@ -102,12 +102,12 @@ std::string ValueNoise::getOperationCode() const
     "        float s34 = mix(s3,s4,fuv.x);\n"
     "        float s1234 = mix(s12,s34,fuv.y);\n"
     "        ret += s1234 * per;\n"
-    "        //w += per;\n"
+    "        w += per;\n"
     "        f *= 2.0f;\n"
     "        per *= res.z;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
-    "    //ret = ret / max(0.1f, w);\n"
+    "    ret = ret / max(0.1f, w);\n"
     "    return vec4(vec3(ret),1.0f);\n"
     "}\n";
     return std::string(code);
@@ -186,6 +186,94 @@ std::string GradientNoise::getOperationCode() const
     return std::string(code);
 }
 
+//--------------------------------------------------------------
+SimplexNoise::SimplexNoise()
+    : ImageOperation(qb::ImageOperationType_SimplexNoise)
+{
+    makeOutput("output", ImageDataType_Float);
+    makeProperty("octaves", &octaves, 1, 10);
+    makeProperty("frequency", &frequency, 1.0f, 32.0f);
+    makeProperty("persistance", &persistance, 0.0f, 1.0f);
+    makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+}
+//--------------------------------------------------------------
+bool SimplexNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    size_t opId = context.getNextVa();
+    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
+    size_t uvId = context.getUvId();
+
+    std::string glsl = "vec4 $1 = simplex_grad($2, $3);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+    frame.hasUv = true;
+
+    return true;
+}
+
+//--------------------------------------------------------------
+std::string SimplexNoise::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec2 rand2_simplex_grad(vec2 uv){\n"
+    "    vec2 ret;\n"
+    "    ret.x = -1.0 + 2.0*fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
+    "    ret.y = -1.0 + 2.0*fract(sin(dot(uv, vec2(269.1836, 183.672))) * 65347.3216);\n"
+    "    return ret;\n"
+    "}\n"
+    "vec2 skew_simplex(vec2 st){\n"
+    "    vec2 r = vec2(0.0);\n"
+    "    r.x = 1.1547*st.x;\n"
+    "    r.y = st.y+0.5*r.x;\n"
+    "    return r;\n"
+    "}\n"
+    "vec3 simplex_grid(vec2 st){\n"
+    "    vec3 xyz;\n"
+    "    st = fract(skew_simplex(st));\n"
+    "    if(st.x > st.y){\n"
+    "        xyz.xy = vec2(1.0-st.x,st.x-st.y);\n"
+    "        xyz.z = st.y;\n"
+    "    } else {\n"
+    "        xyz.yz = vec2(st.y-st.x,1.0-st.y);\n"
+    "        xyz.x = st.x;\n"
+    "    }\n"
+    "    return fract(xyz);\n"
+    "}\n"
+    "vec4 simplex_grad(vec4 res, vec2 uv){\n"
+    "    int octaves = int(res.x);\n"
+    "    vec2 f = res.yy;\n"
+    "    float pers = 0.5f;"
+    "    float r = 0.0f;\n"
+    "    for(int k=0;k<octaves;k++){\n"
+    "        vec2 p = fract(skew_simplex(uv * f));\n"
+    "        vec2 i = floor(skew_simplex(uv * f));\n"
+    "        vec2 oft = vec2(0.0,1.0);\n"
+    "        float r1, r2, r3;\n"
+    "        if(p.x > p.y){\n"
+    "            r1 = dot(p-oft.xx, rand2_simplex_grad(i + oft.xx));\n"
+    "            r2 = dot(p-oft.yx, rand2_simplex_grad(i + oft.yx));\n"
+    "            r3 = dot(p-oft.yy, rand2_simplex_grad(i + oft.yy));\n"
+    "        } else {\n"
+    "            r1 = dot(p-oft.yy, rand2_simplex_grad(i + oft.yy));\n"
+    "            r2 = dot(p-oft.xy, rand2_simplex_grad(i + oft.xy));\n"
+    "            r3 = dot(p-oft.xx, rand2_simplex_grad(i + oft.xx));\n"
+    "        }\n"
+    "        vec3 fa = simplex_grid(uv * f);\n"
+    "        fa = mix(vec3(0.5),fa*fa*fa*(fa*(fa*6.-15.)+10.),res.w);\n"
+    "        r += dot(vec3(r1,r2,r3), fa) * pers;\n"
+    "        pers *= res.z;\n"
+    "        f *= 2.0;\n"
+    "    }\n"
+    "    return vec4(vec3(r * 0.5 + 0.5),1.0f);\n"
+    "}\n";
+    return std::string(code);
+}
 //--------------------------------------------------------------
 VoronoiNoise::VoronoiNoise()
     : ImageOperation(qb::ImageOperationType_Voronoi)

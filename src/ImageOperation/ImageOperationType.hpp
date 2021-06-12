@@ -26,6 +26,7 @@ namespace qb
         ImageOperationType_WhiteNoise,
         ImageOperationType_ValueNoise,
         ImageOperationType_GradientNoise,
+        ImageOperationType_SimplexNoise,
         ImageOperationType_Voronoi,
         ImageOperationType_Mandelbrot,
         ImageOperationType_Dynamics,
