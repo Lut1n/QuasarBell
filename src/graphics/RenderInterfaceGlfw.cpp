@@ -228,6 +228,16 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
     s_targets.push_back(target);
     return idx;
 }
+
+vec2 RenderInterface::getTargetSize(unsigned id)
+{
+    return vec2(s_targets[id].width, s_targets[id].height);
+}
+
+vec2 RenderInterface::getCurrentTargetSize()
+{
+    return getTargetSize(s_currentTarget);
+}
     
 void RenderInterface::setTarget(unsigned target)
 {

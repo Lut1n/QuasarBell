@@ -12,6 +12,7 @@
 //--------------------------------------------------------------
 void saveInto(JsonValue& root, OperationCollection& collection, const OperationConnections& co)
 {
+    Rect boxed = collection.getBoundingBox();
     auto& jsonOp = root.setPath("sfx-nodal","operations");
     auto& ops = collection.operations;
     int index = 0;
@@ -21,7 +22,7 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
         std::string typeName = qb::getOperationName(static_cast<qb::OperationType>(it->second->nodeTypeId()));
         jNode.setPath("type").set(typeName);
         jNode.setPath("id").set((float)it->first);
-        toJson(jNode.setPath("position"), it->second->position);
+        toJson(jNode.setPath("position"), it->second->position-boxed.p0);
         
         auto op = it->second->getOperation();
         for(size_t i=0; i<op->getPropertyCount(); ++i)

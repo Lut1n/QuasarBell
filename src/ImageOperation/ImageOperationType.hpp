@@ -39,6 +39,7 @@ namespace qb
         ImageOperationType_BumpToNormal,
         ImageOperationType_DirSignal,
         ImageOperationType_RadSignal,
+        ImageOperationType_Time,
 
         ImageOperationType_Count,
 

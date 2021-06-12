@@ -48,7 +48,7 @@ void AppInterface::display()
     // property edit panel
     ImGui::SetNextWindowPos(ImVec2(6, 25), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 530), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Node properties", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("Node properties", 0, /*ImGuiWindowFlags_NoMove | */ImGuiWindowFlags_NoCollapse | /*ImGuiWindowFlags_NoResize | */ImGuiWindowFlags_NoSavedSettings);
     if(!UiNode::selected.empty())
         UiNode::selected.front()->displayProperties();
     ImGui::End();

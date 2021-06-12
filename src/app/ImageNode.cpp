@@ -56,6 +56,10 @@ void ImageNode::initializePreview()
 //--------------------------------------------------------------
 void ImageNode::updatePreview()
 {
+    // if selected, force update for taking elapsed time in account
+    if(UiNode::isSelected(this))
+        _operation->preview.dirty(false);
+    
     _operation->preview.compute(_operation);
 }
 //--------------------------------------------------------------

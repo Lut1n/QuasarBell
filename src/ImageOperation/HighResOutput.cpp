@@ -473,3 +473,29 @@ void HighResOutput::uiProperties()
     int res = (int)std::pow(2.0,(float)resolution);
     ImGui::InputInt("resolution", &res);
 }
+
+//--------------------------------------------------------------
+TimeInput::TimeInput()
+    : ImageOperation(qb::ImageOperationType_Time)
+{
+    makeOutput("time", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool TimeInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    float ti = RenderInterface::getTime();
+    size_t inId = frame.pushInput({ti,ti,ti,ti});
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = vec4(vec3($2.x),1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(inId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    return true;
+}

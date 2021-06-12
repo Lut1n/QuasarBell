@@ -36,7 +36,8 @@ namespace qb
         {ImageOperationType_Morpho, "morpho"},
         {ImageOperationType_BumpToNormal, "bump-to-normal"},
         {ImageOperationType_DirSignal, "dir-signal"},
-        {ImageOperationType_RadSignal, "rad-signal"}
+        {ImageOperationType_RadSignal, "rad-signal"},
+        {ImageOperationType_Time, "time-input"}
     };
 }
 //--------------------------------------------------------------

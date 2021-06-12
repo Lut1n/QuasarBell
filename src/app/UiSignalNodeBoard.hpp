@@ -30,6 +30,8 @@ struct OperationCollection
     size_t addOperation(std::unique_ptr<SignalNode>& operation);
     void setOperation(size_t id, std::unique_ptr<SignalNode>& operation);
     SignalNode* getOperation(size_t id);
+    Rect getBoundingBox() const;
+    void centerNodes(const Rect& area);
 };
 
 //--------------------------------------------------------------

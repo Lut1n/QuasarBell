@@ -40,7 +40,7 @@ void UiSignalNodeBoard::update(float t)
 
     if(!_ready)
     {
-        nodeboard = std::make_unique<UiNodeBoard>(vec2(320, 30), vec2(1070, 520));
+        nodeboard = std::make_unique<UiNodeBoard>(vec2(0, 0), RenderInterface::getCurrentTargetSize());
         uiConnections = nodeboard->connections.get();
         uiConnections->handler = this;
         UiSystem::instance()->add(nodeboard.get(), true, true);
@@ -53,6 +53,7 @@ void UiSignalNodeBoard::update(float t)
             OperationConnections connections;
             JsonValue root = loadJsonFile("./default.json");
             loadFrom(root, operations, connections);
+            operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
             for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
             for(auto co : connections.entries)
             {
@@ -61,6 +62,8 @@ void UiSignalNodeBoard::update(float t)
         }
         _ready = true;
     }
+
+    nodeboard->size = RenderInterface::getCurrentTargetSize();
     
     if(app.resetProject)
     {
@@ -82,6 +85,7 @@ void UiSignalNodeBoard::update(float t)
             OperationConnections connections;
             JsonValue root = loadJsonFile(app.fileInput.filepath);
             loadFrom(root, operations, connections);
+            operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
             for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
             for(auto co : connections.entries)
             {
@@ -316,6 +320,31 @@ SignalNode* OperationCollection::getOperation(size_t id)
     auto it = operations.find(id);
     if (it != operations.end()) return it->second.get();
     return nullptr;
+}
+
+Rect OperationCollection::getBoundingBox() const
+{
+    Rect ret;
+    if(!operations.empty())
+    {
+        ret.p0 = operations.begin()->second->position;
+        ret.p1 = ret.p0 + operations.begin()->second->size;
+    }
+    for(const auto& op : operations)
+    {
+        vec2 p = op.second->position;
+        vec2 s = op.second->size;
+        ret = ret.extends(p);
+        ret = ret.extends(p + s);
+    }
+    return ret;
+}
+
+void OperationCollection::centerNodes(const Rect& area)
+{
+    Rect nodeBox = getBoundingBox();
+    vec2 oft = (area.size() - nodeBox.size()) * 0.5f;
+    for(auto& op : operations) op.second->position += oft;
 }
 
 //--------------------------------------------------------------

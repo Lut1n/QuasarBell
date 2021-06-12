@@ -120,6 +120,12 @@ struct RadialSignal : public ImageOperation
     float amplitude = 1.0f;
 };
 //--------------------------------------------------------------
+struct TimeInput : public ImageOperation
+{
+    TimeInput();
+    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+};
+//--------------------------------------------------------------
 struct HighResOutput : public ImageOperation
 {
     HighResOutput();

@@ -38,6 +38,7 @@ MAKE_IMAGE_NODE(UvMapping, qb::ImageOperationType_UvMapping)
 MAKE_IMAGE_NODE(UvInput, qb::ImageOperationType_UvInput)
 MAKE_IMAGE_NODE(DirectionalSignal, qb::ImageOperationType_DirSignal)
 MAKE_IMAGE_NODE(RadialSignal, qb::ImageOperationType_RadSignal)
+MAKE_IMAGE_NODE(TimeInput, qb::ImageOperationType_Time)
 
 
 #endif // TYPED_IMAGE_NODE_H

@@ -123,7 +123,7 @@ ImageOperation::ImageOperation(qb::ImageOperationType opType)
 void ImagePreview::dirty(bool recompile)
 {
     hasChange = true;
-    toRecompile = recompile;
+    if(recompile) toRecompile = true;
 }
 //--------------------------------------------------------------
 void ImagePreview::compute(ImageOperation* operation)
@@ -424,6 +424,11 @@ void ImageOperation::uiPreview()
     float avail = ImGui::GetContentRegionAvail().x * 0.5f;
     if(preview.renderFrame)
     {
+        /*ImGui::Dummy(ImVec2(avail*0.5f,avail));
+        ImGui::SameLine();*/
+        ImVec2 cursor = ImGui::GetCursorPos();
+
+        ImGui::SetCursorPos(ImVec2(ImGui::GetContentRegionAvail().x * 0.25, cursor.y));
         ImGui::Image(RenderInterface::getTargetResource(preview.renderFrame->glResource), ImVec2(avail, avail), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
         if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
             ImGui::OpenPopup("Bigger preview");

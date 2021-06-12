@@ -54,6 +54,7 @@ struct Rect
     
     Rect operator+(const vec2& oft) const;
     Rect clampTo(const Rect& other) const;
+    Rect extends(const vec2& pt) const;
     Rect extends(const Rect& other) const;
 
     bool outside(const vec2& pt) const;

@@ -151,6 +151,21 @@ Rect Rect::clampTo(const Rect& other) const
     return ret;
 }
 
+Rect Rect::extends(const vec2& pt) const
+{
+    auto minf = [](float a, float b) -> float{
+        return a < b ? a : b; };
+    auto maxf = [](float a, float b) -> float{
+        return a > b ? a : b; };
+    
+    Rect ret;
+    ret.p0.x = minf(p0.x,pt.x);
+    ret.p0.y = minf(p0.y,pt.y);
+    ret.p1.x = maxf(p1.x,pt.x);
+    ret.p1.y = maxf(p1.y,pt.y);
+    return ret;
+}
+
 Rect Rect::extends(const Rect& other) const
 {
     auto minf = [](float a, float b) -> float{

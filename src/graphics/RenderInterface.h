@@ -16,6 +16,8 @@ struct RenderInterface
     // todo: deleteTarget and eventually call glfwTerminate()
     static void deleteTarget(unsigned id);
     static unsigned createTarget(unsigned width, unsigned height, bool win = false, const std::string& title = "sfml window");
+    static vec2 getTargetSize(unsigned id);
+    static vec2 getCurrentTargetSize();
     static void setTarget(unsigned target);
     static void* getTargetResource(unsigned target);
     static void clear(unsigned color);
