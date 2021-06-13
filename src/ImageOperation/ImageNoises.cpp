@@ -11,7 +11,7 @@
 WhiteNoise::WhiteNoise()
     : ImageOperation(qb::ImageOperationType_WhiteNoise)
 {
-    makeOutput("output", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
 }
 //--------------------------------------------------------------
 bool WhiteNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
@@ -49,24 +49,44 @@ std::string WhiteNoise::getOperationCode() const
 ValueNoise::ValueNoise()
     : ImageOperation(qb::ImageOperationType_ValueNoise)
 {
-    makeOutput("output", ImageDataType_Float);
     makeProperty("octaves", &octaves, 1, 10);
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+    makeInput("freq", ImageDataType_Float);
+    makeInput("pers", ImageDataType_Float);
+    makeInput("smth", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
 }
 //--------------------------------------------------------------
 bool ValueNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
+    
+    std::string freqId, persId, smoothId;
+
+    if (sampleInput(0, t, visitor))
+        freqId = qb::va(context.popVa());
+    else
+        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
+        
+    if (sampleInput(1, t, visitor))
+        persId = qb::va(context.popVa());
+    else
+        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
+        
+    if (sampleInput(2, t, visitor))
+        smoothId = qb::va(context.popVa());
+    else
+        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
+
+    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+
     size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
     size_t uvId = context.getUvId();
-
-    std::string glsl = "vec4 $1 = perlin($2, $3);\n";
-    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
-
+    std::string glsl = "vec4 $1 = perlin($2.x, $3.x, $4.x, $5.x, $6);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), octaveId, freqId, persId, smoothId, qb::uv(uvId)});
     context.pushVa(opId);
     context.pushCode(glsl);
 
@@ -83,9 +103,9 @@ std::string ValueNoise::getOperationCode() const
     "float rand_perlin(vec2 uv){\n"
     "    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);\n"
     "}\n"
-    "vec4 perlin(vec4 res, vec2 uv){\n"
-    "    int octaves = int(res.x);\n"
-    "    vec2 f = res.yy;\n"
+    "vec4 perlin(float octs, float freq, float persist, float smth, vec2 uv){\n"
+    "    int octaves = int(octs);\n"
+    "    vec2 f = vec2(freq);\n"
     "    float per = 0.5;\n"
     "    float w = 0.0f;\n"
     "    float ret = 0.0f;\n"
@@ -93,7 +113,7 @@ std::string ValueNoise::getOperationCode() const
     "        vec2 oft = vec2(0.0f, 1.0f);\n"
     "        vec2 iuv = floor(uv * f);\n"
     "        vec2 fuv = fract(uv * f);\n"
-    "        fuv = res.w * fuv * fuv * (3.f - 2.f * fuv);\n"
+    "        fuv = smth * fuv * fuv * (3.f - 2.f * fuv);\n"
     "        float s1 = rand_perlin(iuv + oft.xx);\n"
     "        float s2 = rand_perlin(iuv + oft.yx);\n"
     "        float s3 = rand_perlin(iuv + oft.xy);\n"
@@ -104,7 +124,7 @@ std::string ValueNoise::getOperationCode() const
     "        ret += s1234 * per;\n"
     "        w += per;\n"
     "        f *= 2.0f;\n"
-    "        per *= res.z;\n"
+    "        per *= persist;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
     "    ret = ret / max(0.1f, w);\n"
@@ -118,23 +138,44 @@ std::string ValueNoise::getOperationCode() const
 GradientNoise::GradientNoise()
     : ImageOperation(qb::ImageOperationType_GradientNoise)
 {
-    makeOutput("output", ImageDataType_Float);
     makeProperty("octaves", &octaves, 1, 10);
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+    makeInput("freq", ImageDataType_Float);
+    makeInput("pers", ImageDataType_Float);
+    makeInput("smth", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
 }
 //--------------------------------------------------------------
 bool GradientNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-    size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
-    size_t uvId = context.getUvId();
 
-    std::string glsl = "vec4 $1 = perlin_grad($2, $3);\n";
-    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+    std::string freqId, persId, smoothId;
+
+    if (sampleInput(0, t, visitor))
+        freqId = qb::va(context.popVa());
+    else
+        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
+        
+    if (sampleInput(1, t, visitor))
+        persId = qb::va(context.popVa());
+    else
+        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
+        
+    if (sampleInput(2, t, visitor))
+        smoothId = qb::va(context.popVa());
+    else
+        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
+
+    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+
+    size_t opId = context.getNextVa();
+    size_t uvId = context.getUvId();
+    std::string glsl = "vec4 $1 = perlin_grad($2.x, $3.x, $4.x, $5.x, $6);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), octaveId, freqId, persId, smoothId, qb::uv(uvId)});
 
     context.pushVa(opId);
     context.pushCode(glsl);
@@ -155,9 +196,9 @@ std::string GradientNoise::getOperationCode() const
     "    ret.y = -1.0 + 2.0*fract(sin(dot(uv, vec2(269.1836, 183.672))) * 65347.3216);\n"
     "    return ret;\n"
     "}\n"
-    "vec4 perlin_grad(vec4 res, vec2 uv){\n"
-    "    int octaves = int(res.x);\n"
-    "    vec2 f = res.yy;\n"
+    "vec4 perlin_grad(float octs, float freq, float persist, float smth, vec2 uv){\n"
+    "    int octaves = int(octs);\n"
+    "    vec2 f = vec2(freq);\n"
     "    float per = 0.5;\n"
     "    //float w = 0.0f;\n"
     "    float ret = 0.0f;\n"
@@ -165,7 +206,7 @@ std::string GradientNoise::getOperationCode() const
     "        vec2 oft = vec2(0.0f, 1.0f);\n"
     "        vec2 iuv = floor(uv * f);\n"
     "        vec2 fra = fract(uv * f);\n"
-    "        vec2 fuv = res.w * fra * fra * (3.f - 2.f * fra);\n"
+    "        vec2 fuv = smth * fra * fra * (3.f - 2.f * fra);\n"
     "        float s1 = dot(fra - oft.xx, (rand2_perlin_grad(iuv + oft.xx)));\n"
     "        float s2 = dot(fra - oft.yx, (rand2_perlin_grad(iuv + oft.yx)));\n"
     "        float s3 = dot(fra - oft.xy, (rand2_perlin_grad(iuv + oft.xy)));\n"
@@ -176,7 +217,7 @@ std::string GradientNoise::getOperationCode() const
     "        ret += s1234 * per;\n"
     "        //w += per * sign(s1234);\n"
     "        f *= 2.0f;\n"
-    "        per *= res.z;\n"
+    "        per *= persist;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
     "    ret = ret*0.5+0.5;"
@@ -190,23 +231,45 @@ std::string GradientNoise::getOperationCode() const
 SimplexNoise::SimplexNoise()
     : ImageOperation(qb::ImageOperationType_SimplexNoise)
 {
-    makeOutput("output", ImageDataType_Float);
     makeProperty("octaves", &octaves, 1, 10);
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
+    makeInput("freq", ImageDataType_Float);
+    makeInput("pers", ImageDataType_Float);
+    makeInput("smth", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
 }
 //--------------------------------------------------------------
 bool SimplexNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
+    
+    std::string freqId, persId, smoothId;
+
+    if (sampleInput(0, t, visitor))
+        freqId = qb::va(context.popVa());
+    else
+        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
+        
+    if (sampleInput(1, t, visitor))
+        persId = qb::va(context.popVa());
+    else
+        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
+        
+    if (sampleInput(2, t, visitor))
+        smoothId = qb::va(context.popVa());
+    else
+        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
+
+    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+
     size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, smoothness});
     size_t uvId = context.getUvId();
 
-    std::string glsl = "vec4 $1 = simplex_grad($2, $3);\n";
-    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+    std::string glsl = "vec4 $1 = simplex_grad($2.x, $3.x, $4.x, $5.x, $6);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), octaveId, freqId, persId, smoothId, qb::uv(uvId)});
 
     context.pushVa(opId);
     context.pushCode(glsl);
@@ -245,9 +308,9 @@ std::string SimplexNoise::getOperationCode() const
     "    }\n"
     "    return fract(xyz);\n"
     "}\n"
-    "vec4 simplex_grad(vec4 res, vec2 uv){\n"
-    "    int octaves = int(res.x);\n"
-    "    vec2 f = res.yy;\n"
+    "vec4 simplex_grad(float octs, float freq, float persist, float smth, vec2 uv){\n"
+    "    int octaves = int(octs);\n"
+    "    vec2 f = vec2(freq);\n"
     "    float pers = 0.5f;"
     "    float r = 0.0f;\n"
     "    for(int k=0;k<octaves;k++){\n"
@@ -265,9 +328,9 @@ std::string SimplexNoise::getOperationCode() const
     "            r3 = dot(p-oft.xx, rand2_simplex_grad(i + oft.xx));\n"
     "        }\n"
     "        vec3 fa = simplex_grid(uv * f);\n"
-    "        fa = mix(vec3(0.5),fa*fa*fa*(fa*(fa*6.-15.)+10.),res.w);\n"
+    "        fa = mix(vec3(0.5),fa*fa*fa*(fa*(fa*6.-15.)+10.),smth);\n"
     "        r += dot(vec3(r1,r2,r3), fa) * pers;\n"
-    "        pers *= res.z;\n"
+    "        pers *= persist;\n"
     "        f *= 2.0;\n"
     "    }\n"
     "    return vec4(vec3(r * 0.5 + 0.5),1.0f);\n"
@@ -278,23 +341,39 @@ std::string SimplexNoise::getOperationCode() const
 VoronoiNoise::VoronoiNoise()
     : ImageOperation(qb::ImageOperationType_Voronoi)
 {
-    makeOutput("output", ImageDataType_Float);
     makeProperty("octaves", &octaves, 1, 10);
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("mode", &mode, 0, 2);
+    makeInput("freq", ImageDataType_Float);
+    makeInput("pers", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
 }
 //--------------------------------------------------------------
 bool VoronoiNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
+
+    std::string freqId, persId;
+
+    if (sampleInput(0, t, visitor))
+        freqId = qb::va(context.popVa());
+    else
+        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
+        
+    if (sampleInput(1, t, visitor))
+        persId = qb::va(context.popVa());
+    else
+        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
+
+    std::string octaveModeId = qb::in(frame.pushInput({(float)octaves, (float)mode, 0.0, 0.0}));
+
     size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)octaves, frequency, persistance, (float)mode});
     size_t uvId = context.getUvId();
 
-    std::string glsl = "vec4 $1 = voronoi($2, $3);\n";
-    glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1), qb::uv(uvId)});
+    std::string glsl = "vec4 $1 = voronoi($2, $3.x, $4.x, $5);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), octaveModeId, freqId, persId, qb::uv(uvId)});
 
     context.pushVa(opId);
     context.pushCode(glsl);
@@ -318,10 +397,10 @@ std::string VoronoiNoise::getOperationCode() const
     "    ret.y = fract(sin(dot(uv, vec2(97.1836, 23.672))) * 65347.3216);\n"
     "    return ret;\n"
     "}\n"
-    "vec4 voronoi(vec4 res, vec2 uv){\n"
-    "    int octaves = int(res.x);\n"
-    "    vec2 f = res.yy;\n"
-    "    float per = res.z;\n"
+    "vec4 voronoi(vec4 octmode, float freq, float persist, vec2 uv){\n"
+    "    int octaves = int(octmode.x);\n"
+    "    vec2 f = vec2(freq);\n"
+    "    float per = persist;\n"
     "    float w = 0.0f;\n"
     "    vec3 ret;\n"
     "    for(int i=0; i<10; ++i){\n"
@@ -352,11 +431,11 @@ std::string VoronoiNoise::getOperationCode() const
     "        ret += vec3(minCellDist, rand_voronoi(closestcell), minEdgeDist) * per;\n"
     "        w += per;\n"
     "        f *= 2.0f;\n"
-    "        per *= res.z;\n"
+    "        per *= persist;\n"
     "        if (i>=octaves-1) break;\n"
     "    }\n"
     "    ret = ret / max(0.1f, w);\n"
-    "    return vec4(vec3(ret[int(res.w)]),1.0f);\n"
+    "    return vec4(vec3(ret[int(octmode.y)]),1.0f);\n"
     "}\n";
     return std::string(code);
 }
@@ -401,7 +480,7 @@ std::string Mandelbrot::getOperationCode() const
     "    int iterations = int(res.x);\n"
     "    vec2 oft = vec2(res.y,res.z);\n"
     "    vec2 scale = vec2(res.w);\n"
-    "    uv = uv * scale -oft;\n"
+    "    uv = ((uv-0.5) * scale+0.5) -oft;\n"
     "    vec2 d = vec2(0.0);\n"
     "    vec2 z0 = vec2(0.0);\n"
     "    for(int k=0; k<iterations; ++k){\n"

@@ -1,6 +1,8 @@
 #include "App/TypedImageNode.hpp"
 
 MAKE_IMAGE_NODE_CREATOR(ColorInput, qb::ImageOperationType_Color)
+MAKE_IMAGE_NODE_CREATOR(Construct3f, qb::ImageOperationType_Construct3f)
+MAKE_IMAGE_NODE_CREATOR(Split3f, qb::ImageOperationType_Split3f)
 MAKE_IMAGE_NODE_CREATOR(ImageAdd, qb::ImageOperationType_Add)
 MAKE_IMAGE_NODE_CREATOR(ImageSub, qb::ImageOperationType_Sub)
 MAKE_IMAGE_NODE_CREATOR(ImageMult, qb::ImageOperationType_Mult)
@@ -17,6 +19,8 @@ MAKE_IMAGE_NODE_CREATOR(ImageSin, qb::ImageOperationType_Sin)
 MAKE_IMAGE_NODE_CREATOR(ImageCos, qb::ImageOperationType_Cos)
 MAKE_IMAGE_NODE_CREATOR(ImageTan, qb::ImageOperationType_Tan)
 MAKE_IMAGE_NODE_CREATOR(ImageMod, qb::ImageOperationType_Mod)
+MAKE_IMAGE_NODE_CREATOR(ImageExp, qb::ImageOperationType_Exp)
+MAKE_IMAGE_NODE_CREATOR(ImageLog, qb::ImageOperationType_Log)
 MAKE_IMAGE_NODE_CREATOR(WhiteNoise, qb::ImageOperationType_WhiteNoise)
 MAKE_IMAGE_NODE_CREATOR(ValueNoise, qb::ImageOperationType_ValueNoise)
 MAKE_IMAGE_NODE_CREATOR(GradientNoise, qb::ImageOperationType_GradientNoise)

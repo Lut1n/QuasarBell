@@ -9,6 +9,8 @@
 #include "ImageOperation/HighResOutput.hpp"
 
 MAKE_IMAGE_NODE(ColorInput, qb::ImageOperationType_Color)
+MAKE_IMAGE_NODE(Construct3f, qb::ImageOperationType_Construct3f)
+MAKE_IMAGE_NODE(Split3f, qb::ImageOperationType_Split3f)
 MAKE_IMAGE_NODE(ImageAdd, qb::ImageOperationType_Add)
 MAKE_IMAGE_NODE(ImageSub, qb::ImageOperationType_Sub)
 MAKE_IMAGE_NODE(ImageMult, qb::ImageOperationType_Mult)
@@ -25,6 +27,8 @@ MAKE_IMAGE_NODE(ImageSin, qb::ImageOperationType_Sin)
 MAKE_IMAGE_NODE(ImageCos, qb::ImageOperationType_Cos)
 MAKE_IMAGE_NODE(ImageTan, qb::ImageOperationType_Tan)
 MAKE_IMAGE_NODE(ImageMod, qb::ImageOperationType_Mod)
+MAKE_IMAGE_NODE(ImageExp, qb::ImageOperationType_Exp)
+MAKE_IMAGE_NODE(ImageLog, qb::ImageOperationType_Log)
 MAKE_IMAGE_NODE(WhiteNoise, qb::ImageOperationType_WhiteNoise)
 MAKE_IMAGE_NODE(ValueNoise, qb::ImageOperationType_ValueNoise)
 MAKE_IMAGE_NODE(GradientNoise, qb::ImageOperationType_GradientNoise)

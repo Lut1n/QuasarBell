@@ -11,6 +11,8 @@ namespace qb
     {
         ImageOperationType_HighResOutput = 0,
         ImageOperationType_Color,
+        ImageOperationType_Construct3f,
+        ImageOperationType_Split3f,
         ImageOperationType_Add,
         ImageOperationType_Sub,
         ImageOperationType_Mult,
@@ -27,6 +29,8 @@ namespace qb
         ImageOperationType_Cos,
         ImageOperationType_Tan,
         ImageOperationType_Mod,
+        ImageOperationType_Log,
+        ImageOperationType_Exp,
         ImageOperationType_WhiteNoise,
         ImageOperationType_ValueNoise,
         ImageOperationType_GradientNoise,

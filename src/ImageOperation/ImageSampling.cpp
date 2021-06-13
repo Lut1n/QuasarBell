@@ -11,8 +11,8 @@
 BlurFilter::BlurFilter()
     : ImageOperation(qb::ImageOperationType_Blur)
 {
-    makeInput("input", ImageDataType_Float);
-    makeOutput("output", ImageDataType_Float);
+    makeInput("in", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
     makeProperty("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
@@ -80,8 +80,8 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
 SharpenFilter::SharpenFilter()
     : ImageOperation(qb::ImageOperationType_Sharpen)
 {
-    makeInput("input", ImageDataType_Float);
-    makeOutput("output", ImageDataType_Float);
+    makeInput("in", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
     makeProperty("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
@@ -140,8 +140,9 @@ bool SharpenFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
 MorphoFilter::MorphoFilter()
     : ImageOperation(qb::ImageOperationType_Morpho)
 {
-    makeInput("input", ImageDataType_Float);
-    makeOutput("output", ImageDataType_Float);
+    makeInput("in", ImageDataType_Float);
+    makeInput("radius", ImageDataType_Float);
+    makeOutput("out", ImageDataType_Float);
     makeProperty("radius", &radius, 1, 10);
     makeProperty("mode", &mode, 0, 1);
 }
@@ -159,26 +160,34 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     {
         auto& context = frame.getContext();
         
+        std::string radiusId;
+        
+        if (sampleInput(1, t, visitor))
+            radiusId = qb::va(context.popVa());
+        else
+            radiusId = qb::in(frame.pushInput({radius,radius,radius,radius}));
+
+        size_t in1 = frame.pushInput({(float)mode, 0.0, 0.0, 0.0});
+
         size_t opId = context.getNextVa();
-        size_t in1 = frame.pushInput({(float)radius, (float)mode, 0.0, 0.0});
         size_t uvId = context.getUvId();
 
         std::string glsl =
-        "vec4 v$1 = vec4(vec3(1.0-$2.y),1.0);\n"
+        "vec4 v$1 = vec4(vec3(1.0-$2.x),1.0);\n"
         "float s$1 = 1.0/resolution;\n"
-        "int r$1 = int($2.x);\n"
+        "int r$1 = int($5.x);\n"
         "for(int i=-r$1; i<=r$1; ++i){\n"
         "for(int j=-r$1; j<=r$1; ++j){\n"
         "    if(i*i + j*j > r$1*r$1) continue;\n"
         "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
         "    kuv$1.y = 1.0 - kuv$1.y;\n"
-        "    if ($2.y == 0.0)\n"
+        "    if ($2.x == 0.0)\n"
         "        v$1.xyz = min(v$1.xyz, texture2D($3,kuv$1).xyz);\n"
         "    else\n"
         "        v$1.xyz = max(v$1.xyz, texture2D($3,kuv$1).xyz);\n"
         "}}\n";
 
-        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId)});
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId), radiusId});
         context.pushVa(opId);
         context.pushCode(glsl);
 
