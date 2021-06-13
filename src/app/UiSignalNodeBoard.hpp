@@ -19,6 +19,8 @@ struct ImageOperationCollection
     size_t addOperation(std::unique_ptr<ImageNode>& operation);
     void setOperation(size_t id, std::unique_ptr<ImageNode>& operation);
     ImageNode* getOperation(size_t id);
+    Rect getBoundingBox() const;
+    void centerNodes(const Rect& area);
 };
 
 //--------------------------------------------------------------
@@ -47,6 +49,21 @@ struct OperationConnections
     std::vector<Entry> entries;
 
     void fill(UiConnections* ui, const OperationCollection& coll);
+};
+
+//--------------------------------------------------------------
+struct ImageOperationConnections
+{
+    struct Entry
+    {
+        int src;
+        int src_index;
+        int dst;
+        int dst_index;
+    };
+    std::vector<Entry> entries;
+
+    void fill(UiConnections* ui, const ImageOperationCollection& coll);
 };
 
 //--------------------------------------------------------------

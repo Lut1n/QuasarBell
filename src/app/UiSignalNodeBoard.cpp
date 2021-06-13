@@ -18,6 +18,26 @@
 
 #include "ImageOperation/HighResOutput.hpp"
 
+void ImageOperationConnections::fill(UiConnections* ui, const ImageOperationCollection& coll)
+{
+    for (auto link : ui->links)
+    {
+        auto co = link.second;
+        auto pin1 = co.first;
+        auto pin2 = co.second;
+        auto node1 = dynamic_cast<ImageNode*>(pin1->parentNode);
+        auto node2 = dynamic_cast<ImageNode*>(pin2->parentNode);
+        if(!node1 || !node2) continue;
+        int id1 = (int)coll.getId(node1);
+        int id2 = (int)coll.getId(node2);
+        int idx1 = (int)pin1->parentNode->getIndex(pin1);
+        int idx2 = (int)pin2->parentNode->getIndex(pin2);
+        if (pin1->isInput)
+            entries.push_back(Entry{id2,idx2,id1,idx1});
+        else
+            entries.push_back(Entry{id1,idx1,id2,idx2});
+    }
+}
 void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll)
 {
     for (auto link : ui->links)
@@ -25,8 +45,11 @@ void OperationConnections::fill(UiConnections* ui, const OperationCollection& co
         auto co = link.second;
         auto pin1 = co.first;
         auto pin2 = co.second;
-        int id1 = (int)coll.getId(dynamic_cast<SignalNode*>(pin1->parentNode));
-        int id2 = (int)coll.getId(dynamic_cast<SignalNode*>(pin2->parentNode));
+        auto node1 = dynamic_cast<SignalNode*>(pin1->parentNode);
+        auto node2 = dynamic_cast<SignalNode*>(pin2->parentNode);
+        if(!node1 || !node2) continue;
+        int id1 = (int)coll.getId(node1);
+        int id2 = (int)coll.getId(node2);
         int idx1 = (int)pin1->parentNode->getIndex(pin1);
         int idx2 = (int)pin2->parentNode->getIndex(pin2);
         if (pin1->isInput)
@@ -85,6 +108,7 @@ void UiSignalNodeBoard::update(float t)
             operations.operations.clear();
             imageOperations.operations.clear();
             OperationConnections connections;
+            ImageOperationConnections imgConnections;
             JsonValue root = loadJsonFile(app.fileInput.filepath);
             loadFrom(root, operations, connections);
             operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
@@ -93,14 +117,25 @@ void UiSignalNodeBoard::update(float t)
             {
                 uiConnections->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
             }
+            
+            loadFrom(root, imageOperations, imgConnections);
+            imageOperations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
+            for(auto& op : imageOperations.operations) nodeboard->add(op.second.get(), true, true);
+            for(auto co : imgConnections.entries)
+            {
+                uiConnections->createLink(imageOperations.getOperation(co.src)->outputs[co.src_index].get(), imageOperations.getOperation(co.dst)->inputs[co.dst_index].get());
+            }
         }
         else if(app.fileInput.request == UserFileInput::Save_Prj)
         {
-            OperationConnections connections;
-            connections.fill(uiConnections, operations);
             JsonValue root;
             writeInfo(root);
+            OperationConnections connections;
+            connections.fill(uiConnections, operations);
             saveInto(root, operations, connections);
+            ImageOperationConnections imgConnections;
+            imgConnections.fill(uiConnections, imageOperations);
+            saveInto(root, imageOperations, imgConnections);
             saveJsonFile(app.fileInput.filepath, root);
         }
         app.fileInput.request = UserFileInput::Nothing;
@@ -403,4 +438,29 @@ ImageNode* ImageOperationCollection::getOperation(size_t id)
     auto it = operations.find(id);
     if (it != operations.end()) return it->second.get();
     return nullptr;
+}
+
+Rect ImageOperationCollection::getBoundingBox() const
+{
+    Rect ret;
+    if(!operations.empty())
+    {
+        ret.p0 = operations.begin()->second->position;
+        ret.p1 = ret.p0 + operations.begin()->second->size;
+    }
+    for(const auto& op : operations)
+    {
+        vec2 p = op.second->position;
+        vec2 s = op.second->size;
+        ret = ret.extends(p);
+        ret = ret.extends(p + s);
+    }
+    return ret;
+}
+
+void ImageOperationCollection::centerNodes(const Rect& area)
+{
+    Rect nodeBox = getBoundingBox();
+    vec2 oft = (area.size() - nodeBox.size()) * 0.5f;
+    for(auto& op : operations) op.second->position += oft - nodeBox.p0 + area.p0;
 }

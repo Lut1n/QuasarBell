@@ -37,6 +37,9 @@ struct TypedSignalNode : public SignalNode
         title->text = qb::getOperationName(OpType);
         setOperation(&signalOperation);
     }
+    
+    // Early disconnection before destroying imageOperation
+    ~TypedSignalNode() { disconnectAllPins(); setOperation(nullptr); }
 private:
     OpObject signalOperation;
 };

@@ -13,10 +13,9 @@ HighResOutput* HighResOutput::defaultOutput = nullptr;
 ColorInput::ColorInput()
     : ImageOperation(qb::ImageOperationType_Color)
 {
-    // makeInput("input", ImageDataType_Float);
-    makeInput("red", ImageDataType_Float);
-    makeInput("green", ImageDataType_Float);
-    makeInput("blue", ImageDataType_Float);
+    makeProperty("r", ImageDataType_Float, &r);
+    makeProperty("g", ImageDataType_Float, &g);
+    makeProperty("b", ImageDataType_Float, &b);
     makeOutput("output", ImageDataType_Float);
 }
 //--------------------------------------------------------------
@@ -609,7 +608,7 @@ void HighResOutput::uiProperties()
     {
         defaultOutput = this;
     }
-    
+
     if (ImGui::SliderInt("power", &resolution, 0, 12))
     {
         preview.resolution = (int)std::pow(2.0,(float)resolution);
