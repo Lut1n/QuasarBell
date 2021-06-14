@@ -65,22 +65,9 @@ bool Construct3f::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vi
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1Id, in2Id, in3Id;
-
-    if (sampleInput(0, t, visitor))
-        in1Id = qb::va(context.popVa());
-    else
-        in1Id = qb::in(frame.pushInput({c1,c1,c1,1.0}));
-    
-    if (sampleInput(1, t, visitor))
-        in2Id = qb::va(context.popVa());
-    else
-        in2Id = qb::in(frame.pushInput({c2,c2,c2,1.0}));
-    
-    if (sampleInput(2, t, visitor))
-        in3Id = qb::va(context.popVa());
-    else
-        in3Id = qb::in(frame.pushInput({c3,c3,c3,1.0}));
+    std::string in1Id = pushOpOrInput(0,t,visitor, {c1,c1,c1,1.0f});
+    std::string in2Id = pushOpOrInput(1,t,visitor, {c2,c2,c2,1.0f});
+    std::string in3Id = pushOpOrInput(2,t,visitor, {c3,c3,c3,1.0f});
     
     size_t opId = context.getNextVa();
 
@@ -266,17 +253,8 @@ bool ImageClamp::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
     if(!sampleInput(0, t, visitor)) return false;
     size_t v1 = context.popVa();
 
-    std::string edge1Id, edge2Id;
-
-    if (sampleInput(1, t, visitor))
-        edge1Id = qb::va(context.popVa());
-    else
-        edge1Id = qb::in(frame.pushInput({edge0,edge0,edge0,edge0}));
-
-    if (sampleInput(2, t, visitor))
-        edge2Id = qb::va(context.popVa());
-    else
-        edge2Id = qb::in(frame.pushInput({edge1,edge1,edge1,edge1}));
+    std::string edge1Id = pushOpOrInput(1,t,visitor, {edge0,edge0,edge0,edge0});
+    std::string edge2Id = pushOpOrInput(2,t,visitor, {edge1,edge1,edge1,edge1});
 
     size_t opId = context.getNextVa();
 
@@ -365,17 +343,8 @@ bool ImageStep::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visi
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string edgeId, valueId;
-
-    if (sampleInput(0, t, visitor))
-        edgeId = qb::va(context.popVa());
-    else
-        edgeId = qb::in(frame.pushInput({edge,edge,edge,edge}));
-
-    if (sampleInput(1, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string edgeId = pushOpOrInput(0,t,visitor, {edge,edge,edge,edge});
+    std::string valueId = pushOpOrInput(1,t,visitor, {value,value,value,value});
 
     size_t opId = context.getNextVa();
 
@@ -401,18 +370,9 @@ bool ImagePow::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-
-    std::string valueId, powId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
-
-    if (sampleInput(1, t, visitor))
-        powId = qb::va(context.popVa());
-    else
-        powId = qb::in(frame.pushInput({powVal,powVal,powVal,powVal}));
+    
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
+    std::string powId = pushOpOrInput(1,t,visitor, {powVal,powVal,powVal,powVal});
 
     size_t opId = context.getNextVa();
 
@@ -437,12 +397,7 @@ bool ImageSqrt::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visi
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
 
     size_t opId = context.getNextVa();
 
@@ -467,12 +422,7 @@ bool ImageAbs::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -497,12 +447,7 @@ bool ImageSin::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -527,12 +472,7 @@ bool ImageCos::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -557,12 +497,7 @@ bool ImageTan::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -589,17 +524,8 @@ bool ImageMod::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId, modId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
-    
-    if (sampleInput(1, t, visitor))
-        modId = qb::va(context.popVa());
-    else
-        modId = qb::in(frame.pushInput({mod,mod,mod,mod}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
+    std::string modId = pushOpOrInput(1,t,visitor, {mod,mod,mod,mod});
 
     size_t opId = context.getNextVa();
 
@@ -624,12 +550,7 @@ bool ImageLog::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -654,12 +575,7 @@ bool ImageExp::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId;
-
-    if (sampleInput(0, t, visitor))
-        valueId = qb::va(context.popVa());
-    else
-        valueId = qb::in(frame.pushInput({value,value,value,value}));
+    std::string valueId = pushOpOrInput(0,t,visitor, {value,value,value,value});
     
     size_t opId = context.getNextVa();
 
@@ -675,6 +591,8 @@ Dynamics::Dynamics()
     : ImageOperation(qb::ImageOperationType_Dynamics)
 {
     makeInput("in", ImageDataType_Float);
+    makeInput("brightness", ImageDataType_Float);
+    makeInput("contrast", ImageDataType_Float);
     makeOutput("out", ImageDataType_Float);
     makeProperty("brightness", &brightness, -1.0f, 1.0f);
     makeProperty("contrast", &contrast, 0.0f, 10.0f);
@@ -686,12 +604,15 @@ bool Dynamics::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visit
     auto& context = frame.getContext();
     if(sampleInput(0, t, visitor))
     {
-        size_t v1 = context.popVa();
-        size_t in1 = frame.pushInput({brightness,contrast,0.0f,0.0f});
-        size_t opId = context.getNextVa();
-        std::string glsl = "vec4 $1 = dynamics($2, $3);\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1), qb::in(in1)});
-        context.pushVa(opId);
+        std::string inId = qb::va(context.popVa());
+        size_t outId = context.getNextVa();
+        
+        std::string briId = pushOpOrInput(1,t,visitor, {brightness,brightness,brightness,brightness});
+        std::string contId = pushOpOrInput(2,t,visitor, {contrast,contrast,contrast,contrast});
+        
+        std::string glsl = "vec4 $1 = dynamics($2, vec4($3.x,$4.x,0.0,0.0));\n";
+        glsl = qb::replaceArgs(glsl, {qb::va(outId), inId, briId, contId});
+        context.pushVa(outId);
         context.pushCode(glsl);
         frame.setFunctions(getNodeType(), getOperationCode());
         return true;
@@ -730,20 +651,13 @@ bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string glsl = "vec4 $1 = $2;\n";
+    std::string valueId = pushOpOrInput(0,t,visitor, {1.0f,1.0f,1.0f,1.0f});
 
-    if(sampleInput(0, t, visitor))
-    {
-        size_t v1 = context.popVa();
-        opId = context.getNextVa();
-        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::va(v1)});
-    }
-    else
-    {
-        size_t in1 = frame.pushInput({1.0f,1.0f,1.0f,1.0f});
-        opId = context.getNextVa();
-        glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::in(in1)});
-    }
+    opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = $2;\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), valueId});
+
     context.pushVa(opId);
     context.pushCode(glsl);
 

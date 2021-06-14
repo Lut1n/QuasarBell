@@ -24,12 +24,8 @@ bool ImageBasicOperators::sample(size_t index, const Time& t, qb::GlslBuilderVis
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string operand1, operand2;
-
-    if(sampleInput(0, t, visitor)) operand1 = qb::va( context.popVa() );
-    else operand1 = qb::in( frame.pushInput({_in1,_in1,_in1,1.0f}) );
-    if(sampleInput(1, t, visitor)) operand2 = qb::va( context.popVa() );
-    else operand2 = qb::in( frame.pushInput({_in2,_in2,_in2,1.0f}) );
+    std::string operand1 = pushOpOrInput(0,t,visitor, {_in1,_in1,_in1,1.0f});
+    std::string operand2 = pushOpOrInput(1,t,visitor, {_in2,_in2,_in2,1.0f});
 
     size_t opId = context.getNextVa();
     std::string glsl = "vec4 $1 = vec4($2.xyz $3 $4.xyz, 1.0);\n";

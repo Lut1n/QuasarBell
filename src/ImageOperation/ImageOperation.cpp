@@ -220,6 +220,16 @@ bool ImageOperation::sampleInput(size_t index, const Time& t, qb::GlslBuilderVis
         return false;
 }
 //--------------------------------------------------------------
+std::string ImageOperation::pushOpOrInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+    if (sampleInput(index, t, visitor))
+        return qb::va(context.popVa());
+    else
+        return qb::in(frame.pushInput(uniform));
+}
+//--------------------------------------------------------------
 void ImageOperation::makeProperty(const std::string& name, ImageOperationDataType type, void* ptr)
 {
     propDescs.push_back({name, type, ptr, {0,0}});

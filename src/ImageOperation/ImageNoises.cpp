@@ -64,23 +64,10 @@ bool ValueNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId, persId, smoothId;
-
-    if (sampleInput(0, t, visitor))
-        freqId = qb::va(context.popVa());
-    else
-        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
-        
-    if (sampleInput(1, t, visitor))
-        persId = qb::va(context.popVa());
-    else
-        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
-        
-    if (sampleInput(2, t, visitor))
-        smoothId = qb::va(context.popVa());
-    else
-        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
-
+    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
+    
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
     size_t opId = context.getNextVa();
@@ -152,23 +139,10 @@ bool GradientNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-
-    std::string freqId, persId, smoothId;
-
-    if (sampleInput(0, t, visitor))
-        freqId = qb::va(context.popVa());
-    else
-        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
-        
-    if (sampleInput(1, t, visitor))
-        persId = qb::va(context.popVa());
-    else
-        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
-        
-    if (sampleInput(2, t, visitor))
-        smoothId = qb::va(context.popVa());
-    else
-        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
+    
+    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
 
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
@@ -246,22 +220,9 @@ bool SimplexNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId, persId, smoothId;
-
-    if (sampleInput(0, t, visitor))
-        freqId = qb::va(context.popVa());
-    else
-        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
-        
-    if (sampleInput(1, t, visitor))
-        persId = qb::va(context.popVa());
-    else
-        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
-        
-    if (sampleInput(2, t, visitor))
-        smoothId = qb::va(context.popVa());
-    else
-        smoothId = qb::in(frame.pushInput({smoothness,smoothness,smoothness,smoothness}));
+    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
 
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
@@ -354,18 +315,9 @@ bool VoronoiNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-
-    std::string freqId, persId;
-
-    if (sampleInput(0, t, visitor))
-        freqId = qb::va(context.popVa());
-    else
-        freqId = qb::in(frame.pushInput({frequency,frequency,frequency,frequency}));
-        
-    if (sampleInput(1, t, visitor))
-        persId = qb::va(context.popVa());
-    else
-        persId = qb::in(frame.pushInput({persistance,persistance,persistance,persistance}));
+    
+    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
 
     std::string octaveModeId = qb::in(frame.pushInput({(float)octaves, (float)mode, 0.0, 0.0}));
 

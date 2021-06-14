@@ -101,6 +101,7 @@ struct ImageOperation
 
     void update();
     bool sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
+    std::string pushOpOrInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
 
     void startSamplingGraph();
 

@@ -158,13 +158,8 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
     {
         auto& context = frame.getContext();
         
-        std::string radiusId;
-        
         float radiusf = (float)radius;
-        if (sampleInput(1, t, visitor))
-            radiusId = qb::va(context.popVa());
-        else
-            radiusId = qb::in(frame.pushInput({(float)radiusf,radiusf,radiusf,radiusf}));
+        std::string radiusId = pushOpOrInput(1,t,visitor, {radiusf,radiusf,radiusf,radiusf});
 
         size_t in1 = frame.pushInput({(float)mode, 0.0, 0.0, 0.0});
 
