@@ -15,7 +15,7 @@ struct GlSprite
     
     GlSprite();
     
-    void update(const vec2& position, const vec2& size, const vec2& uv0, const vec2& uv1, const vec2& viewport);
+    void update(const vec2& position, const vec2& size, const vec2& uv0, const vec2& uv1, const vec2& viewport, bool yVertInverted = false);
     
     void draw();
 };

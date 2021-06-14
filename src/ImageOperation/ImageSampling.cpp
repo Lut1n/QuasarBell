@@ -59,7 +59,6 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
         "for(int i=-r$1; i<=r$1; ++i){\n"
         "for(int j=-r$1; j<=r$1; ++j){\n"
         "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
-        "    kuv$1.y = 1.0 - kuv$1.y;\n"
         "    v$1.xyz += vec3($5[(i+r$1)*(r$1*2+1)+(j+r$1)]) * texture2D($3,kuv$1).xyz;\n"
         "}}\n";
         //"v$1.xyz /= c$1;\n";
@@ -120,7 +119,6 @@ bool SharpenFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& 
         "for(int i=-r$1; i<=r$1; ++i){\n"
         "for(int j=-r$1; j<=r$1; ++j){\n"
         "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
-        "    kuv$1.y = 1.0 - kuv$1.y;\n"
         "    v$1.xyz += vec3($5[(i+r$1)*(r$1*2+1)+(j+r$1)]) * texture2D($3,kuv$1).xyz;\n"
         "}}\n";
 
@@ -162,10 +160,11 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
         
         std::string radiusId;
         
+        float radiusf = (float)radius;
         if (sampleInput(1, t, visitor))
             radiusId = qb::va(context.popVa());
         else
-            radiusId = qb::in(frame.pushInput({radius,radius,radius,radius}));
+            radiusId = qb::in(frame.pushInput({(float)radiusf,radiusf,radiusf,radiusf}));
 
         size_t in1 = frame.pushInput({(float)mode, 0.0, 0.0, 0.0});
 
@@ -180,7 +179,6 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
         "for(int j=-r$1; j<=r$1; ++j){\n"
         "    if(i*i + j*j > r$1*r$1) continue;\n"
         "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
-        "    kuv$1.y = 1.0 - kuv$1.y;\n"
         "    if ($2.x == 0.0)\n"
         "        v$1.xyz = min(v$1.xyz, texture2D($3,kuv$1).xyz);\n"
         "    else\n"

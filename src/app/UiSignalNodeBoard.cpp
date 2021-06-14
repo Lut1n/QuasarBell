@@ -84,6 +84,8 @@ void UiSignalNodeBoard::update(float t)
             {
                 uiConnections->createLink(operations.getOperation(co.src)->outputs[co.src_index].get(), operations.getOperation(co.dst)->inputs[co.dst_index].get());
             }
+            nodeboard->rem(uiConnections);
+            nodeboard->add(uiConnections);
         }
         _ready = true;
     }
@@ -125,6 +127,8 @@ void UiSignalNodeBoard::update(float t)
             {
                 uiConnections->createLink(imageOperations.getOperation(co.src)->outputs[co.src_index].get(), imageOperations.getOperation(co.dst)->inputs[co.dst_index].get());
             }
+            nodeboard->rem(uiConnections);
+            nodeboard->add(uiConnections);
         }
         else if(app.fileInput.request == UserFileInput::Save_Prj)
         {
@@ -221,7 +225,9 @@ void UiSignalNodeBoard::update(float t)
         u.reset( Factory<SignalNode>::create(type) );
         u->position = nodeboard->contextMenuPosition;
         size_t id = operations.addOperation(u);
-        nodeboard->add(operations.getOperation(id), true, true);
+        nodeboard->add(operations.getOperation(id), true, true);    
+        nodeboard->rem(uiConnections);
+        nodeboard->add(uiConnections);
     }
     if(category == NodeCategory_Image && type != qb::ImageOperationType_None && type < qb::ImageOperationType_Count)
     {
@@ -230,6 +236,8 @@ void UiSignalNodeBoard::update(float t)
         u->position = nodeboard->contextMenuPosition;
         size_t id = imageOperations.addOperation(u);
         nodeboard->add(imageOperations.getOperation(id), true, true);
+        nodeboard->rem(uiConnections);
+        nodeboard->add(uiConnections);
     }
     app.nodeToCreateCategory = NodeCategory_None;
 }

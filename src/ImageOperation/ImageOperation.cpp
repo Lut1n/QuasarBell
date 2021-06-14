@@ -442,6 +442,16 @@ void ImageOperation::uiPreview()
     {
         if(preview.renderFrame)
             ImGui::Text(preview.renderFrame->opCode.c_str());
+        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+            ImGui::OpenPopup("Bigger glsl");
+        
+        if(ImGui::BeginPopup("Bigger glsl"))
+        {
+            ImGui::Text("Copyable glsl code");
+            std::string ccp = preview.renderFrame->opCode;
+            ImGui::InputTextMultiline("##glsl-code", ccp.data(), ccp.size(), ImVec2(512, 512), ImGuiInputTextFlags_ReadOnly);
+            ImGui::EndPopup();
+        }
     }
     ImGui::Separator();
     uiDebugIo();

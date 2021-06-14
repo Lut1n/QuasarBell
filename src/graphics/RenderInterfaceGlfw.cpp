@@ -101,7 +101,11 @@ static UiEvent::State s_buttonStates[3] = {UiEvent::STATE_RELEASED,UiEvent::STAT
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
     // imgui has priority
-    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) return;
+    ImGuiHoveredFlags flags = ImGuiHoveredFlags_AnyWindow
+                            | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem
+                            | ImGuiHoveredFlags_AllowWhenBlockedByPopup;
+
+    if(ImGui::IsWindowHovered(flags)) return;
 
     UiEvent evn;
     evn.type = UiEvent::TYPE_MOUSE_BUTTON;
@@ -252,7 +256,7 @@ void RenderInterface::setTarget(unsigned target)
 void* RenderInterface::getTargetResource(unsigned target)
 {
     if(!s_targets[target].isWindow)
-        return (void*)s_targets[target].texture->tex;
+        return reinterpret_cast<void*>(s_targets[target].texture->tex);
     return (void*)0;
 }
 
@@ -389,7 +393,7 @@ void RenderInterface::fill(const vec2& tl, const vec2& br)
     s_quad->draw();
     s_quadShader->unbindAttributes();
 }
-void RenderInterface::copy(unsigned srcTarget, const Rect& srcRect, const Rect& dstRect)
+void RenderInterface::copy(unsigned srcTarget, const Rect& srcRect, const Rect& dstRect, bool ySrcInverted, bool yDstInverted)
 {
     if(s_targets[srcTarget].isWindow) return;
     
@@ -397,18 +401,18 @@ void RenderInterface::copy(unsigned srcTarget, const Rect& srcRect, const Rect& 
     vec2 uv1 = srcRect.p0 / srcSize;
     vec2 uv2 = srcRect.p1 / srcSize;
     
-    //uv1 = uv1 * vec2(1.0, -1.0);
-    //uv2 = uv2 * vec2(1.0, -1.0);
-    
-    uv1.y = 1.f - uv1.y;
-    uv2.y = 1.f - uv2.y;
+    if (ySrcInverted)
+    {
+        uv1.y = 1.f - uv1.y;
+        uv2.y = 1.f - uv2.y;
+    }
     
     vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
     s_spriteShader->setup(colorf, 0);
     GL_CHECKERROR("sprite::setup --- sprite::update");
     s_targets[srcTarget].texture->bindAsTexture();
-    s_sprite->update(dstRect.p0, dstRect.p1 - dstRect.p0, uv1, uv2, vp);
+    s_sprite->update(dstRect.p0, dstRect.size(), uv1, uv2, vp, yDstInverted);
     GL_CHECKERROR("sprite::update --- sprite::bindAttrib");
     s_spriteShader->bindAttributes();
     GL_CHECKERROR("sprite::bindAttrib --- sprite::draw");
@@ -511,11 +515,12 @@ void RenderInterface::setInputFrameCustomProgram(unsigned customId, size_t srcId
 
 void RenderInterface::applyCustomProgram(unsigned customId, const vec2& tl, const vec2& br)
 {
+    bool yDstInverted = false;
     vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
     s_CustomPrograms[customId]->setup();
     GL_CHECKERROR("custom::setup --- custom::update");
     vec2 size = br-tl;
-    s_sprite->update(tl, size, vec2(0.0f,0.0f), vec2(1.0f,1.0f), vp);
+    s_sprite->update(tl, size, vec2(0.0f,0.0f), vec2(1.0f,1.0f), vp, yDstInverted);
     GL_CHECKERROR("custom::update --- bindAttrib");
     s_CustomPrograms[customId]->bindAttributes();
     GL_CHECKERROR("customProgram: bindAttrib");

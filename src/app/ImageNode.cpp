@@ -72,5 +72,5 @@ void ImageNode::drawPreview(const Rect& previewArea)
     RenderInterface::setColor(0xFFFFFFFF);
     
     if(preview.renderFrame)
-        RenderInterface::copy(preview.renderFrame->glResource, src, previewArea);
+        RenderInterface::copy(preview.renderFrame->glResource, src, previewArea, false, true);
 }

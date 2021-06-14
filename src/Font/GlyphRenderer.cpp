@@ -75,7 +75,7 @@ void GlyphRenderer::renderChar(char c, const vec2& pos, float size, unsigned col
         Rect dstRect{pos, pos + dst_size};
         
         RenderInterface::setColor(color);
-        RenderInterface::copy(_atlasTexture, uv, dstRect);
+        RenderInterface::copy(_atlasTexture, uv, dstRect, true, true);
     }
 }
 
@@ -130,7 +130,7 @@ void GlyphRenderer::renderClippedChar(char c, const Rect& clip, const vec2& pos,
         }
 
         RenderInterface::setColor(color);
-        RenderInterface::copy(_atlasTexture, uv, dstRect);
+        RenderInterface::copy(_atlasTexture, uv, dstRect, true, true);
     }
 }
 
@@ -205,7 +205,7 @@ void GlyphRenderer::renderTexture(unsigned /*srcTarget*/)
     dst.p1 = vec2((float)size(), (float)size());
     
     RenderInterface::setColor(0xFFFFFFFF);
-    RenderInterface::copy(_atlasTexture, uv, dst);
+    RenderInterface::copy(_atlasTexture, uv, dst, true, true);
 }
 
 vec2 GlyphRenderer::computeSize(const std::string& str, float size)

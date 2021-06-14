@@ -34,7 +34,7 @@ GlSprite::GlSprite()
     GL_CHECKERROR("sprite buffer data");
 }
 
-void GlSprite::update(const vec2& position, const vec2& size, const vec2& uv0, const vec2& uv1, const vec2& viewport)
+void GlSprite::update(const vec2& position, const vec2& size, const vec2& uv0, const vec2& uv1, const vec2& viewport, bool yVertInverted)
 {
     vec2 pts[4] = {u_p0, u_p1, u_p2, u_p3};
     for(auto& pt : pts)
@@ -44,7 +44,8 @@ void GlSprite::update(const vec2& position, const vec2& size, const vec2& uv0, c
         
         pt = pt / viewport;
         pt = pt * 2.0 - vec2(1.0,1.0);
-        pt = pt * vec2(1.0,-1.0);
+        if(yVertInverted)
+            pt = pt * vec2(1.0,-1.0);
     }
     
     float vertices[24] = 
