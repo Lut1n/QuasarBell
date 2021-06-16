@@ -31,6 +31,8 @@ namespace qb
         ImageOperationType_Mod,
         ImageOperationType_Log,
         ImageOperationType_Exp,
+        ImageOperationType_Min,
+        ImageOperationType_Max,
         ImageOperationType_WhiteNoise,
         ImageOperationType_ValueNoise,
         ImageOperationType_GradientNoise,

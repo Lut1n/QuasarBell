@@ -35,9 +35,66 @@ bool ImageBasicOperators::sample(size_t index, const Time& t, qb::GlslBuilderVis
     frame.setFunctions(getNodeType(), getOperationCode());
     return true;
 }
+//--------------------------------------------------------------
+ImageBuiltInFunc::ImageBuiltInFunc(qb::ImageOperationType type, const std::string& funcName, const std::vector<std::string>& argNames)
+    : ImageOperation(type)
+    , argNames(argNames)
+{
+    argValues.resize(argNames.size(), 0.0);
+    idsCache.resize(argNames.size() + 1);
+    glslTemplate = "vec4 $1 = vec4(" + funcName + "(";
+    for(size_t i=0; i<argNames.size(); ++i)
+    {
+        makeProperty(argNames[i], ImageDataType_Float, &argValues[i]);
+        makeInput(argNames[i], ImageDataType_Float);
+        if(i>0) glslTemplate += ",";
+        glslTemplate += "$" + std::to_string(i+2) + ".xyz";
+    }
+    glslTemplate += "),1.0);\n";
+    makeOutput("out", ImageDataType_Float);
+}
+//--------------------------------------------------------------
+bool ImageBuiltInFunc::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    for(size_t i=0; i<argValues.size(); ++i)
+    {
+        float arg = argValues[i];
+        idsCache[i+1] = pushOpOrInput(i,t,visitor,{arg,arg,arg,arg});
+    }
+
+    size_t opId = context.getNextVa();
+    idsCache[0] = qb::va(opId);
+
+    std::string glsl = qb::replaceArgs(glslTemplate, idsCache);
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
 
 //--------------------------------------------------------------
-ImageAdd::ImageAdd() : ImageBasicOperators(qb::ImageOperationType_Add, "+") {}
-ImageSub::ImageSub() : ImageBasicOperators(qb::ImageOperationType_Sub, "-") {}
-ImageMult::ImageMult() : ImageBasicOperators(qb::ImageOperationType_Mult, "*") {}
-ImageDiv::ImageDiv() : ImageBasicOperators(qb::ImageOperationType_Div, "/") {}
+MAKE_BUILTIN_OPERATION_FUNC(Mix, "mix", QB_ARGS({"in1", "in2", "delta"}))
+MAKE_BUILTIN_OPERATION_FUNC(Clamp, "clamp", QB_ARGS({"in1", "edge0", "edge1"}))
+MAKE_BUILTIN_OPERATION_FUNC(Dot, "dot", QB_ARGS({"in1", "in2"}))
+MAKE_BUILTIN_OPERATION_FUNC(Cross, "cross", QB_ARGS({"in1", "in2"}))
+MAKE_BUILTIN_OPERATION_FUNC(Step, "step", QB_ARGS({"edge", "in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Sin, "sin", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Cos, "cos", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Tan, "tan", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Mod, "mod", QB_ARGS({"in", "mod"}))
+MAKE_BUILTIN_OPERATION_FUNC(Pow, "pow", QB_ARGS({"in", "pow"}))
+MAKE_BUILTIN_OPERATION_FUNC(Sqrt, "sqrt", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Abs, "abs", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Log, "log", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Exp, "exp", QB_ARGS({"in"}))
+MAKE_BUILTIN_OPERATION_FUNC(Min, "min", QB_ARGS({"in1","in2"}))
+MAKE_BUILTIN_OPERATION_FUNC(Max, "max", QB_ARGS({"in1","in2"}))
+
+//--------------------------------------------------------------
+MAKE_BASIC_OPERATOR_SYMBOL(Add, "+")
+MAKE_BASIC_OPERATOR_SYMBOL(Sub, "-")
+MAKE_BASIC_OPERATOR_SYMBOL(Mult, "*")
+MAKE_BASIC_OPERATOR_SYMBOL(Div, "/")

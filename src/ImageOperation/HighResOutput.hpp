@@ -3,7 +3,6 @@
 
 #include "ImageOperation/ImageOperation.hpp"
 
-
 //--------------------------------------------------------------
 struct ColorInput : public ImageOperation
 {
@@ -14,7 +13,6 @@ struct ColorInput : public ImageOperation
 
     float r=1.0f,g=1.0f,b=1.0f,a=1.0f;
 };
-
 
 //--------------------------------------------------------------
 struct Construct3f : public ImageOperation
@@ -35,132 +33,6 @@ struct Split3f : public ImageOperation
 
     float r=1.0f,g=1.0f,b=1.0f;
     int index = 0;
-};
-
-//--------------------------------------------------------------
-struct ImageMix : public ImageOperation
-{
-    ImageMix();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float delta;
-};
-
-//--------------------------------------------------------------
-struct ImageClamp : public ImageOperation
-{
-    ImageClamp();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float edge0 = 0.0f;
-    float edge1 = 1.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageDot : public ImageOperation
-{
-    ImageDot();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
-struct ImageCross : public ImageOperation
-{
-    ImageCross();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-};
-
-//--------------------------------------------------------------
-struct ImageStep : public ImageOperation
-{
-    ImageStep();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float edge = 0.5f;
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageSin : public ImageOperation
-{
-    ImageSin();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageCos : public ImageOperation
-{
-    ImageCos();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageTan : public ImageOperation
-{
-    ImageTan();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageMod : public ImageOperation
-{
-    ImageMod();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-    float mod = 1.0f;
-};
-
-//--------------------------------------------------------------
-struct ImagePow : public ImageOperation
-{
-    ImagePow();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-    float powVal = 1.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageSqrt : public ImageOperation
-{
-    ImageSqrt();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageAbs : public ImageOperation
-{
-    ImageAbs();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageLog : public ImageOperation
-{
-    ImageLog();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
-};
-
-//--------------------------------------------------------------
-struct ImageExp : public ImageOperation
-{
-    ImageExp();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    float value = 0.0f;
 };
 
 //--------------------------------------------------------------

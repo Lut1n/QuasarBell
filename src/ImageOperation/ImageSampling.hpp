@@ -3,21 +3,31 @@
 
 #include "ImageOperation/ImageOperation.hpp"
 
-struct BlurFilter : public ImageOperation
+
+struct ImageFilter : public ImageOperation
 {
-    BlurFilter();
+    ImageFilter(qb::ImageOperationType type);
     bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
 
+    virtual void updateKernel();
+
+    std::string getOperationCode() const override;
+
+    Kernel kernel;
     int radius = 1;
 };
 
+struct BlurFilter : public ImageFilter
+{
+    BlurFilter();
+    void updateKernel() override;
+};
 
-struct SharpenFilter : public ImageOperation
+
+struct SharpenFilter : public ImageFilter
 {
     SharpenFilter();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
-
-    int radius = 1;
+    void updateKernel() override;
 };
 
 struct MorphoFilter : public ImageOperation

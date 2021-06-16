@@ -8,31 +8,18 @@
 #include "Ui/UiSystem.h"
 
 //--------------------------------------------------------------
-BlurFilter::BlurFilter()
-    : ImageOperation(qb::ImageOperationType_Blur)
+ImageFilter::ImageFilter(qb::ImageOperationType type)
+    : ImageOperation(type)
+    , kernel({1})
 {
     makeInput("in", ImageDataType_Float);
     makeOutput("out", ImageDataType_Float);
     makeProperty("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
-bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ImageFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
 {
-    /*float to = radius*2+1;
-    Kernel k(to,to);
-    float bv = 1.0/(to*to);
-    for(int i = 0; i<k.w;++i)
-    for(int j = 0; j<k.h;++j)
-        k(i,j) = bv;*/
-
-    // gaussian
-    Kernel k0(3,3);
-    for(int i=0;i<9;++i)k0.data[i] = 1.0/9.0;
-    Kernel k = k0;
-    for(int i=1; i<radius; ++i)
-        k = Kernel::convProduct(k, k0);
-
-    // Kernel::display(k);
+    updateKernel();
 
     auto& frame = visitor.getCurrentFrame();
 
@@ -47,22 +34,10 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
         
         size_t opId = context.getNextVa();
         size_t in1 = frame.pushInput({(float)radius, 0.0, 0.0, 0.0});
-        size_t ke1 = frame.pushKernel(k);
+        size_t ke1 = frame.pushKernel(kernel);
         size_t uvId = context.getUvId();
 
-        std::string glsl =
-        "vec4 v$1 = vec4(vec3(0.0),1.0);\n"
-        "float s$1 = 1.0/resolution;\n"
-        "int r$1 = int($2.x);\n"
-        "float c$1 = (r$1*2.0+1.0);\n"
-        "c$1 = c$1*c$1;\n"
-        "for(int i=-r$1; i<=r$1; ++i){\n"
-        "for(int j=-r$1; j<=r$1; ++j){\n"
-        "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
-        "    v$1.xyz += vec3($5[(i+r$1)*(r$1*2+1)+(j+r$1)]) * texture2D($3,kuv$1).xyz;\n"
-        "}}\n";
-        //"v$1.xyz /= c$1;\n";
-
+        std::string glsl = "vec4 v$1 = image_filter($3, $4, $5, int($2.x));\n";
         glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId), qb::ke(ke1)});
         context.pushVa(opId);
         context.pushCode(glsl);
@@ -76,64 +51,61 @@ bool BlurFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vis
     return false;
 }
 //--------------------------------------------------------------
-SharpenFilter::SharpenFilter()
-    : ImageOperation(qb::ImageOperationType_Sharpen)
+std::string ImageFilter::getOperationCode() const
 {
-    makeInput("in", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
-    makeProperty("radius", &radius, 1, 10);
+    static constexpr std::string_view code =
+    "vec4 image_filter(sampler2D src, vec2 uv, const in float kernel[512], int radius){\n"
+    "    vec4 ret = vec4(vec3(0.0),1.0);\n"
+    "    float ps = 1.0/resolution;\n"
+    "    for(int i=-radius; i<=radius; ++i){\n"
+    "    for(int j=-radius; j<=radius; ++j){\n"
+    "        vec2 kuv = uv + vec2(i,j)*ps;\n"
+    "        ret.xyz += vec3(kernel[(i+radius)*(radius*2+1)+(j+radius)]) * texture2D(src,kuv).xyz;\n"
+    "    }}\n"
+    "    return ret;\n"
+    "}\n";
+    return std::string(code);
 }
 //--------------------------------------------------------------
-bool SharpenFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+void ImageFilter::updateKernel()
+{
+    size_t size = radius*2+1;
+    kernel = Kernel({1}).resize(size,size);
+}
+
+//--------------------------------------------------------------
+BlurFilter::BlurFilter()
+    : ImageFilter(qb::ImageOperationType_Blur)
+{
+}
+//--------------------------------------------------------------
+void BlurFilter::updateKernel()
+{
+    // gaussian
+    Kernel k0(3,3);
+    for(int i=0;i<9;++i)k0.data[i] = 1.0/9.0;
+    kernel = k0;
+    for(int i=1; i<radius; ++i)
+        kernel = Kernel::convProduct(kernel, k0);
+}
+
+//--------------------------------------------------------------
+SharpenFilter::SharpenFilter()
+    : ImageFilter(qb::ImageOperationType_Sharpen)
+{
+}
+//--------------------------------------------------------------
+void SharpenFilter::updateKernel()
 {
     Kernel k0(3,3);
     k0 = { 0,-1, 0,
           -1, 5,-1,
            0,-1, 0};
-    Kernel k = k0;
+    kernel = k0;
     for(int i=1; i<radius; ++i)
-        k = Kernel::convProduct(k, k0);
-
-    auto& frame = visitor.getCurrentFrame();
-
-    size_t inputFrame = 0;
-    visitor.pushFrame();
-    bool inputValid = sampleInput(0, t, visitor);
-    visitor.popFrame();
-
-    if(inputValid)
-    {
-        auto& context = frame.getContext();
-        
-        size_t opId = context.getNextVa();
-        size_t in1 = frame.pushInput({(float)radius, 0.0, 0.0, 0.0});
-        size_t ke1 = frame.pushKernel(k);
-        size_t uvId = context.getUvId();
-
-        std::string glsl =
-        "vec4 v$1 = vec4(vec3(0.0),1.0);\n"
-        "float s$1 = 1.0/resolution;\n"
-        "int r$1 = int($2.x);\n"
-        "float c$1 = (r$1*2.0+1.0);\n"
-        "c$1 = c$1*c$1;\n"
-        "for(int i=-r$1; i<=r$1; ++i){\n"
-        "for(int j=-r$1; j<=r$1; ++j){\n"
-        "    vec2 kuv$1 = $4 + vec2(i,j)*s$1;\n"
-        "    v$1.xyz += vec3($5[(i+r$1)*(r$1*2+1)+(j+r$1)]) * texture2D($3,kuv$1).xyz;\n"
-        "}}\n";
-
-        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId), qb::ke(ke1)});
-        context.pushVa(opId);
-        context.pushCode(glsl);
-
-        frame.setFunctions(getNodeType(), getOperationCode());
-        frame.hasUv = true;
-
-        return true;
-    }
-
-    return false;
+        kernel = Kernel::convProduct(kernel, k0);
 }
+
 //--------------------------------------------------------------
 MorphoFilter::MorphoFilter()
     : ImageOperation(qb::ImageOperationType_Morpho)

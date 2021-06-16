@@ -29,6 +29,8 @@ namespace qb
         {ImageOperationType_Mod, "mod"},
         {ImageOperationType_Exp, "exp"},
         {ImageOperationType_Log, "log"},
+        {ImageOperationType_Min, "min"},
+        {ImageOperationType_Max, "max"},
         {ImageOperationType_WhiteNoise, "white-noise"},
         {ImageOperationType_ValueNoise, "value-noise"},
         {ImageOperationType_GradientNoise, "gradient-noise"},
