@@ -24,7 +24,6 @@ inline void glErrToString(GLenum error, std::string& string)
     //ENUM_TO_STR(error, GL_STACK_OVERFLOW, string)
 }
 
-
 inline bool GLcheckError(const std::string& debugMsg, const char* file, int line)
 {
     bool res = true;
@@ -34,12 +33,11 @@ inline bool GLcheckError(const std::string& debugMsg, const char* file, int line
         res = false;
         std::string strErr;
         glErrToString(error, strErr);
-        std::cout << "[impError] " << debugMsg << " - GL error in " << file << " at line " << line << std::endl;
+        std::cout << "[qb::Error] " << debugMsg << " - GL error in " << file << " at line " << line << std::endl;
         std::cout << strErr << std::endl;
     }
     return res;
 }
-
 
 inline void testCompilation(unsigned shader, const std::string& msg)
 {

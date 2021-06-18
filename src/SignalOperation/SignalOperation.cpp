@@ -5,20 +5,6 @@
 #include "imgui.h"
 
 //--------------------------------------------------------------
-namespace qb
-{
-    template<typename Ty>
-    Ty& getPropertyValueRef(SignalOperation::PropDesc& property)
-    {
-        return *reinterpret_cast<Ty*>(std::get<2>(property));
-    }
-    template<typename Ty>
-    const Ty& getPropertyValueRef(const SignalOperation::PropDesc& property)
-    {
-        return *reinterpret_cast<Ty*>(std::get<2>(property));
-    }
-};
-//--------------------------------------------------------------
 void SignalPreview::dirty()
 {
     hasChange = true;
@@ -30,17 +16,17 @@ void SignalPreview::compute(SignalOperation* operation)
     if(hasChange)
     {
         operation->startSamplingGraph();
-        SignalOperation::Time time;
-        time.duration = 1.0;
-        time.elapsed = 1.0f/sample_count;
-        time.dstOp = operation;
+        qb::PcmBuilderVisitor visitor;
+        visitor.time.duration = 1.0;
+        visitor.time.elapsed = 1.0f/sample_count;
         float minVal = 100000.0; float maxVal = -100000.0;
         for(size_t i=0; i<sample_count; ++i)
         {
-            time.t = (float)i/sample_count;
-            time.sec = (float)i/sample_count;
+            visitor.time.t = (float)i/sample_count;
+            visitor.time.sec = (float)i/sample_count;
 
-            data[i] = operation->sample(0, time).fvec[0];
+            operation->sample(0, visitor);
+            data[i] = visitor.data.fvec[0];
             if (data[i] < minVal) minVal = data[i];
             if (data[i] > maxVal) maxVal = data[i];
         }
@@ -49,123 +35,32 @@ void SignalPreview::compute(SignalOperation* operation)
     }
 }
 //--------------------------------------------------------------
-OperationDataType SignalOperation::getInputType(size_t index) const
+SignalOperation::SignalOperation()
+    : BaseOperation(UiPin::TYPE_FLOAT1)
 {
-    if (index < inputs.size()) return inputs[index].type;
-    return DataType_Undefined;
 }
 //--------------------------------------------------------------
-OperationDataType SignalOperation::getOuputType(size_t index) const
-{
-    if (index < outputs.size()) return outputs[index].type;
-    return DataType_Undefined;
-}
-//--------------------------------------------------------------
-void SignalOperation::setInput(size_t index, SignalOperation* src, size_t srcIndex)
-{
-    setConnection(src, srcIndex, this, index);
-}
-//--------------------------------------------------------------
-void SignalOperation::setOuput(size_t index, SignalOperation* dst, size_t dstIndex)
-{
-    setConnection(this, index, dst, dstIndex);
-}
-//--------------------------------------------------------------
-SignalOperationConnection* SignalOperation::getInput(size_t index)
-{
-    if (index < inputs.size())
-        return &inputs[index];
-    return nullptr;
-}
-//--------------------------------------------------------------
-SignalOperationConnection* SignalOperation::getOutput(size_t index)
-{
-    if (index < outputs.size())
-        return &outputs[index];
-    return nullptr;
-}
-//--------------------------------------------------------------
-void SignalOperation::startSamplingGraph()
-{ 
-    for (auto input : inputs)
-    {
-        if (!input.refs.empty())
-            input.refs[0].operation->startSamplingGraph();
-    }
-    startSampling();
-}
-//--------------------------------------------------------------
-OperationData SignalOperation::sampleInput(size_t index, const Time& t)
+bool SignalOperation::sampleInput(size_t index, qb::PcmBuilderVisitor& visitor)
 {
     auto* co = getInput(index);
     if (!co->refs.empty())
     {
         auto& ref = co->refs[0];
-        return ref.operation->sample(ref.index, t);
+        return ref.operation->sample(ref.index, visitor);
     }
     else
-        return OperationData{DataType_Error};
+        return false;
 }
 //--------------------------------------------------------------
-void SignalOperation::makeProperty(const PropDesc& property)
+float SignalOperation::inputOrProperty(size_t index, qb::PcmBuilderVisitor& visitor, float property)
 {
-    propDescs.push_back(property);
-}
-//--------------------------------------------------------------
-void SignalOperation::makeInput(const std::string& name, OperationDataType type)
-{
-    SignalOperationConnection input;
-    input.name = name;
-    input.type = type;
-    inputs.push_back(input);
-}
-//--------------------------------------------------------------
-void SignalOperation::makeOutput(const std::string& name, OperationDataType type)
-{
-    SignalOperationConnection output;
-    output.name = name;
-    output.type = type;
-    outputs.push_back(output);
-}
-//--------------------------------------------------------------
-void SignalOperation::setConnection(SignalOperation* src, size_t srcIdx, SignalOperation* dst, size_t dstIdx)
-{
-    remConnection(dst, dstIdx);
-    
-    if (src && dst && src != dst && srcIdx < src->outputs.size() && dstIdx < dst->inputs.size())
-    {
-        SignalOperationConnection::Ref ref;
-        ref.operation = dst;
-        ref.index = dstIdx;
-        src->outputs[srcIdx].refs.push_back(ref);
-        
-        ref.operation = src;
-        ref.index = srcIdx;
-        dst->inputs[dstIdx].refs.push_back(ref);
-        // dst->inputs[dstIdx].refs = {ref};
-        dst->dirty();
-    }
-}
-//--------------------------------------------------------------
-void SignalOperation::remConnection(SignalOperation* dst, size_t dstIdx)
-{
-    if (dst && dstIdx < dst->inputs.size() && !dst->inputs[dstIdx].refs.empty())
-    {
-        dst->dirty();
-        auto& inRefs = dst->inputs[dstIdx].refs[0];
-        auto op = inRefs.operation;
-        auto index = inRefs.index;
-        if(op && index < op->outputs.size())
-        {
-            auto& outRefs = op->outputs[index].refs;
-            SignalOperationConnection::Ref toErase{dst, dstIdx};
-            auto it = std::find_if(outRefs.begin(), outRefs.end(), [toErase](SignalOperationConnection::Ref& ref){
-                return ref.operation == toErase.operation && ref.index == toErase.index;
-            });
-            outRefs.erase(it);
-        }
-        dst->inputs[dstIdx].refs.clear();
-    }
+    qb::PcmBuilderVisitor v;
+    v.time = visitor.time;
+    v.phase = visitor.phase;
+    if (sampleInput(index, v))
+        return v.data.fvec[0];
+    else
+        return property;
 }
 //--------------------------------------------------------------
 std::string SignalOperation::name() const
@@ -173,122 +68,35 @@ std::string SignalOperation::name() const
     return "None";
 }
 //--------------------------------------------------------------
-void SignalOperation::startSampling()
+bool SignalOperation::sample(size_t index, BaseOperationVisitor& visitor)
+{
+    return sample(index, dynamic_cast<qb::PcmBuilderVisitor&>(visitor));
+}
+//--------------------------------------------------------------
+bool SignalOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
     // to implement by children
+    return false;
 }
-//--------------------------------------------------------------
-OperationData SignalOperation::sample(size_t index, const Time& t)
-{
-    // to implement by children
-    return OperationData{DataType_Error};
-}
-//--------------------------------------------------------------
-size_t SignalOperation::getInputCount() const
-{
-    return inputs.size();
-}
-//--------------------------------------------------------------
-size_t SignalOperation::getOutputCount() const
-{
-    return outputs.size();
-}
-//--------------------------------------------------------------
-size_t SignalOperation::getPropertyCount() const
-{
-    return propDescs.size();
-}
-//--------------------------------------------------------------
-OperationDataType SignalOperation::getPropertyType(size_t i) const
-{
-    if(i >= 0 && i < propDescs.size())
-        return std::get<1>(propDescs[i]);
-    return DataType_Error;
-}
-//--------------------------------------------------------------
-std::string SignalOperation::getPropertyName(size_t i) const
-{
-    if(i >= 0 && i < propDescs.size())
-        return std::get<0>(propDescs[i]);
-    return "None";
-}
-//--------------------------------------------------------------
-void SignalOperation::getProperty(size_t i, std::string& value) const
-{
-    value = qb::getPropertyValueRef<std::string>(propDescs[i]);
-}
-//--------------------------------------------------------------
-void SignalOperation::getProperty(size_t i, float& value) const
-{
-    value = qb::getPropertyValueRef<float>(propDescs[i]);
-}
-//--------------------------------------------------------------
-void SignalOperation::getProperty(size_t i, int& value) const
-{
-    value = qb::getPropertyValueRef<int>(propDescs[i]);
-}
-//--------------------------------------------------------------
-void SignalOperation::getProperty(size_t i, bool& value) const
-{
-    value = qb::getPropertyValueRef<bool>(propDescs[i]);
-}
-//--------------------------------------------------------------
-void SignalOperation::setProperty(size_t i, const std::string& value)
-{
-    qb::getPropertyValueRef<std::string>(propDescs[i]) = value;
-}
-//--------------------------------------------------------------
-void SignalOperation::setProperty(size_t i, float value)
-{
-    qb::getPropertyValueRef<float>(propDescs[i]) = value;
-}
-//--------------------------------------------------------------
-void SignalOperation::setProperty(size_t i, int value)
-{
-    qb::getPropertyValueRef<int>(propDescs[i]) = value;
-}
-//--------------------------------------------------------------
-void SignalOperation::setProperty(size_t i, bool value)
-{
-    qb::getPropertyValueRef<bool>(propDescs[i]) = value;
-}
-//--------------------------------------------------------------
-void SignalOperation::saveCustomData(JsonValue& json)
-{
-}
-//--------------------------------------------------------------
-void SignalOperation::loadCustomData(JsonValue& json)
-{
-}
-//--------------------------------------------------------------
-bool SignalOperation::hasCustomData() const
-{
-    return _hasCustomData;
-}
-//--------------------------------------------------------------
-void SignalOperation::uiProperties()
+void SignalOperation::uiPreview()
 {
     ImGui::Text("Preview:");
     preview.compute(this);
     ImGui::PlotLines("##preview", preview.data.data(), 32, 0, NULL, FLT_MAX, FLT_MAX, ImVec2(0, 60.0f));
     
     ImGui::Separator();
-    for(size_t i=0; i<getPropertyCount(); ++i) uiProperty((int)i);
+    uiDebugIo();
+    ImGui::Separator();
 }
 //--------------------------------------------------------------
-void SignalOperation::uiProperty(int index)
+void SignalOperation::onInputConnectionChanged()
 {
-    auto type = getPropertyType(index);
-    auto name = getPropertyName(index);
-    bool changed = false;
-    if (type == DataType_Float)
-        changed = ImGui::InputFloat(name.c_str(), (float*)std::get<2>(propDescs[index]));
-    else if (type == DataType_Int)
-        changed = ImGui::InputInt(name.c_str(), (int*)std::get<2>(propDescs[index]));
-    else if (type == DataType_Bool)
-        changed = ImGui::Checkbox(name.c_str(), (bool*)std::get<2>(propDescs[index]));
-
-    if (changed) dirty();
+    dirty();
+}
+//--------------------------------------------------------------
+void SignalOperation::onPropertiesChanged()
+{
+    dirty();
 }
 //--------------------------------------------------------------
 void SignalOperation::dirty()
@@ -297,6 +105,6 @@ void SignalOperation::dirty()
     for(auto& output : outputs)
     {
         for(auto& ref : output.refs)
-            ref.operation->dirty();
+            ref.operation->onInputConnectionChanged();
     }
 }

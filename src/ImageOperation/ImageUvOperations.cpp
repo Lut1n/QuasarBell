@@ -11,10 +11,10 @@
 UvInput::UvInput()
     : ImageOperation(qb::ImageOperationType_UvInput)
 {
-    makeOutput("uv", ImageDataType_Float);
+    makeOutput("uv", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool UvInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool UvInput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -34,22 +34,22 @@ bool UvInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visito
 UvDistortion::UvDistortion()
     : ImageOperation(qb::ImageOperationType_UvDistortion)
 {
-    makeInput("uv", ImageDataType_Float);
-    makeInput("normals", ImageDataType_Float);
-    makeOutput("uv", ImageDataType_Float);
+    makeInput("uv", BaseOperationDataType::Float);
+    makeInput("normals", BaseOperationDataType::Float);
+    makeOutput("uv", BaseOperationDataType::Float);
     makeProperty("force", &_force, 0.0f, 1.0f);
 }
 //--------------------------------------------------------------
-bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool UvDistortion::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
     std::string inputUv, inputNormals;
 
-    if(sampleInput(0, t, visitor)) inputUv = qb::va( context.popVa() );
+    if(sampleInput(0, visitor)) inputUv = qb::va( context.popVa() );
     else inputUv = "uv0";
-    if(sampleInput(1, t, visitor)) inputNormals = qb::va( context.popVa() );
+    if(sampleInput(1, visitor)) inputNormals = qb::va( context.popVa() );
     else inputNormals = "vec4(0.5,0.5,1.0,1.0)";
 
     std::string forceIn = qb::in( frame.pushInput({_force,_force,_force,_force}) );
@@ -69,23 +69,23 @@ bool UvDistortion::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 UvMapping::UvMapping()
     : ImageOperation(qb::ImageOperationType_UvMapping)
 {
-    makeInput("in", ImageDataType_Float);
-    makeInput("uv", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in", BaseOperationDataType::Float);
+    makeInput("uv", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("u offset", &uOft, -1.0f, 1.0f);
     makeProperty("v offset", &vOft, -1.0f, 1.0f);
     makeProperty("u factor", &uFct, 0.0001f, 10.0f);
     makeProperty("v factor", &vFct, 0.0001f, 10.0f);
 }
 //--------------------------------------------------------------
-bool UvMapping::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool UvMapping::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
     std::string glsl;
 
-    bool inputValid = sampleInput(1, t, visitor); // uv map
+    bool inputValid = sampleInput(1, visitor); // uv map
 
     size_t uvId2 = context.getNextUv();
     size_t uvId = context.getUvId();
@@ -107,7 +107,7 @@ bool UvMapping::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visi
 
     context.pushCode(glsl);
     context.pushUv(uvId2);
-    bool ret = sampleInput(0, t, visitor);
+    bool ret = sampleInput(0, visitor);
     context.popUv();
     return ret;
 }

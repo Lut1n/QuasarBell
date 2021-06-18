@@ -18,13 +18,6 @@ enum NodeCategory
     NodeCategory_None
 };
 
-struct KeyEvent
-{
-    char key;
-    bool pressed;
-    double time;
-};
-
 class AppInterface
 {
 public:

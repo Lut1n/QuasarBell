@@ -6,32 +6,17 @@
 #include "Ui/UiNodeBoard.h"
 
 #include "App/AppInterface.hpp"
-#include "App/SignalNode.hpp"
-#include "App/ImageNode.hpp"
-
-
-//--------------------------------------------------------------
-struct ImageOperationCollection
-{
-    std::unordered_map<size_t, std::unique_ptr<ImageNode>> operations;
-    size_t getId(ImageNode* operation) const;
-    size_t getFreeId() const;
-    size_t addOperation(std::unique_ptr<ImageNode>& operation);
-    void setOperation(size_t id, std::unique_ptr<ImageNode>& operation);
-    ImageNode* getOperation(size_t id);
-    Rect getBoundingBox() const;
-    void centerNodes(const Rect& area);
-};
+#include "App/BaseOperationNode.hpp"
 
 //--------------------------------------------------------------
 struct OperationCollection
 {
-    std::unordered_map<size_t, std::unique_ptr<SignalNode>> operations;
-    size_t getId(SignalNode* operation) const;
+    std::unordered_map<size_t, std::unique_ptr<BaseOperationNode>> operations;
+    size_t getId(BaseOperationNode* operation) const;
     size_t getFreeId() const;
-    size_t addOperation(std::unique_ptr<SignalNode>& operation);
-    void setOperation(size_t id, std::unique_ptr<SignalNode>& operation);
-    SignalNode* getOperation(size_t id);
+    size_t addOperation(std::unique_ptr<BaseOperationNode>& operation);
+    void setOperation(size_t id, std::unique_ptr<BaseOperationNode>& operation);
+    BaseOperationNode* getOperation(size_t id);
     Rect getBoundingBox() const;
     void centerNodes(const Rect& area);
 };
@@ -48,34 +33,26 @@ struct OperationConnections
     };
     std::vector<Entry> entries;
 
-    void fill(UiConnections* ui, const OperationCollection& coll);
+    void fill(UiConnections* ui, const OperationCollection& coll, UiPin::Type pinType);
 };
 
-//--------------------------------------------------------------
-struct ImageOperationConnections
-{
-    struct Entry
-    {
-        int src;
-        int src_index;
-        int dst;
-        int dst_index;
-    };
-    std::vector<Entry> entries;
-
-    void fill(UiConnections* ui, const ImageOperationCollection& coll);
-};
+class OutputOperation;
+class HighResOutput;
 
 //--------------------------------------------------------------
 class UiSignalNodeBoard : public UiConnections::Handler
 {
 public:
     void update(float t);
+    void cleanup();
+    void load(const std::string& path);
+    void save(const std::string& path);
+    void exportWav(const std::string& path, OutputOperation& outputNode);
+    void exportTga(const std::string& path, HighResOutput& outputNode);
     
     void onConnect(UiPin* a, UiPin* b) override;
     void onDisconnect(UiPin* a, UiPin* b) override;
 
-    void initializePreviews();
     void updatePreviews();
 
 private:
@@ -83,8 +60,7 @@ private:
     bool _ready = false;
 
     std::unique_ptr<UiNodeBoard> nodeboard;
-    OperationCollection operations; 
-    ImageOperationCollection imageOperations; 
+    OperationCollection operations;
     UiConnections* uiConnections;
 };
 

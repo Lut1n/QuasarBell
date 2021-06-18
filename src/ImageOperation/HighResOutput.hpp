@@ -7,7 +7,7 @@
 struct ColorInput : public ImageOperation
 {
     ColorInput();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 
@@ -18,7 +18,7 @@ struct ColorInput : public ImageOperation
 struct Construct3f : public ImageOperation
 {
     Construct3f();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     float c1=0.0f,c2=0.0f,c3=0.0f;
 };
@@ -27,7 +27,7 @@ struct Construct3f : public ImageOperation
 struct Split3f : public ImageOperation
 {
     Split3f();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
     
     void uiProperties() override;
 
@@ -39,7 +39,7 @@ struct Split3f : public ImageOperation
 struct Dynamics : public ImageOperation
 {
     Dynamics();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -50,7 +50,7 @@ struct Dynamics : public ImageOperation
 struct DirectionalSignal : public ImageOperation
 {
     DirectionalSignal();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     float directionX = 1.0f;
     float directionY = 1.0f;
@@ -61,7 +61,7 @@ struct DirectionalSignal : public ImageOperation
 struct RadialSignal : public ImageOperation
 {
     RadialSignal();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     float centerX = 1.0f;
     float centerY = 1.0f;
@@ -72,14 +72,14 @@ struct RadialSignal : public ImageOperation
 struct TimeInput : public ImageOperation
 {
     TimeInput();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 };
 //--------------------------------------------------------------
 struct HighResOutput : public ImageOperation
 {
     HighResOutput();
     ~HighResOutput();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 

@@ -3,31 +3,26 @@
 //--------------------------------------------------------------
 MixOperation::MixOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("input2", DataType_Float);
-    makeInput("delta", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1",DataType_Float, &input1});
-    makeProperty({"input2",DataType_Float, &input2});
-    makeProperty({"delta",DataType_Float, &delta});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("input2", BaseOperationDataType::Float);
+    makeInput("delta", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1",BaseOperationDataType::Float, &input1);
+    makeProperty("input2",BaseOperationDataType::Float, &input2);
+    makeProperty("delta",BaseOperationDataType::Float, &delta);
 }
 //--------------------------------------------------------------
-OperationData MixOperation::sample(size_t index, const Time& t)
+bool MixOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-    OperationData c = sampleInput(2, t);
-
-    float in1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float in2 = b.type == DataType_Float ? b.fvec[0] : input2;
-    float dt = c.type == DataType_Float ? c.fvec[0] : delta;
+    float in1 = inputOrProperty(0, visitor, input1);
+    float in2 = inputOrProperty(1, visitor, input2);
+    float dt = inputOrProperty(2, visitor, delta);
 
     data.type = output->type;
-    data.count = output->count;
 
     data.fvec[0] = in1 * (1.f-dt) + in2 * dt;
-    return data;
+    return true;
 }

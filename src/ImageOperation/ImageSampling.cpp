@@ -12,12 +12,12 @@ ImageFilter::ImageFilter(qb::ImageOperationType type)
     : ImageOperation(type)
     , kernel({1})
 {
-    makeInput("in", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
-bool ImageFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ImageFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     updateKernel();
 
@@ -25,7 +25,7 @@ bool ImageFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vi
 
     size_t inputFrame = 0;
     visitor.pushFrame();
-    bool inputValid = sampleInput(0, t, visitor);
+    bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 
     if(inputValid)
@@ -83,7 +83,7 @@ void BlurFilter::updateKernel()
 {
     // gaussian
     Kernel k0(3,3);
-    for(int i=0;i<9;++i)k0.data[i] = 1.0/9.0;
+    for(int i=0;i<9;++i)k0.data[i] = (float)(1.0/9.0);
     kernel = k0;
     for(int i=1; i<radius; ++i)
         kernel = Kernel::convProduct(kernel, k0);
@@ -110,20 +110,20 @@ void SharpenFilter::updateKernel()
 MorphoFilter::MorphoFilter()
     : ImageOperation(qb::ImageOperationType_Morpho)
 {
-    makeInput("in", ImageDataType_Float);
-    makeInput("radius", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in", BaseOperationDataType::Float);
+    makeInput("radius", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("radius", &radius, 1, 10);
     makeProperty("mode", &mode, 0, 1);
 }
 //--------------------------------------------------------------
-bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool MorphoFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
 
     size_t inputFrame = 0;
     visitor.pushFrame();
-    bool inputValid = sampleInput(0, t, visitor);
+    bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 
     if(inputValid)
@@ -131,7 +131,7 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
         auto& context = frame.getContext();
         
         float radiusf = (float)radius;
-        std::string radiusId = pushOpOrInput(1,t,visitor, {radiusf,radiusf,radiusf,radiusf});
+        std::string radiusId = pushOpOrInput(1,visitor, {radiusf,radiusf,radiusf,radiusf});
 
         size_t in1 = frame.pushInput({(float)mode, 0.0, 0.0, 0.0});
 
@@ -168,17 +168,17 @@ bool MorphoFilter::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 BumpToNormal::BumpToNormal()
     : ImageOperation(qb::ImageOperationType_BumpToNormal)
 {
-    makeInput("bump", ImageDataType_Float);
-    makeOutput("normal", ImageDataType_Float);
+    makeInput("bump", BaseOperationDataType::Float);
+    makeOutput("normal", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool BumpToNormal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool BumpToNormal::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
     size_t ctx = frame.pushContext();
-    bool inputValid = sampleInput(0, t, visitor);
+    bool inputValid = sampleInput(0, visitor);
     frame.popContext();
 
     if(inputValid)

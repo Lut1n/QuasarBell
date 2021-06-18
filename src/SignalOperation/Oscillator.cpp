@@ -6,12 +6,12 @@
 //--------------------------------------------------------------
 Oscillator::Oscillator()
 {
-    makeInput("freq", DataType_Float);
-    makeInput("ampl", DataType_Float);
-    makeInput("waveform", DataType_Float);
-    makeOutput("signal", DataType_Float);
-    makeProperty({"freq", DataType_Float, &freq});
-    makeProperty({"ampl", DataType_Float, &ampl});
+    makeInput("freq", BaseOperationDataType::Float);
+    makeInput("ampl", BaseOperationDataType::Float);
+    makeInput("waveform", BaseOperationDataType::Float);
+    makeOutput("signal", BaseOperationDataType::Float);
+    makeProperty("freq", BaseOperationDataType::Float, &freq);
+    makeProperty("ampl", BaseOperationDataType::Float, &ampl);
 }
 //--------------------------------------------------------------
 void Oscillator::startSampling()
@@ -19,32 +19,30 @@ void Oscillator::startSampling()
     phases.clear();
 }
 //--------------------------------------------------------------
-OperationData Oscillator::sample(size_t index, const Time& t)
+bool Oscillator::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    float& phase = phases[t.dstOp];
+    float& phase = visitor.phase; // phases[t.dstOp];
 
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
+    
+    float fe = inputOrProperty(0, visitor, freq);
+    float am = inputOrProperty(1, visitor, ampl);
 
-    float fe = a.type == DataType_Float ? a.fvec[0] : freq;
-    float am = b.type == DataType_Float ? b.fvec[0] : ampl;
+    phase += visitor.time.elapsed * fe;
 
-    phase += t.elapsed * fe;
-
-    Time tWaveform = t;
-    tWaveform.t = phase;
-    while(tWaveform.t > 1.0) tWaveform.t -= 1.0;
-    OperationData c = sampleInput(2, tWaveform);
+    qb::PcmBuilderVisitor tWaveform;
+    tWaveform.phase = visitor.phase;
+    tWaveform.time = visitor.time;
+    tWaveform.time.t = phase;
+    while(tWaveform.time.t > 1.0) tWaveform.time.t -= 1.0;
 
     data.type = output->type;
-    data.count = output->count;
+
+    float dfltVal = std::sin(phase * 2.0f * 3.141592f);
+    data.fvec[0] = inputOrProperty(2, tWaveform, dfltVal);
+    data.fvec[0] *= am;
     
-    if (c.type == DataType_Float)
-        data.fvec[0] = c.fvec[0] * am;
-    else
-        data.fvec[0] = std::sin(phase * 2.0f * 3.141592f) * am;
-    return data;
+    return true;
 }

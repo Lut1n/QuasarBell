@@ -8,7 +8,7 @@
 struct Harmonics : public SignalOperation
 {
     Harmonics();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;

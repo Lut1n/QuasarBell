@@ -25,9 +25,9 @@ struct UiConnections : public UiElement
     void draw() override;
     Rect computeBounds() const override;
 
-    std::uint64_t createLink(UiPin* a, UiPin* b);
+    std::uint64_t createLink(UiPin* a, UiPin* b, bool useCallback = true);
     void updateLink(std::uint64_t id, UiPin* a, UiPin* b);
-    void deleteLink(std::uint64_t id);
+    void deleteLink(std::uint64_t id, bool useCallback = true);
 
     std::uint64_t startLink(UiPin* a);
     void updateCurrentLink(vec2 b);

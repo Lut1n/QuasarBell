@@ -5,41 +5,31 @@
 //--------------------------------------------------------------
 Quantizer::Quantizer()
 {
-    makeInput("value", DataType_Float);
-    makeInput("quantity", DataType_Int);
-    makeOutput("value", DataType_Float);
-    makeProperty({"quantity", DataType_Int, &quantity});
+    makeInput("value", BaseOperationDataType::Float);
+    makeInput("quantity", BaseOperationDataType::Int);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("quantity", BaseOperationDataType::Int, &quantity);
 }
 //--------------------------------------------------------------
-OperationData Quantizer::sample(size_t index, const Time& t)
+bool Quantizer::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
 
-    if (a.type == DataType_Float)
-    {
-        int qu = b.type == DataType_Int ? b.ivec[0] : quantity;
-        data.type = output->type;
-        data.count = output->count;
-        data.fvec[0] = a.fvec[0];
+    int qu = (int) inputOrProperty(1, visitor, (float)quantity);
+    data.type = output->type;
+    data.fvec[0] = 0.0;
 
-        if (qu > 0)
-        {
-            int n = (int)(t.t * qu);
-            float rounded = ((float)n+0.5f) / (float)qu;
-            Time t2 = t;
-            t2.t = rounded;
-            a = sampleInput(0, t2);
-            data.fvec[0] = a.fvec[0];
-        }
-    }
-    else
+    if (qu > 0)
     {
-        data.type = DataType_Error;
+        qb::PcmBuilderVisitor v2;
+        int n = (int)(visitor.time.t * qu);
+        float rounded = ((float)n+0.5f) / (float)qu;
+        v2.time = visitor.time;
+        v2.time.t = rounded;
+        data.fvec[0] = inputOrProperty(0, visitor, 0.0);
     }
 
-    return data;
+    return true;
 }

@@ -177,7 +177,7 @@ std::string qb::GlslFrame::compile()
     for(auto& func : functions) glsl += func.second;
 
     // sub contexts
-    int contextId = subContexts.size() - 1;
+    int contextId = (int)subContexts.size() - 1;
     for(auto rit=subContexts.rbegin(); rit!=subContexts.rend(); rit++)
     {
         auto& context = *rit;

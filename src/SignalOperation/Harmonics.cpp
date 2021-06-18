@@ -12,23 +12,22 @@
 Harmonics::Harmonics()
 {
     _hasCustomData = true;
-    makeOutput("value", DataType_Float);
-    makeProperty({"count", DataType_Int, &count});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("count", BaseOperationDataType::Int, &count);
     freqs.resize(1,{440.f,1.f});
 }
 
 //--------------------------------------------------------------
-OperationData Harmonics::sample(size_t index, const Time& t)
+bool Harmonics::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    // t.dstOp = this;
     auto output  = getOutput(0);
 
-    OperationData data;
+    qb::OperationData& data = visitor.data;
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = 0.0;
-    for(auto f : freqs) data.fvec[0] += std::sin( t.t * f.first * 2.f * 3.141592f ) * f.second;
-    return data;
+    for(auto f : freqs) data.fvec[0] += std::sin( visitor.time.t * f.first * 2.f * 3.141592f ) * f.second;
+    return true;
 }
 
 //--------------------------------------------------------------

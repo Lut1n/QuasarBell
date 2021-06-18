@@ -8,7 +8,7 @@
 struct Quantizer : public SignalOperation
 {
     Quantizer();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     int quantity = 0;
 };

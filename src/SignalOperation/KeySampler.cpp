@@ -11,28 +11,29 @@
 KeySampler::KeySampler()
 {
     _hasCustomData = true;
-    makeOutput("value", DataType_Float);
-    makeProperty({"count", DataType_Int, &count});
-    makeProperty({"interpo", DataType_Int, &interpo});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("count", BaseOperationDataType::Int, &count);
+    makeProperty("interpo", BaseOperationDataType::Int, &interpo);
     keys.resize(1,{0.f,1.f});
 }
 //--------------------------------------------------------------
-OperationData KeySampler::sample(size_t index, const Time& t)
+bool KeySampler::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
 
     data.type = output->type;
-    data.count = output->count;
+
+    float& t = visitor.time.t;
 
     int index1 = -1;
     int index2 = -1;
     for(size_t i=0; i<keys.size(); ++i)
     {
         int j = (int)(keys.size()-1-i);
-        if(keys[i].first <= t.t) index1 = (int)i;
-        if(keys[j].first >= t.t) index2 = (int)j;
+        if(keys[i].first <= t) index1 = (int)i;
+        if(keys[j].first >= t) index2 = (int)j;
     }
 
     if(index1 == -1 && index2 == -1)
@@ -45,11 +46,11 @@ OperationData KeySampler::sample(size_t index, const Time& t)
         data.fvec[0] = keys[index1].second;
     else
     {
-        float x = (t.t-keys[index1].first) / (keys[index2].first-keys[index1].first);
+        float x = (t-keys[index1].first) / (keys[index2].first-keys[index1].first);
         data.fvec[0] = keys[index1].second + interpolate(x) * (keys[index2].second-keys[index1].second);
     }
     
-    return data;
+    return true;
 }
 //--------------------------------------------------------------
 float KeySampler::interpolate(float x)

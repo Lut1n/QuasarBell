@@ -44,6 +44,7 @@ int runQuasarBell(int argc, char* argv[])
         UiSystem::instance()->setActivated(true);
         RenderInterface::end();
     }
+    nodalEditor.cleanup();
     RenderInterface::shutdown();
     return 0;
 }

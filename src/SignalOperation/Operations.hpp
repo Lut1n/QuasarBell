@@ -8,7 +8,7 @@
 struct FloatInput : public SignalOperation
 {
     FloatInput();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float value = 0.0;
 };
@@ -16,13 +16,13 @@ struct FloatInput : public SignalOperation
 struct NoiseInput : public SignalOperation
 {
     NoiseInput();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 };
 // --------------------------------------------------------------
 struct Repeater : public SignalOperation
 {
     Repeater();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     int count = 1;
 };
@@ -31,7 +31,7 @@ struct Repeater : public SignalOperation
 struct CubicSampler : public SignalOperation
 {
     CubicSampler();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float value = 0.0;
     float speed = 0.0;
@@ -44,7 +44,7 @@ struct CubicSampler : public SignalOperation
 struct PolynomialSampler : public SignalOperation
 {
     PolynomialSampler();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
     
     void saveCustomData(JsonValue& json) override;
     void loadCustomData(JsonValue& json) override;
@@ -60,7 +60,7 @@ struct PolynomialSampler : public SignalOperation
 struct AddOperation : public SignalOperation
 {
     AddOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -70,7 +70,7 @@ struct AddOperation : public SignalOperation
 struct SubOperation : public SignalOperation
 {
     SubOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -80,7 +80,7 @@ struct SubOperation : public SignalOperation
 struct MultOperation : public SignalOperation
 {
     MultOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -90,7 +90,7 @@ struct MultOperation : public SignalOperation
 struct DivOperation : public SignalOperation
 {
     DivOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;
@@ -100,7 +100,7 @@ struct DivOperation : public SignalOperation
 struct ClampOperation : public SignalOperation
 {
     ClampOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float minVal = 0.0f;
@@ -111,14 +111,14 @@ struct ClampOperation : public SignalOperation
 struct AbsOperation : public SignalOperation
 {
     AbsOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 struct TimeScale : public SignalOperation
 {
     TimeScale();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float delay = 0.0;
     float scale = 1.0;
@@ -130,7 +130,7 @@ struct OutputOperation : public SignalOperation
     OutputOperation();
     ~OutputOperation();
     
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 

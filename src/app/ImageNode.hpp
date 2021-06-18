@@ -11,40 +11,20 @@
 #include "Core/Factory.h"
 
 //--------------------------------------------------------------
-struct ImageNode : public UiNode
+struct ImageNode : public BaseOperationNode
 {
-    ImageNode(const std::string& title, size_t nodetypeId);
-    ~ImageNode();
-
-    void setOperation(ImageOperation* op);
-    ImageOperation* getOperation();
-
-    void displayProperties() override;
-    void initializePreview();
-    void updatePreview();
-
+    ImageNode(qb::ImageOperationType opType, BaseOperation* operation)
+        : BaseOperationNode(qb::getImageOperationName(opType), (size_t)opType, operation)
+        {}
+    
+    void updatePreview() override;
     void drawPreview(const Rect& previewArea) override;
-
-    size_t nodeTypeId() const;
-private:
-    ImageOperation* _operation = nullptr;
-    size_t _nodetypeId;
 };
 //--------------------------------------------------------------
 template<typename OpObject, qb::ImageOperationType OpType>
 struct TypedImageNode : public ImageNode
 {
-    TypedImageNode()
-        : ImageNode("ImageNode", OpType)
-    {
-        title->text = qb::getImageOperationName(OpType);
-        setOperation(&imageOperation);
-    }
-
-    // Early disconnection before destroying imageOperation
-    ~TypedImageNode() { disconnectAllPins(); setOperation(nullptr); }
-private:
-    OpObject imageOperation;
+    TypedImageNode() : ImageNode(OpType, new OpObject()) {}
 };
 //--------------------------------------------------------------
 #define MAKE_IMAGE_NODE(opclass, optype)\

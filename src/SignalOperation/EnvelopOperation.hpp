@@ -8,7 +8,7 @@
 struct EnvelopOperation : public SignalOperation
 {
     EnvelopOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float sampleADSR(float t);
 

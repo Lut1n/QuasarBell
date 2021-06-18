@@ -8,7 +8,7 @@
 struct MixOperation : public SignalOperation
 {
     MixOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float input1 = 0.0f;
     float input2 = 0.0f;

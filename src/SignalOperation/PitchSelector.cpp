@@ -13,11 +13,11 @@
 //--------------------------------------------------------------
 PitchSelector::PitchSelector()
 {
-    makeInput("octave", DataType_Float);
-    makeInput("semitone", DataType_Float);
-    makeOutput("freq", DataType_Float);
-    makeProperty({"octave", DataType_Int, &octave});
-    makeProperty({"semitone", DataType_Int, &semitone});
+    makeInput("octave", BaseOperationDataType::Float);
+    makeInput("semitone", BaseOperationDataType::Float);
+    makeOutput("freq", BaseOperationDataType::Float);
+    makeProperty("octave", BaseOperationDataType::Int, &octave);
+    makeProperty("semitone", BaseOperationDataType::Int, &semitone);
 }
 //--------------------------------------------------------------
 int PitchSelector::getMidiIndex() const
@@ -34,26 +34,22 @@ float PitchSelector::getFreq() const
     return pitchToFreq((float)getMidiIndex(), midi_la440, midi_semitones);
 }
 //--------------------------------------------------------------
-OperationData PitchSelector::sample(size_t index, const Time& t)
+bool PitchSelector::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
+    // t.dstOp = this;
     auto output1  = getOutput(0);
-    OperationData data;
+    qb::OperationData& data = visitor.data;
     data.type = output1->type;
-    data.count = output1->count;
 
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-
-    float oc = a.type == DataType_Float ? a.fvec[0] : octave;
-    float se = b.type == DataType_Float ? b.fvec[0] : semitone;
+    float oc = inputOrProperty(0, visitor, (float)octave);
+    float se = inputOrProperty(1, visitor, (float)semitone);
     constexpr int midi_semitones = 12;
     constexpr int midi_la440 = 69;
     constexpr int midi_first_octave = -1;
     float midiindex = (oc-midi_first_octave) * midi_semitones + se;
     data.fvec[0] = pitchToFreq(midiindex, midi_la440, midi_semitones);
 
-    return data;
+    return true;
 }
 //--------------------------------------------------------------
 void PitchSelector::uiProperties()

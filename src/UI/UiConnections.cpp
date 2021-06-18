@@ -40,7 +40,7 @@ UiConnections::UiConnections()
     instance = this;
 }
 
-std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
+std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b, bool useCallback)
 {
     if(a == b || a->type != b->type || a->isInput == b->isInput) return 0;
 
@@ -64,7 +64,7 @@ std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b)
     }
     a->addConnectionId(id);
     b->addConnectionId(id);
-    if(handler) handler->onConnect(a,b);
+    if(handler && useCallback) handler->onConnect(a,b);
     return id;
 }
 
@@ -73,7 +73,7 @@ void UiConnections::updateLink(std::uint64_t id, UiPin* a, UiPin* b)
     links[id] = Link{a,b};
 }
 
-void UiConnections::deleteLink(std::uint64_t id)
+void UiConnections::deleteLink(std::uint64_t id, bool useCallback)
 {
     if (links.find(id) == links.end())
     {
@@ -83,7 +83,7 @@ void UiConnections::deleteLink(std::uint64_t id)
 
     auto& link = links[id];
     std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << "]" << std::endl;
-    if(handler) handler->onDisconnect(link.first,link.second);
+    if(handler && useCallback) handler->onDisconnect(link.first,link.second);
 
     link.first->remConnectionId(id);
     link.second->remConnectionId(id);

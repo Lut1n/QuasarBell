@@ -7,7 +7,7 @@
 struct ImageBasicOperators : public ImageOperation
 {
     ImageBasicOperators(qb::ImageOperationType type, const std::string& operatorSymbol);
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
     std::string _operatorSymbol;
     float _in1 = 0.0f;
     float _in2 = 0.0f;
@@ -23,7 +23,7 @@ struct ImageBasicOperators : public ImageOperation
 struct ImageBuiltInFunc : public ImageOperation
 {
     ImageBuiltInFunc(qb::ImageOperationType type, const std::string& funcName, const std::vector<std::string>& argNames);
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string glslTemplate;
     std::vector<std::string> argNames;

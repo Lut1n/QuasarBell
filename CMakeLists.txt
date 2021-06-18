@@ -19,6 +19,7 @@ add_executable(
     src/App/TypedSignalNode.hpp
     src/App/ImageNode.hpp
     src/App/TypedImageNode.hpp
+    src/App/BaseOperationNode.hpp
     src/Json/json.hpp
     src/Json/jsonrw.hpp
     src/ReaderWriter/FileIO.hpp
@@ -44,6 +45,7 @@ add_executable(
     src/SignalOperation/Waveform.hpp
     src/SignalOperation/KeySampler.hpp
     src/SignalOperation/Harmonics.hpp
+    src/SignalOperation/PcmBuilder.hpp
     src/ImageOperation/GlslBuilder.hpp
     src/ImageOperation/HighResOutput.hpp
     src/ImageOperation/ImageNoises.hpp
@@ -94,6 +96,7 @@ add_executable(
     src/App/TypedSignalNode.cpp
     src/App/ImageNode.cpp
     src/App/TypedImageNode.cpp
+    src/App/BaseOperationNode.cpp
     src/Json/json.cpp
     src/Json/jsonrw.cpp
     src/ReaderWriter/FileIO.cpp
@@ -117,6 +120,7 @@ add_executable(
     src/SignalOperation/Waveform.cpp
     src/SignalOperation/KeySampler.cpp
     src/SignalOperation/Harmonics.cpp
+    src/SignalOperation/PcmBuilder.cpp
     src/ImageOperation/GlslBuilder.cpp
     src/ImageOperation/HighResOutput.cpp
     src/ImageOperation/ImageNoises.cpp

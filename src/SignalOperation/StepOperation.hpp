@@ -8,7 +8,7 @@
 struct StepOperation : public SignalOperation
 {
     StepOperation();
-    OperationData sample(size_t index, const Time& t) override;
+    bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float edge = 0.5f;
     float thenValue = 0.0f;

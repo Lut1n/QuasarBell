@@ -219,7 +219,7 @@ Kernel::Kernel(int w, int h) : w(w), h(h)
 
 Kernel::Kernel(std::initializer_list<float> initData)
 {
-    size_t size = std::sqrt(initData.size());
+    int size = (int)std::sqrt(initData.size());
     w = size;
     h = size;
     data.resize(w*h);
@@ -250,17 +250,17 @@ void Kernel::operator=(std::initializer_list<float> initData)
 Kernel Kernel::resize(size_t nw, size_t nh)
 {
     auto& src = *this;
-    Kernel ret(nw,nh);
-    int oft_x = (nw-w)/2;
-    int oft_y = (nh-h)/2;
+    Kernel ret((int)nw,(int)nh);
+    int oft_x = (int)(nw-w)/2;
+    int oft_y = (int)(nh-h)/2;
 
-    for(size_t y=0; y<h; ++y)
+    for(int y=0; y<h; ++y)
     {
-        for(size_t x=0; x<w; ++x)
+        for(int x=0; x<w; ++x)
         {
             int yy = y+oft_y;
             int xx = x+oft_x;
-            if(xx>=0 && xx<nw && yy>=0 && yy<nh)
+            if(xx>=0 && xx<(int)nw && yy>=0 && yy<(int)nh)
                 ret(xx,yy) = src(x,y);
         }
     }
@@ -286,22 +286,22 @@ void Kernel::display(const Kernel& k)
 
 Kernel Kernel::convProduct(const Kernel& k1, const Kernel& k2)
 {
-    size_t w = k2.w + k1.w - 1;
-    size_t h = k2.h + k1.h - 1;
+    int w = k2.w + k1.w - 1;
+    int h = k2.h + k1.h - 1;
     Kernel ret(w,h);
 
-    size_t oft_x1 = (k1.w-1)/2;
-    size_t oft_y1 = (k1.h-1)/2;
-    size_t oft_x2 = k1.w-1;
-    size_t oft_y2 = k1.h-1;
-    for(size_t y=0; y<ret.h; ++y)
+    int oft_x1 = (k1.w-1)/2;
+    int oft_y1 = (k1.h-1)/2;
+    int oft_x2 = k1.w-1;
+    int oft_y2 = k1.h-1;
+    for(int y=0; y<ret.h; ++y)
     {
-        for(size_t x=0; x<ret.w; ++x)
+        for(int x=0; x<ret.w; ++x)
         {
             ret(x,y) = 0.0f;
-            for(size_t y1=0; y1<k1.h; ++y1)
+            for(int y1=0; y1<k1.h; ++y1)
             {
-                for(size_t x1=0; x1<k1.w; ++x1)
+                for(int x1=0; x1<k1.w; ++x1)
                 {
                     float v2 = 0.0;
                     float v1 = 0.0;

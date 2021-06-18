@@ -10,39 +10,15 @@
 
 #include "ImageOperation/ImageOperationType.hpp"
 #include "ImageOperation/GlslBuilder.hpp"
+#include "App/BaseOperationNode.hpp"
 
 #include "Core/Math.hpp"
 #include "Core/Vec2.h"
 
 //--------------------------------------------------------------
-enum ImageOperationDataType
-{
-    ImageDataType_Undefined,
-    ImageDataType_Error,
-    ImageDataType_Bool,
-    ImageDataType_Int,
-    ImageDataType_Float,
-    
-    ImageDataType_Count
-};
-
-//--------------------------------------------------------------
 struct ImageOperation;
-class JsonValue;
 
 //--------------------------------------------------------------
-struct ImageOperationConnection
-{
-    struct Ref 
-    {
-        ImageOperation* operation = nullptr;
-        size_t index = 0;
-    };
-    std::vector<Ref> refs;
-    ImageOperationDataType type = ImageDataType_Undefined;
-    std::string name;
-};
-
 struct ImagePreview
 {
     struct RenderFrame
@@ -75,68 +51,23 @@ struct ImagePreview
 };
 
 //--------------------------------------------------------------
-struct ImageOperation
+struct ImageOperation : public BaseOperation
 {
-    struct Time {};
-
-    union MinMaxVal
-    {
-        float f2[2];
-        int i2[2];
-    };
-
-    using PropDesc = std::tuple<std::string,ImageOperationDataType,void*,MinMaxVal>;
-
     ImageOperation(qb::ImageOperationType opType);
     virtual ~ImageOperation() = default;
 
-    ImageOperationDataType getInputType(size_t index) const;
-    ImageOperationDataType getOuputType(size_t index) const;
-    
-    void setInput(size_t index, ImageOperation* src, size_t srcIndex);
-    void setOuput(size_t index, ImageOperation* dst, size_t dstIndex);
-
-    ImageOperationConnection* getInput(size_t index);
-    ImageOperationConnection* getOutput(size_t index);
-
     void update();
-    bool sampleInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
-    std::string pushOpOrInput(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
-
-    void startSamplingGraph();
+    bool sampleInput(size_t index, qb::GlslBuilderVisitor& visitor);
+    std::string pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
 
     virtual std::string name() const;
-    virtual void startSampling();
-    virtual bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor);
+    bool sample(size_t index, BaseOperationVisitor& visitor) override;
+    virtual bool sample(size_t index, qb::GlslBuilderVisitor& visitor);
     
-    size_t getInputCount() const;
-    size_t getOutputCount() const;
+    void uiPreview() override;
 
-    size_t getPropertyCount() const;
-    ImageOperationDataType getPropertyType(size_t i) const;
-    std::string getPropertyName(size_t i) const;
-
-    bool hasCustomData() const;
-    
-    void getProperty(size_t i, std::string& value) const;
-    void getProperty(size_t i, float& value) const;
-    void getProperty(size_t i, int& value) const;
-    void getPropertyMinMax(size_t i, float& minVal, float& maxVal) const;
-    void getPropertyMinMax(size_t i, int& minVal, int& maxVal) const;
-    void getProperty(size_t i, bool& value) const;
-    void setProperty(size_t i, const std::string& value);
-    void setProperty(size_t i, float value);
-    void setProperty(size_t i, int value);
-    void setProperty(size_t i, bool value);
-
-    virtual void saveCustomData(JsonValue& json);
-    virtual void loadCustomData(JsonValue& json);
-
-    static void setConnection(ImageOperation* src, size_t srcIdx, ImageOperation* dst, size_t dstIdx);
-    static void remConnection(ImageOperation* op, size_t index);
-
-    virtual void uiProperties();
-
+    void onInputConnectionChanged() override;
+    void onPropertiesChanged() override;
     void dirty(bool recompile = false);
 
     qb::ImageOperationType getNodeType() const;
@@ -144,25 +75,11 @@ struct ImageOperation
     ImagePreview preview;
 
 protected:
-    void makeInput(const std::string& name, ImageOperationDataType type);
-    void makeOutput(const std::string& name, ImageOperationDataType type);
-    void makeProperty(const std::string& name, ImageOperationDataType type, void* ptr);
-    void makeProperty(const std::string& name, float* ptr, float minVal, float maxVal);
-    void makeProperty(const std::string& name, int* ptr, int minVal, int maxVal);
-    void uiPreview();
-    void uiProperty(int index);
-    void uiDebugIo();
-    bool _hasCustomData = false;
-
     virtual std::string getOperationCode() const;
     const qb::ImageOperationType _operationType;
 
 private:
     void updateAllChildren();
-
-    std::vector<ImageOperationConnection> inputs;
-    std::vector<ImageOperationConnection> outputs;
-    std::vector<PropDesc> propDescs;
 };
 
 #endif // QUASAR_BELL_IMAGE_OPERATION_HPP

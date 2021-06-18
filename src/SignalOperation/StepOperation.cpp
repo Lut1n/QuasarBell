@@ -5,34 +5,27 @@
 //--------------------------------------------------------------
 StepOperation::StepOperation()
 {
-    makeInput("value", DataType_Float);
-    makeInput("edge", DataType_Float);
-    makeInput("then", DataType_Float);
-    makeInput("else", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"edge", DataType_Float, &edge});
-    makeProperty({"then", DataType_Float, &thenValue});
-    makeProperty({"else", DataType_Float, &elseValue});
+    makeInput("value", BaseOperationDataType::Float);
+    makeInput("edge", BaseOperationDataType::Float);
+    makeInput("then", BaseOperationDataType::Float);
+    makeInput("else", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("edge", BaseOperationDataType::Float, &edge);
+    makeProperty("then", BaseOperationDataType::Float, &thenValue);
+    makeProperty("else", BaseOperationDataType::Float, &elseValue);
 }
 //--------------------------------------------------------------
-OperationData StepOperation::sample(size_t index, const Time& t)
+bool StepOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-    OperationData c = sampleInput(2, t);
-    OperationData d = sampleInput(3, t);
-
-    float test = a.type == DataType_Float ? a.fvec[0] : 0.0f;
-    float ed = b.type == DataType_Float ? b.fvec[0] : edge;
-    float tv = c.type == DataType_Float ? c.fvec[0] : thenValue;
-    float ev = d.type == DataType_Float ? d.fvec[0] : elseValue;
+    float test = inputOrProperty(0, visitor, 0.0);
+    float ed = inputOrProperty(1, visitor, edge);
+    float tv = inputOrProperty(2, visitor, thenValue);
+    float ev = inputOrProperty(3, visitor, elseValue);
 
     data.type = output->type;
-    data.count = output->count;
-
     data.fvec[0] = test > ed ? tv : ev;
-    return data;
+    return true;
 }

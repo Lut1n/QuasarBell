@@ -11,37 +11,19 @@
 #include "Core/Factory.h"
 
 //--------------------------------------------------------------
-struct SignalNode : public UiNode
+struct SignalNode : public BaseOperationNode
 {
-    SignalNode(const std::string& title, size_t nodetypeId);
-    ~SignalNode();
-
-    void setOperation(SignalOperation* op);
-    SignalOperation* getOperation();
-
-    void displayProperties() override;
+    SignalNode(qb::OperationType opType, BaseOperation* operation)
+        : BaseOperationNode(qb::getOperationName(opType), (size_t)opType, operation)
+        {}
+    
     void drawPreview(const Rect& previewArea) override;
-
-    size_t nodeTypeId() const;
-private:
-    SignalOperation* _operation = nullptr;
-    size_t _nodetypeId;
 };
 //--------------------------------------------------------------
 template<typename OpObject, qb::OperationType OpType>
 struct TypedSignalNode : public SignalNode
 {
-    TypedSignalNode()
-        : SignalNode("SignalNode", OpType)
-    {
-        title->text = qb::getOperationName(OpType);
-        setOperation(&signalOperation);
-    }
-    
-    // Early disconnection before destroying imageOperation
-    ~TypedSignalNode() { disconnectAllPins(); setOperation(nullptr); }
-private:
-    OpObject signalOperation;
+    TypedSignalNode() : SignalNode(OpType, new OpObject()) {}
 };
 //--------------------------------------------------------------
 #define MAKE_SIGNAL_NODE(opclass, optype)\

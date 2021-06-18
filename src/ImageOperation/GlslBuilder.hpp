@@ -9,6 +9,7 @@
 #include "Core/Vec2.h"
 #include "Core/Math.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
+#include "App/BaseOperationNode.hpp"
 
 //--------------------------------------------------------------
 namespace qb
@@ -73,7 +74,7 @@ namespace qb
         std::string compile();
     };
 
-    struct GlslBuilderVisitor
+    struct GlslBuilderVisitor : public BaseOperationVisitor
     {
         GlslFrame mainFrame;
         std::list<GlslFrame*> frameStack;

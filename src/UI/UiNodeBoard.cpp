@@ -1,14 +1,5 @@
 #include "Ui/UiNodeBoard.h"
 
-// std::list<UiNode*> UiNode::selected;
-
-/*bool UiNode::isSelected(UiNode* node)
-{
-    for (auto n : selected)
-        if (n == node) return true;
-    return false;
-}*/
-
 UiNodeBoard::UiNodeBoard(const vec2& position, const vec2& size)
     : UiFrame(position, size)
 {

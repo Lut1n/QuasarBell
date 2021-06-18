@@ -88,7 +88,7 @@ void GlCustomProgram::use()
 void GlCustomProgram::setUniform(size_t id, const vec4& v4)
 {
     use();
-    size_t loc = glGetUniformLocation(program, (std::string("u")+std::to_string(id)).c_str());
+    int loc = glGetUniformLocation(program, (std::string("u")+std::to_string(id)).c_str());
     glUniform4fv(loc, 1, v4.v);
     GL_CHECKERROR("customProgram: set uniform (maybe unused)");
 }
@@ -96,16 +96,16 @@ void GlCustomProgram::setUniform(size_t id, const vec4& v4)
 void GlCustomProgram::setUniform(size_t id, const std::vector<float>& fv)
 {
     use();
-    size_t loc = glGetUniformLocation(program, (std::string("k")+std::to_string(id)).c_str());
-    glUniform1fv(loc, fv.size(), fv.data());
+    int loc = glGetUniformLocation(program, (std::string("k")+std::to_string(id)).c_str());
+    glUniform1fv(loc, (int)fv.size(), fv.data());
     GL_CHECKERROR("customProgram: set kernel uniform (maybe unused)");
 }
 
 void GlCustomProgram::setSampler(size_t id, size_t textureUnit)
 {
     use();
-    size_t loc = glGetUniformLocation(program, (std::string("frame")+std::to_string(id)).c_str());
-    glUniform1i(loc, textureUnit);
+    int loc = glGetUniformLocation(program, (std::string("frame")+std::to_string(id)).c_str());
+    glUniform1i(loc, (int)textureUnit);
     GL_CHECKERROR("customProgram: set sampler uniform (maybe unused)");
 }
 

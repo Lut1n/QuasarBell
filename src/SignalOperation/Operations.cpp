@@ -15,111 +15,95 @@ OutputOperation* OutputOperation::defaultOutput = nullptr;
 //--------------------------------------------------------------
 FloatInput::FloatInput()
 {
-    makeOutput("value", DataType_Float);
-    makeProperty({"value", DataType_Float, &value});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("value", BaseOperationDataType::Float, &value);
 }
 //--------------------------------------------------------------
-OperationData FloatInput::sample(size_t index, const Time& t)
+bool FloatInput::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
-    data.type = DataType_Float;
-    data.count = 1;
-    data.fvec[0] = value;
-    return data;
+    // t.dstOp = this;
+    visitor.data.type = BaseOperationDataType::Float;
+    visitor.data.fvec[0] = value;
+    return true;
 }
 
 //--------------------------------------------------------------
 NoiseInput::NoiseInput()
 {
-    makeOutput("value", DataType_Float);
+    makeOutput("value", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-OperationData NoiseInput::sample(size_t index, const Time& t)
+bool NoiseInput::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
-    data.type = DataType_Float;
-    data.count = 1;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
+    data.type = BaseOperationDataType::Float;
     data.fvec[0] = qb::noiseValue() * 2.f - 1.f;;
-    return data;
+    return true;
 }
 
 
 //--------------------------------------------------------------
 Repeater::Repeater()
 {
-    makeInput("value", DataType_Float);
-    makeInput("count", DataType_Int);
-    makeOutput("value", DataType_Float);
-    makeProperty({"count", DataType_Int, &count});
+    makeInput("value", BaseOperationDataType::Float);
+    makeInput("count", BaseOperationDataType::Int);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("count", BaseOperationDataType::Int, &count);
 }
 //--------------------------------------------------------------
-OperationData Repeater::sample(size_t index, const Time& t)
+bool Repeater::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData b = sampleInput(1, t);
 
-    float qu = b.type == DataType_Int ? b.ivec[0] : (float)count;
+
+    float qu = inputOrProperty(1, visitor, (float)count);
     if (qu==0.0f) qu=1.0f;
 
-    Time t2 = t;
+    qb::PcmBuilderVisitor v2;
+    v2.phase = visitor.phase;
+    qb::Time& t2 = v2.time;
+    auto& t = visitor.time;
     t2.t = (t.t*qu);
     while(t2.t > 1.0f) t2.t -= 1.0f;
 
-    OperationData a = sampleInput(0, t2);
+    data.type = output->type;
+    data.fvec[0] = inputOrProperty(0, v2, 0.0);
 
-    if (a.type == DataType_Float)
-    {
-        data.type = output->type;
-        data.count = output->count;
-        data.fvec[0] = a.fvec[0];
-    }
-    else
-    {
-        data.type = DataType_Error;
-    }
-
-    return data;
+    return true;
 }
 
 
 //--------------------------------------------------------------
 CubicSampler::CubicSampler()
 {
-    makeInput("value", DataType_Float);
-    makeInput("speed", DataType_Float);
-    makeInput("acc", DataType_Float);
-    makeInput("jerk", DataType_Float);
-    makeInput("reset", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"value", DataType_Float, &value});
-    makeProperty({"speed", DataType_Float, &speed});
-    makeProperty({"acc", DataType_Float, &acc});
-    makeProperty({"jerk", DataType_Float, &jerk});
-    makeProperty({"reset", DataType_Float, &reset});
+    makeInput("value", BaseOperationDataType::Float);
+    makeInput("speed", BaseOperationDataType::Float);
+    makeInput("acc", BaseOperationDataType::Float);
+    makeInput("jerk", BaseOperationDataType::Float);
+    makeInput("reset", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("value", BaseOperationDataType::Float, &value);
+    makeProperty("speed", BaseOperationDataType::Float, &speed);
+    makeProperty("acc", BaseOperationDataType::Float, &acc);
+    makeProperty("jerk", BaseOperationDataType::Float, &jerk);
+    makeProperty("reset", BaseOperationDataType::Float, &reset);
 }
 //--------------------------------------------------------------
-OperationData CubicSampler::sample(size_t index, const Time& t)
+bool CubicSampler::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-    OperationData c = sampleInput(2, t);
-    OperationData d = sampleInput(3, t);
-    OperationData e = sampleInput(4, t);
-
     if(reset < 0.0f) reset = 0.0f;
 
-    float va = a.type != DataType_Error ? a.fvec[0] : value;
-    float sp = b.type != DataType_Error ? b.fvec[0] : speed;
-    float ac = c.type != DataType_Error ? c.fvec[0] : acc;
-    float je = d.type != DataType_Error ? d.fvec[0] : jerk;
-    float rs = e.type != DataType_Error ? e.fvec[0] : reset;
+    float va = inputOrProperty(0, visitor, value);
+    float sp = inputOrProperty(1, visitor, speed);
+    float ac = inputOrProperty(2, visitor, acc);
+    float je = inputOrProperty(3, visitor, jerk);
+    float rs = inputOrProperty(4, visitor, reset);
 
     auto sampler = [va,sp,ac,je,rs](float t)
     {
@@ -131,30 +115,29 @@ OperationData CubicSampler::sample(size_t index, const Time& t)
     };
 
     data.type = output->type;
-    data.count = output->count;
-    data.fvec[0] = sampler(t.t);
-    return data;
+    data.fvec[0] = sampler(visitor.time.t);
+    return true;
 }
 
 //--------------------------------------------------------------
 PolynomialSampler::PolynomialSampler()
 {
     _hasCustomData = true;
-    makeOutput("value", DataType_Float);
-    makeProperty({"count", DataType_Int, &count});
-    makeProperty({"reset", DataType_Float, &reset});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("count", BaseOperationDataType::Int, &count);
+    makeProperty("reset", BaseOperationDataType::Float, &reset);
     coefs.resize(1, 0);
 }
 //--------------------------------------------------------------
-OperationData PolynomialSampler::sample(size_t index, const Time& t)
+bool PolynomialSampler::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
 
     if(reset < 0.0f) reset = 0.0f;
 
-    float x = t.t;
+    float x = visitor.time.t;
     if(reset > 0.0)
     {
         while(x>=reset) x -= reset;
@@ -168,9 +151,8 @@ OperationData PolynomialSampler::sample(size_t index, const Time& t)
     }
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = res;
-    return data;
+    return true;
 }
 
 void PolynomialSampler::saveCustomData(JsonValue& json)
@@ -225,200 +207,174 @@ void PolynomialSampler::uiProperties()
 //--------------------------------------------------------------
 AddOperation::AddOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("input2", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1", DataType_Float, &input1});
-    makeProperty({"input2", DataType_Float, &input2});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("input2", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1", BaseOperationDataType::Float, &input1);
+    makeProperty("input2", BaseOperationDataType::Float, &input2);
 }
 //--------------------------------------------------------------
-OperationData AddOperation::sample(size_t index, const Time& t)
+bool AddOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-
-    float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
+    float i1 = inputOrProperty(0, visitor, input1);
+    float i2 = inputOrProperty(1, visitor, input2);
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = i1 + i2;
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 SubOperation::SubOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("input2", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1", DataType_Float, &input1});
-    makeProperty({"input2", DataType_Float, &input2});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("input2", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1", BaseOperationDataType::Float, &input1);
+    makeProperty("input2", BaseOperationDataType::Float, &input2);
 }
 //--------------------------------------------------------------
-OperationData SubOperation::sample(size_t index, const Time& t)
+bool SubOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-
-    float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
+    float i1 = inputOrProperty(0, visitor, input1);
+    float i2 = inputOrProperty(1, visitor, input2);
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = i1 - i2;
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 MultOperation::MultOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("input2", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1", DataType_Float, &input1});
-    makeProperty({"input2", DataType_Float, &input2});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("input2", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1", BaseOperationDataType::Float, &input1);
+    makeProperty("input2", BaseOperationDataType::Float, &input2);
 }
 //--------------------------------------------------------------
-OperationData MultOperation::sample(size_t index, const Time& t)
+bool MultOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-
-    float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
+    float i1 = inputOrProperty(0, visitor, input1);
+    float i2 = inputOrProperty(1, visitor, input2);
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = i1 * i2;
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 DivOperation::DivOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("input2", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1", DataType_Float, &input1});
-    makeProperty({"input2", DataType_Float, &input2});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("input2", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1", BaseOperationDataType::Float, &input1);
+    makeProperty("input2", BaseOperationDataType::Float, &input2);
 }
 //--------------------------------------------------------------
-OperationData DivOperation::sample(size_t index, const Time& t)
+bool DivOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-
-    float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float i2 = b.type == DataType_Float ? b.fvec[0] : input2;
+    float i1 = inputOrProperty(0, visitor, input1);
+    float i2 = inputOrProperty(1, visitor, input2);
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = i2!=0.0 ? i1/i2 : i1;
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 ClampOperation::ClampOperation()
 {
-    makeInput("input1", DataType_Float);
-    makeInput("minVal", DataType_Float);
-    makeInput("maxVal", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"input1", DataType_Float, &input1});
-    makeProperty({"minVal", DataType_Float, &minVal});
-    makeProperty({"maxVal", DataType_Float, &maxVal});
+    makeInput("input1", BaseOperationDataType::Float);
+    makeInput("minVal", BaseOperationDataType::Float);
+    makeInput("maxVal", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("input1", BaseOperationDataType::Float, &input1);
+    makeProperty("minVal", BaseOperationDataType::Float, &minVal);
+    makeProperty("maxVal", BaseOperationDataType::Float, &maxVal);
 }
 //--------------------------------------------------------------
-OperationData ClampOperation::sample(size_t index, const Time& t)
+bool ClampOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-    OperationData b = sampleInput(1, t);
-    OperationData c = sampleInput(2, t);
-
-    float i1 = a.type == DataType_Float ? a.fvec[0] : input1;
-    float e1 = b.type == DataType_Float ? b.fvec[0] : minVal;
-    float e2 = c.type == DataType_Float ? c.fvec[0] : maxVal;
-
+    float i1 = inputOrProperty(0, visitor, input1);
+    float e1 = inputOrProperty(1, visitor, minVal);
+    float e2 = inputOrProperty(2, visitor, maxVal);
+    
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = i1>e2 ? e2 : (i1<e1 ? e1 : i1);
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 AbsOperation::AbsOperation()
 {
-    makeInput("value", DataType_Float);
-    makeOutput("value", DataType_Float);
+    makeInput("value", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-OperationData AbsOperation::sample(size_t index, const Time& t)
+bool AbsOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, t);
-
-    float val = a.type == DataType_Float ? a.fvec[0] : 0.f;
+    float val = inputOrProperty(0, visitor, 0.0);
 
     data.type = output->type;
-    data.count = output->count;
     data.fvec[0] = val>0.0 ? val : -val;
-    return data;
+    return true;
 }
 //--------------------------------------------------------------
 TimeScale::TimeScale()
 {
-    makeInput("value", DataType_Float);
-    makeOutput("value", DataType_Float);
-    makeProperty({"delay", DataType_Float, &delay});
-    makeProperty({"scale", DataType_Float, &scale});
+    makeInput("value", BaseOperationDataType::Float);
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("delay", BaseOperationDataType::Float, &delay);
+    makeProperty("scale", BaseOperationDataType::Float, &scale);
 }
 //--------------------------------------------------------------
-OperationData TimeScale::sample(size_t index, const Time& t)
+bool TimeScale::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    Time time2 = t;
-    time2.duration = t.duration * scale;
-    time2.elapsed = t.elapsed * scale;
-    time2.t = t.t*scale - delay;
-    time2.sec =  time2.t * time2.duration;
-    time2.dstOp = this;
+    // t.dstOp = this;
+    qb::PcmBuilderVisitor v2;
+    v2.time = visitor.time;
+    v2.time.duration = visitor.time.duration * scale;
+    v2.time.elapsed = visitor.time.elapsed * scale;
+    v2.time.t = visitor.time.t*scale - delay;
+    v2.time.sec =  v2.time.t * v2.time.duration;
+    // time2.dstOp = this;
 
-    OperationData data;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
-    OperationData a = sampleInput(0, time2);
-
-    data.fvec[0] = a.type == DataType_Float ? a.fvec[0] : 0.f;
+    data.fvec[0] = inputOrProperty(0, v2, 0.0);
     data.type = output->type;
-    data.count = output->count;
-    return data;
+    return true;
 }
 
 //--------------------------------------------------------------
 OutputOperation::OutputOperation()
 {
-    makeInput("signal", DataType_Float);
-    makeProperty({"range", DataType_Float, &range});
-    makeProperty({"duration", DataType_Float, &duration});
-    makeProperty({"sample-rate", DataType_Int, &sampleRate});
-    makeProperty({"sample-bits", DataType_Int, &sampleBits});
+    makeInput("signal", BaseOperationDataType::Float);
+    makeProperty("range", BaseOperationDataType::Float, &range);
+    makeProperty("duration", BaseOperationDataType::Float, &duration);
+    makeProperty("sample-rate", BaseOperationDataType::Int, &sampleRate);
+    makeProperty("sample-bits", BaseOperationDataType::Int, &sampleBits);
 
     if (defaultOutput == nullptr) defaultOutput = this;
 }
@@ -427,10 +383,10 @@ OutputOperation::~OutputOperation()
     if (defaultOutput == this) defaultOutput = nullptr;
 }
 //--------------------------------------------------------------
-OperationData OutputOperation::sample(size_t index, const Time& t)
+bool OutputOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    return sampleInput(index, t);
+    // t.dstOp = this;
+    return sampleInput(index, visitor);
 }
 
 void OutputOperation::uiProperties()
@@ -532,14 +488,15 @@ void OutputOperation::generate(PcmDataBase& pcm)
     
     float sample_t = 1.f / (float)sampleRate;
     
-    SignalOperation::Time time;
-    time.duration = duration;
-    time.elapsed = sample_t;
-    time.dstOp = this;
+    qb::PcmBuilderVisitor visitor;
+    visitor.time.duration = duration;
+    visitor.time.elapsed = sample_t;
+    // time.dstOp = this;
     for(unsigned i=0;i<pcm.count();++i)
     {
-        time.sec = (float)i / (float)sampleRate;
-        time.t = time.sec / time.duration;
-        pcm.set(i, sample(0, time).fvec[0]);
+        visitor.time.sec = (float)i / (float)sampleRate;
+        visitor.time.t = visitor.time.sec / visitor.time.duration;
+        sample(0, visitor);
+        pcm.set(i, visitor.data.fvec[0]);
     }
 }

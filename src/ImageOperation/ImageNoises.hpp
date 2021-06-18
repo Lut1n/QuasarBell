@@ -7,7 +7,7 @@
 struct WhiteNoise : public ImageOperation
 {
     WhiteNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -16,7 +16,7 @@ struct WhiteNoise : public ImageOperation
 struct ValueNoise : public ImageOperation
 {
     ValueNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -30,7 +30,7 @@ struct ValueNoise : public ImageOperation
 struct GradientNoise : public ImageOperation
 {
     GradientNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -44,7 +44,7 @@ struct GradientNoise : public ImageOperation
 struct SimplexNoise : public ImageOperation
 {
     SimplexNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -58,7 +58,7 @@ struct SimplexNoise : public ImageOperation
 struct VoronoiNoise : public ImageOperation
 {
     VoronoiNoise();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -72,7 +72,7 @@ struct VoronoiNoise : public ImageOperation
 struct Mandelbrot : public ImageOperation
 {
     Mandelbrot();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 

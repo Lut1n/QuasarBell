@@ -13,13 +13,13 @@ HighResOutput* HighResOutput::defaultOutput = nullptr;
 ColorInput::ColorInput()
     : ImageOperation(qb::ImageOperationType_Color)
 {
-    makeProperty("r", ImageDataType_Float, &r);
-    makeProperty("g", ImageDataType_Float, &g);
-    makeProperty("b", ImageDataType_Float, &b);
-    makeOutput("out", ImageDataType_Float);
+    makeProperty("r", BaseOperationDataType::Float, &r);
+    makeProperty("g", BaseOperationDataType::Float, &g);
+    makeProperty("b", BaseOperationDataType::Float, &b);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool ColorInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ColorInput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -51,23 +51,23 @@ void ColorInput::uiProperties()
 Construct3f::Construct3f()
     : ImageOperation(qb::ImageOperationType_Construct3f)
 {
-    makeProperty("c1", ImageDataType_Float, &c1);
-    makeProperty("c2", ImageDataType_Float, &c2);
-    makeProperty("c3", ImageDataType_Float, &c3);
-    makeInput("in1", ImageDataType_Float);
-    makeInput("in2", ImageDataType_Float);
-    makeInput("in3", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeProperty("c1", BaseOperationDataType::Float, &c1);
+    makeProperty("c2", BaseOperationDataType::Float, &c2);
+    makeProperty("c3", BaseOperationDataType::Float, &c3);
+    makeInput("in1", BaseOperationDataType::Float);
+    makeInput("in2", BaseOperationDataType::Float);
+    makeInput("in3", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Construct3f::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool Construct3f::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1Id = pushOpOrInput(0,t,visitor, {c1,c1,c1,1.0f});
-    std::string in2Id = pushOpOrInput(1,t,visitor, {c2,c2,c2,1.0f});
-    std::string in3Id = pushOpOrInput(2,t,visitor, {c3,c3,c3,1.0f});
+    std::string in1Id = pushOpOrInput(0,visitor, {c1,c1,c1,1.0f});
+    std::string in2Id = pushOpOrInput(1,visitor, {c2,c2,c2,1.0f});
+    std::string in3Id = pushOpOrInput(2,visitor, {c3,c3,c3,1.0f});
     
     size_t opId = context.getNextVa();
 
@@ -84,15 +84,15 @@ bool Construct3f::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& vi
 Split3f::Split3f()
     : ImageOperation(qb::ImageOperationType_Split3f)
 {
-    makeProperty("r", ImageDataType_Float, &r);
-    makeProperty("g", ImageDataType_Float, &g);
-    makeProperty("b", ImageDataType_Float, &b);
+    makeProperty("r", BaseOperationDataType::Float, &r);
+    makeProperty("g", BaseOperationDataType::Float, &g);
+    makeProperty("b", BaseOperationDataType::Float, &b);
     makeProperty("index", &index, 0, 2);
-    makeInput("in", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Split3f::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool Split3f::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -102,7 +102,7 @@ bool Split3f::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visito
     
     std::string glsl = "vec4 $1 = vec4(vec3($3[int($2.w)]),1.0);\n";
     
-    if(sampleInput(0, t, visitor))
+    if(sampleInput(0, visitor))
         vaId = qb::va(context.popVa());
     else
         vaId = inId;
@@ -139,10 +139,10 @@ DirectionalSignal::DirectionalSignal()
     makeProperty("direction y", &directionY, -1.0, 1.0);
     makeProperty("frequency", &frequency, 1.0, 10.0);
     makeProperty("amplitude", &amplitude, 0.0, 1.0);
-    makeOutput("out", ImageDataType_Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool DirectionalSignal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool DirectionalSignal::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -169,10 +169,10 @@ RadialSignal::RadialSignal()
     makeProperty("center y", &centerY, 0.0, 1.0);
     makeProperty("frequency", &frequency, 1.0, 10.0);
     makeProperty("amplitude", &amplitude, 0.0, 1.0);
-    makeOutput("out", ImageDataType_Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool RadialSignal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool RadialSignal::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -195,25 +195,25 @@ bool RadialSignal::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& v
 Dynamics::Dynamics()
     : ImageOperation(qb::ImageOperationType_Dynamics)
 {
-    makeInput("in", ImageDataType_Float);
-    makeInput("brightness", ImageDataType_Float);
-    makeInput("contrast", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in", BaseOperationDataType::Float);
+    makeInput("brightness", BaseOperationDataType::Float);
+    makeInput("contrast", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("brightness", &brightness, -1.0f, 1.0f);
     makeProperty("contrast", &contrast, 0.0f, 10.0f);
 }
 //--------------------------------------------------------------
-bool Dynamics::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool Dynamics::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-    if(sampleInput(0, t, visitor))
+    if(sampleInput(0, visitor))
     {
         std::string inId = qb::va(context.popVa());
         size_t outId = context.getNextVa();
         
-        std::string briId = pushOpOrInput(1,t,visitor, {brightness,brightness,brightness,brightness});
-        std::string contId = pushOpOrInput(2,t,visitor, {contrast,contrast,contrast,contrast});
+        std::string briId = pushOpOrInput(1,visitor, {brightness,brightness,brightness,brightness});
+        std::string contId = pushOpOrInput(2,visitor, {contrast,contrast,contrast,contrast});
         
         std::string glsl = "vec4 $1 = dynamics($2, vec4($3.x,$4.x,0.0,0.0));\n";
         glsl = qb::replaceArgs(glsl, {qb::va(outId), inId, briId, contId});
@@ -239,8 +239,8 @@ HighResOutput::HighResOutput()
     : ImageOperation(qb::ImageOperationType_HighResOutput)
 {
     preview.resolution = (int)std::pow(2.0,(float)resolution);
-    makeInput("in", ImageDataType_Float);
-    makeProperty("resolution", ImageDataType_Int, &resolution);
+    makeInput("in", BaseOperationDataType::Float);
+    makeProperty("resolution", BaseOperationDataType::Int, &resolution);
 
     if (defaultOutput == nullptr) defaultOutput = this;
 }
@@ -250,13 +250,13 @@ HighResOutput::~HighResOutput()
     if (defaultOutput == this) defaultOutput = nullptr;
 }
 //--------------------------------------------------------------
-bool HighResOutput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool HighResOutput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId = pushOpOrInput(0,t,visitor, {1.0f,1.0f,1.0f,1.0f});
+    std::string valueId = pushOpOrInput(0,visitor, {1.0f,1.0f,1.0f,1.0f});
 
     opId = context.getNextVa();
 
@@ -298,15 +298,15 @@ void HighResOutput::uiProperties()
 TimeInput::TimeInput()
     : ImageOperation(qb::ImageOperationType_Time)
 {
-    makeOutput("time", ImageDataType_Float);
+    makeOutput("time", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool TimeInput::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool TimeInput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    float ti = RenderInterface::getTime();
+    float ti = (float)RenderInterface::getTime();
     size_t inId = frame.pushInput({ti,ti,ti,ti});
     size_t opId = context.getNextVa();
 

@@ -235,7 +235,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
 
 vec2 RenderInterface::getTargetSize(unsigned id)
 {
-    return vec2(s_targets[id].width, s_targets[id].height);
+    return vec2((float)s_targets[id].width, (float)s_targets[id].height);
 }
 
 vec2 RenderInterface::getCurrentTargetSize()
@@ -256,7 +256,7 @@ void RenderInterface::setTarget(unsigned target)
 void* RenderInterface::getTargetResource(unsigned target)
 {
     if(!s_targets[target].isWindow)
-        return reinterpret_cast<void*>(s_targets[target].texture->tex);
+        return (void*)(size_t)(s_targets[target].texture->tex);
     return (void*)0;
 }
 
@@ -478,7 +478,7 @@ void RenderInterface::shutdown()
 
 unsigned RenderInterface::createCustomProgram()
 {
-    unsigned id = s_CustomPrograms.size();
+    unsigned id = (unsigned)s_CustomPrograms.size();
     s_CustomPrograms.push_back(new GlCustomProgram());
     GL_CHECKERROR("customProgram: create");
     return id;
@@ -509,7 +509,7 @@ void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId,
 
 void RenderInterface::setInputFrameCustomProgram(unsigned customId, size_t srcId, size_t textureUnit, size_t uniformId)
 {
-    s_targets[srcId].texture->bindAsTexture(textureUnit);
+    s_targets[srcId].texture->bindAsTexture((unsigned)textureUnit);
     s_CustomPrograms[customId]->setSampler(uniformId, textureUnit);
 }
 

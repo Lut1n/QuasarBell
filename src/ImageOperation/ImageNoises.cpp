@@ -11,10 +11,10 @@
 WhiteNoise::WhiteNoise()
     : ImageOperation(qb::ImageOperationType_WhiteNoise)
 {
-    makeOutput("out", ImageDataType_Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool WhiteNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool WhiteNoise::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -53,20 +53,20 @@ ValueNoise::ValueNoise()
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
-    makeInput("freq", ImageDataType_Float);
-    makeInput("pers", ImageDataType_Float);
-    makeInput("smth", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("freq", BaseOperationDataType::Float);
+    makeInput("pers", BaseOperationDataType::Float);
+    makeInput("smth", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool ValueNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ValueNoise::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = pushOpOrInput(0,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,visitor, {smoothness,smoothness,smoothness,smoothness});
     
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
@@ -129,20 +129,20 @@ GradientNoise::GradientNoise()
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
-    makeInput("freq", ImageDataType_Float);
-    makeInput("pers", ImageDataType_Float);
-    makeInput("smth", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("freq", BaseOperationDataType::Float);
+    makeInput("pers", BaseOperationDataType::Float);
+    makeInput("smth", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool GradientNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool GradientNoise::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = pushOpOrInput(0,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,visitor, {smoothness,smoothness,smoothness,smoothness});
 
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
@@ -209,20 +209,20 @@ SimplexNoise::SimplexNoise()
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("smoothness", &smoothness, 0.0f, 1.0f);
-    makeInput("freq", ImageDataType_Float);
-    makeInput("pers", ImageDataType_Float);
-    makeInput("smth", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("freq", BaseOperationDataType::Float);
+    makeInput("pers", BaseOperationDataType::Float);
+    makeInput("smth", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool SimplexNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool SimplexNoise::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(2,t,visitor, {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = pushOpOrInput(0,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,visitor, {persistance,persistance,persistance,persistance});
+    std::string smoothId = pushOpOrInput(2,visitor, {smoothness,smoothness,smoothness,smoothness});
 
     std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
 
@@ -306,18 +306,18 @@ VoronoiNoise::VoronoiNoise()
     makeProperty("frequency", &frequency, 1.0f, 32.0f);
     makeProperty("persistance", &persistance, 0.0f, 1.0f);
     makeProperty("mode", &mode, 0, 2);
-    makeInput("freq", ImageDataType_Float);
-    makeInput("pers", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("freq", BaseOperationDataType::Float);
+    makeInput("pers", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool VoronoiNoise::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool VoronoiNoise::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string freqId = pushOpOrInput(0,t,visitor, {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(1,t,visitor, {persistance,persistance,persistance,persistance});
+    std::string freqId = pushOpOrInput(0,visitor, {frequency,frequency,frequency,frequency});
+    std::string persId = pushOpOrInput(1,visitor, {persistance,persistance,persistance,persistance});
 
     std::string octaveModeId = qb::in(frame.pushInput({(float)octaves, (float)mode, 0.0, 0.0}));
 
@@ -397,14 +397,14 @@ std::string VoronoiNoise::getOperationCode() const
 Mandelbrot::Mandelbrot()
     : ImageOperation(qb::ImageOperationType_Mandelbrot)
 {
-    makeOutput("out", ImageDataType_Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("iterations", &iterations, 1, 300);
     makeProperty("oftx", &oftx, -2.0f, 2.0f);
     makeProperty("ofty", &ofty, -2.0f, 2.0f);
     makeProperty("scale", &scale, 0.01f, 10.0f);
 }
 //--------------------------------------------------------------
-bool Mandelbrot::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool Mandelbrot::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();

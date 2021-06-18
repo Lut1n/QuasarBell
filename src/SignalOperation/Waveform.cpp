@@ -10,13 +10,13 @@
 //--------------------------------------------------------------
 Waveform::Waveform()
 {
-    makeOutput("value", DataType_Float);
-    makeProperty({"period", DataType_Float, &period});
-    makeProperty({"min", DataType_Float, &minVal});
-    makeProperty({"max", DataType_Float, &maxVal});
-    makeProperty({"type", DataType_Int, &type});
-    makeProperty({"noise-seed", DataType_Int, &noiseSeed});
-    makeProperty({"noise-samples", DataType_Int, &noiseSamples});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("period", BaseOperationDataType::Float, &period);
+    makeProperty("min", BaseOperationDataType::Float, &minVal);
+    makeProperty("max", BaseOperationDataType::Float, &maxVal);
+    makeProperty("type", BaseOperationDataType::Int, &type);
+    makeProperty("noise-seed", BaseOperationDataType::Int, &noiseSeed);
+    makeProperty("noise-samples", BaseOperationDataType::Int, &noiseSamples);
 }
 //--------------------------------------------------------------
 void Waveform::startSampling()
@@ -65,18 +65,17 @@ float Waveform::sampleFlip(float t)
 }
 
 //--------------------------------------------------------------
-OperationData Waveform::sample(size_t index, const Time& t)
+bool Waveform::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // t.dstOp = this;
+    qb::OperationData& data = visitor.data;
     auto output  = getOutput(0);
     
     data.type = output->type;
-    data.count = output->count;
 
     float ampl = (maxVal-minVal);
-    data.fvec[0] = (sampleFlip(t.t * period) + 1.0f) * 0.5f * ampl + minVal;
-    return data;
+    data.fvec[0] = (sampleFlip(visitor.time.t * period) + 1.0f) * 0.5f * ampl + minVal;
+    return true;
 }
 
 void Waveform::computeNoise()

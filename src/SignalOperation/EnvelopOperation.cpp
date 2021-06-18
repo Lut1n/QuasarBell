@@ -3,22 +3,21 @@
 //--------------------------------------------------------------
 EnvelopOperation::EnvelopOperation()
 {
-    makeOutput("value", DataType_Float);
-    makeProperty({"attack", DataType_Float, &attack});
-    makeProperty({"decay", DataType_Float, &decay});
-    makeProperty({"sustain", DataType_Float, &sustain});
-    makeProperty({"release", DataType_Float, &release});
+    makeOutput("value", BaseOperationDataType::Float);
+    makeProperty("attack", BaseOperationDataType::Float, &attack);
+    makeProperty("decay", BaseOperationDataType::Float, &decay);
+    makeProperty("sustain", BaseOperationDataType::Float, &sustain);
+    makeProperty("release", BaseOperationDataType::Float, &release);
 }
 //--------------------------------------------------------------
-OperationData EnvelopOperation::sample(size_t index, const Time& t)
+bool EnvelopOperation::sample(size_t index, qb::PcmBuilderVisitor& visitor)
 {
-    t.dstOp = this;
-    OperationData data;
+    // visitor.dstOp = this;
     auto output  = getOutput(0);
+    qb::OperationData& data = visitor.data;
     data.type = output->type;
-    data.count = output->count;
-    data.fvec[0] = sampleADSR(t.t);
-    return data;
+    data.fvec[0] = sampleADSR(visitor.time.t);
+    return true;
 }
 
 float EnvelopOperation::sampleADSR(float t)

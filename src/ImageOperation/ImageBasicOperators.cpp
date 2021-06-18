@@ -12,20 +12,20 @@ ImageBasicOperators::ImageBasicOperators(qb::ImageOperationType type, const std:
     : ImageOperation(type)
     , _operatorSymbol(operatorSymbol)
 {
-    makeInput("in1", ImageDataType_Float);
-    makeInput("in2", ImageDataType_Float);
-    makeOutput("out", ImageDataType_Float);
+    makeInput("in1", BaseOperationDataType::Float);
+    makeInput("in2", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
     makeProperty("in1", &_in1, 0.0f, 10.0f);
     makeProperty("in2", &_in2, 0.0f, 10.0f);
 }
 //--------------------------------------------------------------
-bool ImageBasicOperators::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ImageBasicOperators::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     
-    std::string operand1 = pushOpOrInput(0,t,visitor, {_in1,_in1,_in1,1.0f});
-    std::string operand2 = pushOpOrInput(1,t,visitor, {_in2,_in2,_in2,1.0f});
+    std::string operand1 = pushOpOrInput(0,visitor, {_in1,_in1,_in1,1.0f});
+    std::string operand2 = pushOpOrInput(1,visitor, {_in2,_in2,_in2,1.0f});
 
     size_t opId = context.getNextVa();
     std::string glsl = "vec4 $1 = vec4($2.xyz $3 $4.xyz, 1.0);\n";
@@ -45,16 +45,16 @@ ImageBuiltInFunc::ImageBuiltInFunc(qb::ImageOperationType type, const std::strin
     glslTemplate = "vec4 $1 = vec4(" + funcName + "(";
     for(size_t i=0; i<argNames.size(); ++i)
     {
-        makeProperty(argNames[i], ImageDataType_Float, &argValues[i]);
-        makeInput(argNames[i], ImageDataType_Float);
+        makeProperty(argNames[i], BaseOperationDataType::Float, &argValues[i]);
+        makeInput(argNames[i], BaseOperationDataType::Float);
         if(i>0) glslTemplate += ",";
         glslTemplate += "$" + std::to_string(i+2) + ".xyz";
     }
     glslTemplate += "),1.0);\n";
-    makeOutput("out", ImageDataType_Float);
+    makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool ImageBuiltInFunc::sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor)
+bool ImageBuiltInFunc::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -62,7 +62,7 @@ bool ImageBuiltInFunc::sample(size_t index, const Time& t, qb::GlslBuilderVisito
     for(size_t i=0; i<argValues.size(); ++i)
     {
         float arg = argValues[i];
-        idsCache[i+1] = pushOpOrInput(i,t,visitor,{arg,arg,arg,arg});
+        idsCache[i+1] = pushOpOrInput(i,visitor,{arg,arg,arg,arg});
     }
 
     size_t opId = context.getNextVa();

@@ -7,7 +7,7 @@
 struct ImageFilter : public ImageOperation
 {
     ImageFilter(qb::ImageOperationType type);
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     virtual void updateKernel();
 
@@ -33,7 +33,7 @@ struct SharpenFilter : public ImageFilter
 struct MorphoFilter : public ImageOperation
 {
     MorphoFilter();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     int radius = 1;
     int mode = 0;
@@ -43,7 +43,7 @@ struct MorphoFilter : public ImageOperation
 struct BumpToNormal : public ImageOperation
 {
     BumpToNormal();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 };
 
 

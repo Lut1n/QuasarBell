@@ -7,14 +7,14 @@
 struct UvInput : public ImageOperation
 {
     UvInput();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 };
 
 //--------------------------------------------------------------
 struct UvDistortion : public ImageOperation
 {
     UvDistortion();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     float _force = 0.1f;
 };
@@ -23,7 +23,7 @@ struct UvDistortion : public ImageOperation
 struct UvMapping : public ImageOperation
 {
     UvMapping();
-    bool sample(size_t index, const Time& t, qb::GlslBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
