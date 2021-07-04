@@ -1,9 +1,11 @@
 # QuasarBell
-QuasarBell is a small sfx editor made with openal + imgui
+QuasarBell is a small sfx and texture nodal editor made with openal + imgui
 
 ### Preview
 
 ![preview_nodal](demo/preview_nodal.png)
+
+![preview_texture](demo/preview_texture.jpg)
 
 ### Dependencies
 - OpenAL (SDK 1.1 under Windows; 1.20 under Linux)
