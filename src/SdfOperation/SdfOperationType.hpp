@@ -12,6 +12,7 @@ namespace qb
         SdfOperationType_Sphere = 0,
         SdfOperationType_Box,
         SdfOperationType_Capsule,
+        SdfOperationType_Cone,
         SdfOperationType_Union,
         SdfOperationType_Substraction,
         SdfOperationType_Intersection,

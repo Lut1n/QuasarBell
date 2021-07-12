@@ -217,7 +217,7 @@ std::string Union::getOperationCode() const
 {
     static constexpr std::string_view code =
     "vec4 opUnion(vec4 d1, vec4 d2){\n"
-    "    return min(d1, d2);\n"
+    "    return d1.x<d2.x ? d1 : d2;\n"
     "}\n";
     return std::string(code);
 }
@@ -227,7 +227,7 @@ std::string Substraction::getOperationCode() const
 {
     static constexpr std::string_view code =
     "vec4 opSubstraction(vec4 d1, vec4 d2){\n"
-    "    return max(-d1, d2);\n"
+    "    return -d1.x>d2.x ? vec4(-d1.x,d1.yzw) : d2;\n"
     "}\n";
     return std::string(code);
 }
@@ -237,7 +237,7 @@ std::string Intersection::getOperationCode() const
 {
     static constexpr std::string_view code =
     "vec4 opIntersection(vec4 d1, vec4 d2){\n"
-    "    return max(d1, d2);\n"
+    "    return d1.x>d2.x ? d1 : d2;\n"
     "}\n";
     return std::string(code);
 }
@@ -248,7 +248,8 @@ std::string SmoothUnion::getOperationCode() const
     static constexpr std::string_view code =
     "vec4 opSmoothUnion(vec4 d1, vec4 d2, vec4 k){\n"
     "    float h = clamp(0.5 + 0.5 * (d2.x-d1.x)/k.x, 0.0, 1.0);\n"
-    "    return vec4(mix(d2.x,d1.x,h) - k.x*h*(1.0-h));\n"
+    "    return vec4(mix(d2.x,d1.x,h) - k.x*h*(1.0-h),\n"
+    "        mix(d2.yzw,d1.yzw,h) - k.x*h*(1.0-h));\n"
     "}\n";
     return std::string(code);
 }
@@ -259,7 +260,8 @@ std::string SmoothSubstraction::getOperationCode() const
     static constexpr std::string_view code =
     "vec4 opSmoothSubstraction(vec4 d1, vec4 d2, vec4 k){\n"
     "    float h = clamp( 0.5 - 0.5*(d2.x+d1.x)/k.x, 0.0, 1.0 );\n"
-    "    return vec4(mix( d2.x, -d1.x, h ) + k.x*h*(1.0-h));\n"
+    "    return vec4(mix( d2.x, -d1.x, h ) + k.x*h*(1.0-h),\n"
+    "        mix( d2.yzw, -d1.yzw, h ) + k.x*h*(1.0-h));\n"
     "}\n";
     return std::string(code);
 }
@@ -270,7 +272,8 @@ std::string SmoothIntersection::getOperationCode() const
     static constexpr std::string_view code =
     "vec4 opSmoothIntersection(vec4 d1, vec4 d2, vec4 k){\n"
     "    float h = clamp( 0.5 - 0.5*(d2.x-d1.x)/k.x, 0.0, 1.0 );\n"
-    "    return vec4(mix( d2.x, d1.x, h ) + k.x*h*(1.0-h));\n"
+    "    return vec4(mix( d2.x, d1.x, h ) + k.x*h*(1.0-h),\n"
+    "        mix( d2.yzw, d1.yzw, h ) + k.x*h*(1.0-h));\n"
     "}\n";
     return std::string(code);
 }
