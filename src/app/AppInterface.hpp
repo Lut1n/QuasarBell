@@ -27,6 +27,9 @@ public:
     ~AppInterface() = default;
     
     void display();
+    void openBigPreview(BaseOperation* op);
+    void closeBigPreview();
+    BaseOperation* getPreviewOperation() {return stickyOperation;}
 
     static AppInterface& get();
 
@@ -44,6 +47,8 @@ public:
     size_t nodeToCreateType = qb::OperationType_None;
 
 private:
+    bool _bigPreviewOpened = false;
+    BaseOperation* stickyOperation = nullptr;
     std::vector<std::string> operationNames;
     std::vector<std::string> imageOperationNames;
     std::vector<std::string> SdfOperationNames;

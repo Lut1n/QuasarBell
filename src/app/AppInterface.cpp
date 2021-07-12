@@ -4,6 +4,9 @@
 
 #include "Audio/Signal.hpp"
 
+#include "SdfOperation/SdfOperation.hpp"
+#include "ImageOperation/ImageOperation.hpp"
+
 namespace qb
 {
     AppInterface* appInstance = nullptr;
@@ -51,10 +54,35 @@ void AppInterface::display()
     // property edit panel
     ImGui::SetNextWindowPos(ImVec2(6, 25), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 530), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Node properties", 0, /*ImGuiWindowFlags_NoMove | */ImGuiWindowFlags_NoCollapse | /*ImGuiWindowFlags_NoResize | */ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("Node properties", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
     if(!UiNode::selected.empty())
         UiNode::selected.front()->displayProperties();
     ImGui::End();
+
+    
+    if(_bigPreviewOpened)
+    {
+        if(ImGui::Begin("Bigger preview",&_bigPreviewOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings))
+        {
+            SdfOperation* sdf = dynamic_cast<SdfOperation*>(stickyOperation);
+            if(sdf)
+            {
+                ImGui::Image(RenderInterface::getTargetResource((unsigned)sdf->preview.renderFrame->glResource),
+                            ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
+            }
+            ImageOperation* img = dynamic_cast<ImageOperation*>(stickyOperation);
+            if(img)
+            {
+                ImGui::Image(RenderInterface::getTargetResource((unsigned)img->preview.renderFrame->glResource),
+                            ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
+            }
+        }
+        ImGui::End();
+    }
+    else
+    {
+        stickyOperation = nullptr;
+    }
     
     // context menu
     if (nodeboard && nodeboard->requestContextMenu)
@@ -111,6 +139,18 @@ void AppInterface::display()
     waveInput.display();
     tgaInput.display();
     _aboutPanel.display();
+}
+
+void AppInterface::openBigPreview(BaseOperation* op)
+{
+    stickyOperation = op;
+    _bigPreviewOpened = true;
+}
+
+void AppInterface::closeBigPreview()
+{
+    stickyOperation = nullptr;
+    _bigPreviewOpened=false;
 }
 
 AppInterface& AppInterface::get()

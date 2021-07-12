@@ -13,6 +13,24 @@ struct Union : public SdfOperation
 };
 
 //--------------------------------------------------------------
+struct Substraction : public SdfOperation
+{
+    Substraction();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+};
+
+//--------------------------------------------------------------
+struct Intersection : public SdfOperation
+{
+    Intersection();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+};
+
+//--------------------------------------------------------------
 struct SmoothUnion : public SdfOperation
 {
     SmoothUnion();
@@ -22,6 +40,29 @@ struct SmoothUnion : public SdfOperation
 
     float k = 0.3;
 };
+
+//--------------------------------------------------------------
+struct SmoothSubstraction : public SdfOperation
+{
+    SmoothSubstraction();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+    
+    float k = 0.3;
+};
+
+//--------------------------------------------------------------
+struct SmoothIntersection : public SdfOperation
+{
+    SmoothIntersection();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+    
+    float k = 0.3;
+};
+
 //--------------------------------------------------------------
 struct HighResSdfOutput : public SdfOperation
 {

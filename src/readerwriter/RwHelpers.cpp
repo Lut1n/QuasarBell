@@ -1,5 +1,7 @@
 #include "ReaderWriter/RwHelpers.hpp"
 
+#include "Core/Version.hpp"
+
 #include <chrono>
 #include <iomanip> // put_time
 #include <ctime> // localtime
@@ -29,6 +31,6 @@ void writeInfo(JsonValue& root)
     std::string app = "QuasarBell (https://www.github.com/Lut1n/QuasarBell)";
 
     root.setPath("info","app").set(app);
-    root.setPath("info","version").set(3.0);
+    root.setPath("info","version").set(QB_VERSION);
     root.setPath("info","date").set(date.str());
 }

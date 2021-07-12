@@ -62,6 +62,7 @@ add_executable(
     src/SdfOperation/SdfPrimitives.hpp
     src/SdfOperation/SdfBasicOperations.hpp
     src/SdfOperation/SdfTransforms.hpp
+    src/Core/Version.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
     src/Core/Quat.hpp

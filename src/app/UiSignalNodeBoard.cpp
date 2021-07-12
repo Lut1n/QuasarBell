@@ -105,6 +105,9 @@ void UiSignalNodeBoard::update(float t)
     {
         if (it->second->toDelete)
         {
+            AppInterface& app = AppInterface::get();
+            if(app.getPreviewOperation() == it->second->getOperation())
+                app.closeBigPreview();
             it->second->disconnectAllPins();
             nodeboard->rem(it->second.get());
             it = col.erase(it);
@@ -158,6 +161,7 @@ void UiSignalNodeBoard::cleanup()
         nodeboard->rem(op.second.get());
     }
     operations.operations.clear();
+    AppInterface::get().closeBigPreview();
 }
 //--------------------------------------------------------------
 void UiSignalNodeBoard::load(const std::string& path)

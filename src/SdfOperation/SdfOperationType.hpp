@@ -12,7 +12,11 @@ namespace qb
         SdfOperationType_Sphere = 0,
         SdfOperationType_Box,
         SdfOperationType_Union,
+        SdfOperationType_Substraction,
+        SdfOperationType_Intersection,
         SdfOperationType_SmoothUnion,
+        SdfOperationType_SmoothSubstraction,
+        SdfOperationType_SmoothIntersection,
         SdfOperationType_Transform,
         SdfOperationType_HighResOutput,
 
