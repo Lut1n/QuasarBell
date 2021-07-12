@@ -25,4 +25,14 @@ struct Box : public SdfOperation
     float sx = 0.2f,sy = 0.2f, sz = 0.2f;
 };
 
+struct Capsule : public SdfOperation
+{
+    Capsule();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    float h = 0.5f, r = 0.2f;
+};
+
 #endif // QUASAR_BELL_SDF_PRIMITIVES_HPP

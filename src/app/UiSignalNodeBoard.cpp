@@ -173,6 +173,8 @@ void UiSignalNodeBoard::load(const std::string& path)
             [](const std::string& type){return Factory<SignalNode>::create(qb::getOperationType(type));});
     loadFrom(root, operations, connections, "texture-nodal", UiPin::TYPE_FLOAT2,
             [](const std::string& type){return Factory<ImageNode>::create(qb::getImageOperationType(type));});
+    loadFrom(root, operations, connections, "sdf-nodal", UiPin::TYPE_FLOAT3,
+            [](const std::string& type){return Factory<GeometryNode>::create(qb::getSdfOperationType(type));});
 
     operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
     for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
@@ -190,13 +192,16 @@ void UiSignalNodeBoard::save(const std::string& path)
 {
     JsonValue root;
     writeInfo(root);
-    OperationConnections connections, iconnections;
+    OperationConnections connections, iconnections, sconnections;
     connections.fill(uiConnections, operations, UiPin::TYPE_FLOAT1);
     saveInto(root, operations, connections, "sfx-nodal", UiPin::TYPE_FLOAT1,
             [](BaseOperationNode* node){return qb::getOperationName(static_cast<qb::OperationType>(node->nodeTypeId()));});
     iconnections.fill(uiConnections, operations, UiPin::TYPE_FLOAT2);
     saveInto(root, operations, iconnections, "texture-nodal", UiPin::TYPE_FLOAT2,
             [](BaseOperationNode* node){return qb::getImageOperationName(static_cast<qb::ImageOperationType>(node->nodeTypeId()));});
+    sconnections.fill(uiConnections, operations, UiPin::TYPE_FLOAT3);
+    saveInto(root, operations, sconnections, "sdf-nodal", UiPin::TYPE_FLOAT3,
+            [](BaseOperationNode* node){return qb::getSdfOperationName(static_cast<qb::SdfOperationType>(node->nodeTypeId()));});
     saveJsonFile(path, root);
 }
 //--------------------------------------------------------------
