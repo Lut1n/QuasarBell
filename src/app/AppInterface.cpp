@@ -17,6 +17,7 @@ AppInterface::AppInterface()
 {
     operationNames = qb::getOperationNames();
     imageOperationNames = qb::getImageOperationNames();
+    SdfOperationNames = qb::getSdfOperationNames();
     qb::appInstance = this;
 }
 
@@ -86,6 +87,18 @@ void AppInterface::display()
                 if(ImGui::MenuItem(imageOperationNames[i].c_str()))
                 {
                     nodeToCreateCategory = NodeCategory_Image;
+                    nodeToCreateType = i;
+                }
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Geometry"))
+        {
+            for(size_t i=0; i<SdfOperationNames.size(); ++i)
+            {
+                if(ImGui::MenuItem(SdfOperationNames[i].c_str()))
+                {
+                    nodeToCreateCategory = NodeCategory_Geometry;
                     nodeToCreateType = i;
                 }
             }

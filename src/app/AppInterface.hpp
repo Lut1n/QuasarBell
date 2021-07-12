@@ -8,12 +8,14 @@
 #include "App/UserFileInput.hpp"
 #include "SignalOperation/OperationType.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
+#include "SdfOperation/SdfOperationType.hpp"
 #include "Ui/UiNodeBoard.h"
 
 enum NodeCategory
 {
     NodeCategory_Signal,
     NodeCategory_Image,
+    NodeCategory_Geometry,
     
     NodeCategory_None
 };
@@ -44,6 +46,7 @@ public:
 private:
     std::vector<std::string> operationNames;
     std::vector<std::string> imageOperationNames;
+    std::vector<std::string> SdfOperationNames;
 
     AboutPanel _aboutPanel;
 };

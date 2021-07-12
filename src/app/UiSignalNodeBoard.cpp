@@ -6,6 +6,7 @@
 
 #include "App/SignalNode.hpp"
 #include "App/ImageNode.hpp"
+#include "App/SdfNode.hpp"
 
 #include "ReaderWriter/FileIO.hpp"
 #include "ReaderWriter/RwHelpers.hpp"
@@ -16,6 +17,9 @@
 
 #include "ImageOperation/ImageOperationType.hpp"
 #include "ImageOperation/ImageOperation.hpp"
+
+#include "SdfOperation/SdfOperationType.hpp"
+#include "SdfOperation/SdfOperation.hpp"
 
 #include "ImageOperation/HighResOutput.hpp"
 
@@ -127,6 +131,16 @@ void UiSignalNodeBoard::update(float t)
     {
         std::unique_ptr<BaseOperationNode> u;
         u.reset( Factory<ImageNode>::create(type) );
+        u->position = nodeboard->contextMenuPosition;
+        size_t id = operations.addOperation(u);
+        nodeboard->add(operations.getOperation(id), true, true);
+        nodeboard->rem(uiConnections);
+        nodeboard->add(uiConnections);
+    }
+    if(category == NodeCategory_Geometry && type != qb::SdfOperationType_None && type < qb::SdfOperationType_Count)
+    {
+        std::unique_ptr<BaseOperationNode> u;
+        u.reset( Factory<GeometryNode>::create(type) );
         u->position = nodeboard->contextMenuPosition;
         size_t id = operations.addOperation(u);
         nodeboard->add(operations.getOperation(id), true, true);

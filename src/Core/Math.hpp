@@ -39,6 +39,32 @@ namespace qb
 struct vec4
 {
     union {struct{float x,y,z,w;}; float v[4];};
+    
+    vec4()
+        : x(0.0f), y(0.0f), z(0.0f), w(0.0f)
+        {}
+
+    vec4(float x, float y, float z, float w)
+        : x(x), y(y), z(z), w(w)
+        {}
+
+    vec4(float* fv)
+    {
+        for(size_t i=0;i<4;++i) v[i] = fv[i];
+    }
+
+    void normalize()
+    {
+        float len = length();
+        x /= len;
+        y /= len;
+        z /= len;
+    }
+
+    float length()
+    {
+        return std::sqrt(x*x+y*y+z*z);
+    }
 };
 
 #endif // QUASAR_BELL_MATH_HPP
