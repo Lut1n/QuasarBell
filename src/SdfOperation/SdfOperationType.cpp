@@ -9,6 +9,7 @@ namespace qb
     {
         {SdfOperationType_Sphere, "sphere"},
         {SdfOperationType_Box, "box"},
+        {SdfOperationType_Capsule, "capsule"},
         {SdfOperationType_Union, "union"},
         {SdfOperationType_Substraction, "sub"},
         {SdfOperationType_Intersection, "inter"},
