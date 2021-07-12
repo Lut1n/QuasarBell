@@ -10,7 +10,11 @@ namespace qb
         {SdfOperationType_Sphere, "sphere"},
         {SdfOperationType_Box, "box"},
         {SdfOperationType_Union, "union"},
+        {SdfOperationType_Substraction, "sub"},
+        {SdfOperationType_Intersection, "inter"},
         {SdfOperationType_SmoothUnion, "s-union"},
+        {SdfOperationType_SmoothSubstraction, "s-sub"},
+        {SdfOperationType_SmoothIntersection, "s-inter"},
         {SdfOperationType_Transform, "transform"},
         {SdfOperationType_HighResOutput, "high-res"}
     };

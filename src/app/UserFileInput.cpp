@@ -1,4 +1,5 @@
-#include "UserFileInput.hpp"
+#include "App/UserFileInput.hpp"
+#include "Core/Version.hpp"
 
 #include "imgui.h"
 
@@ -130,8 +131,10 @@ void AboutPanel::display()
     if(!ImGui::BeginPopupModal("About"))
         return;
 
+    static const std::string version_txt = std::string("version ") + std::to_string(QB_VERSION_MAJOR) + "." + std::to_string(QB_VERSION_MINOR);
+
     ImGui::Text("QuasarBell");
-    ImGui::Text("version 3.0");
+    ImGui::Text(version_txt.c_str());
     ImGui::Text("2021 - Mathieu Boulet");
     ImGui::Text("sources: https://www.github.com/Lut1n/QuasarBell");
     if(ImGui::Button("Okay"))

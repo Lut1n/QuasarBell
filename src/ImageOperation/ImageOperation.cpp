@@ -1,4 +1,5 @@
 #include "ImageOperation/ImageOperation.hpp"
+#include "App/AppInterface.hpp"
 
 #include <algorithm>
 #include <string>
@@ -201,12 +202,8 @@ void ImageOperation::uiPreview()
         ImGui::SetCursorPos(ImVec2(ImGui::GetContentRegionAvail().x * 0.25f, cursor.y));
         ImGui::Image(RenderInterface::getTargetResource((unsigned)preview.renderFrame->glResource), ImVec2(avail, avail), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
         if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
-            ImGui::OpenPopup("Bigger preview");
-        
-        if(ImGui::BeginPopup("Bigger preview"))
         {
-            ImGui::Image(RenderInterface::getTargetResource((unsigned)preview.renderFrame->glResource), ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
-            ImGui::EndPopup();
+            AppInterface::get().openBigPreview(this);
         }
     }
 
