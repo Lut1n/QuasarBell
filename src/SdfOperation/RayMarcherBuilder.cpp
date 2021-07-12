@@ -218,9 +218,9 @@ std::string qb::RMFrame::compile()
 
     
     glsl +=
-    "float sdMain(vec3 tfmr_0){\n";
+    "vec4 sdMain(vec3 tfmr_0){\n";
     glsl += mainContext.code;
-    glsl += replaceArgs("return $1.x;\n};\n", {va(mainContext.getVa())});
+    glsl += replaceArgs("return $1;\n};\n", {va(mainContext.getVa())});
 
     glsl +=
     "vec3 unproj(vec2 uv, float focalLength){\n"
@@ -229,28 +229,30 @@ std::string qb::RMFrame::compile()
     "vec3 calcNormal(vec3 p){\n"
     "    const float eps = 0.0001;\n"
     "    const vec2 h = vec2(eps,0);\n"
-    "    return normalize(vec3(sdMain(p+h.xyy) - sdMain(p-h.xyy),\n"
-    "                     sdMain(p+h.yxy) - sdMain(p-h.yxy),\n"
-    "                     sdMain(p+h.yyx) - sdMain(p-h.yyx)));\n"
+    "    return normalize(vec3(sdMain(p+h.xyy).x - sdMain(p-h.xyy).x,\n"
+    "                     sdMain(p+h.yxy).x - sdMain(p-h.yxy).x,\n"
+    "                     sdMain(p+h.yyx).x - sdMain(p-h.yyx).x));\n"
     "}\n"
-    "vec2 raycast(vec3 ro, vec3 rd){\n"
+    "vec4 raycast(vec3 ro, vec3 rd){\n"
     "    float res = 1e10;\n"
     "    float t = 1.0;\n"
+    "    vec3 c = vec3(1.0);"
     "    for(int i=0; i<32; ++i){\n"
     "        vec3 pos = ro + t*rd;\n"
-    "        float hit = sdMain(pos);\n"
+    "        vec4 hitc = sdMain(pos);\n"
+    "        float hit = hitc.x; c=hitc.yzw;\n"
     "        if (abs(hit) < 0.001){\n"
     "           res = t;\n"
     "           break;\n"
     "        }\n"
     "        t += hit;\n"
     "    }\n"
-    "    return vec2(res,0.0);\n"
+    "    return vec4(res,c);\n"
     "}\n"
     "vec4 render(vec2 uv){\n"
     "    vec3 ro = vec3(0.0,0.0,-2.0);\n"
     "    vec3 rd = unproj(uv, 2.5);\n"
-    "    vec2 res = raycast(ro, rd);\n"
+    "    vec4 res = raycast(ro, rd);\n"
     "    \n"
     "    vec3 col = vec3(0.0);\n"
     "    vec3 pos = ro + res.x*rd;\n"
@@ -263,8 +265,7 @@ std::string qb::RMFrame::compile()
     "        col += dif;\n"
     "        col += spe;\n"
     "    }\n"
-    // "    float fog = mix(0.0, 1.0,clamp(res.x/5.0,0.0,1.0));\n"
-    "    return vec4(col,1.0);\n"
+    "    return vec4(col*res.yzw,1.0);\n"
     "}\n";
 
     // main context

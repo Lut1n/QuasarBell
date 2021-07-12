@@ -3,6 +3,7 @@
 MAKE_GEOMETRY_NODE_CREATOR(Sphere, qb::SdfOperationType_Sphere)
 MAKE_GEOMETRY_NODE_CREATOR(Box, qb::SdfOperationType_Box)
 MAKE_GEOMETRY_NODE_CREATOR(Capsule, qb::SdfOperationType_Capsule)
+MAKE_GEOMETRY_NODE_CREATOR(Cone, qb::SdfOperationType_Cone)
 MAKE_GEOMETRY_NODE_CREATOR(Union, qb::SdfOperationType_Union)
 MAKE_GEOMETRY_NODE_CREATOR(Substraction, qb::SdfOperationType_Substraction)
 MAKE_GEOMETRY_NODE_CREATOR(Intersection, qb::SdfOperationType_Intersection)
