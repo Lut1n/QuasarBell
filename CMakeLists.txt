@@ -19,6 +19,8 @@ add_executable(
     src/App/TypedSignalNode.hpp
     src/App/ImageNode.hpp
     src/App/TypedImageNode.hpp
+    src/App/SdfNode.hpp
+    src/App/TypedSdfNode.hpp
     src/App/BaseOperationNode.hpp
     src/Json/json.hpp
     src/Json/jsonrw.hpp
@@ -54,8 +56,15 @@ add_executable(
     src/ImageOperation/ImageBasicOperators.hpp
     src/ImageOperation/ImageOperation.hpp
     src/ImageOperation/ImageOperationType.hpp
+    src/SdfOperation/RayMarcherBuilder.hpp
+    src/SdfOperation/SdfOperation.hpp
+    src/SdfOperation/SdfOperationType.hpp
+    src/SdfOperation/SdfPrimitives.hpp
+    src/SdfOperation/SdfBasicOperations.hpp
+    src/SdfOperation/SdfTransforms.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
+    src/Core/Quat.hpp
     src/Core/Math.hpp
     src/Core/PseudoRand.hpp
     src/Font/DefaultFontMaker.h
@@ -96,6 +105,8 @@ add_executable(
     src/App/TypedSignalNode.cpp
     src/App/ImageNode.cpp
     src/App/TypedImageNode.cpp
+    src/App/SdfNode.cpp
+    src/App/TypedSdfNode.cpp
     src/App/BaseOperationNode.cpp
     src/Json/json.cpp
     src/Json/jsonrw.cpp
@@ -129,7 +140,14 @@ add_executable(
     src/ImageOperation/ImageBasicOperators.cpp
     src/ImageOperation/ImageOperation.cpp
     src/ImageOperation/ImageOperationType.cpp
+    src/SdfOperation/RayMarcherBuilder.cpp
+    src/SdfOperation/SdfOperation.cpp
+    src/SdfOperation/SdfOperationType.cpp
+    src/SdfOperation/SdfPrimitives.cpp
+    src/SdfOperation/SdfBasicOperations.cpp
+    src/SdfOperation/SdfTransforms.cpp
     src/Core/Vec2.cpp
+    src/Core/Quat.cpp
     src/Core/PseudoRand.cpp
     src/Font/DefaultFontMaker.cpp
     src/Font/FontMaker.cpp

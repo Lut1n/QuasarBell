@@ -79,7 +79,7 @@ UvMapping::UvMapping()
 }
 //--------------------------------------------------------------
 bool UvMapping::sample(size_t index, qb::GlslBuilderVisitor& visitor)
-{    
+{
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
