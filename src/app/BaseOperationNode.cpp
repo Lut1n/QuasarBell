@@ -60,17 +60,17 @@ BaseOperationConnection* BaseOperation::getOutput(size_t index)
     return nullptr;
 }
 //--------------------------------------------------------------
-void BaseOperation::startSamplingGraph()
+void BaseOperation::startSamplingGraph(int d)
 { 
     for (auto input : inputs)
     {
         for(auto& ref : input.refs)
-            if (ref.operation) ref.operation->startSamplingGraph();
+            if (ref.operation) ref.operation->startSamplingGraph(d+1);
     }
-    startSampling();
+    startSampling(d);
 }
 //--------------------------------------------------------------
-void BaseOperation::startSampling()
+void BaseOperation::startSampling(int /*d*/)
 {
     // to implement by children
 }
@@ -322,6 +322,11 @@ BaseOperationNode::BaseOperationNode(const std::string& title, size_t nodeTypeId
     : UiNode(title, vec2(0.0,0.0), vec2(70,70))
     , _nodetypeId(nodeTypeId)
 {
+    // unsigned basecolor = 0x010810FF;
+    unsigned basecolor = 0x505050FF;
+    color = basecolor;
+    colorOnOver = 0x606060FF;
+    colorOnIdle = basecolor;
     _operation.reset(op);
     
     for(size_t i=0; i<_operation->getInputCount(); ++i)

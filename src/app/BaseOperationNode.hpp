@@ -34,6 +34,7 @@ struct BaseOperationConnection
     std::string name;
 };
 
+//--------------------------------------------------------------
 struct BaseOperationVisitor
 {
     virtual ~BaseOperationVisitor() = default;
@@ -65,8 +66,8 @@ struct BaseOperation
     BaseOperationConnection* getInput(size_t index);
     BaseOperationConnection* getOutput(size_t index);
 
-    void startSamplingGraph();
-    virtual void startSampling();
+    void startSamplingGraph(int d=0);
+    virtual void startSampling(int d=0);
 
     virtual bool sample(size_t index, BaseOperationVisitor& visitor) = 0;
     void remOutput(size_t index, const BaseOperationConnection::Ref& toErase);

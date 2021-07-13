@@ -14,7 +14,7 @@ Oscillator::Oscillator()
     makeProperty("ampl", BaseOperationDataType::Float, &ampl);
 }
 //--------------------------------------------------------------
-void Oscillator::startSampling()
+void Oscillator::startSampling(int /*d*/)
 {
     phases.clear();
 }

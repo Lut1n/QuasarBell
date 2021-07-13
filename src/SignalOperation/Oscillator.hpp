@@ -8,7 +8,7 @@
 struct Oscillator : public SignalOperation
 {
     Oscillator();
-    void startSampling() override;
+    void startSampling(int d) override;
     bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     float freq = 440.0f;
