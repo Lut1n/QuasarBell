@@ -9,6 +9,10 @@ namespace qb
     {
         {SdfOperationType_Sphere, "sphere"},
         {SdfOperationType_Box, "box"},
+        {SdfOperationType_RoundBox, "roundbox"},
+        {SdfOperationType_Torus, "torus"},
+        {SdfOperationType_HexPrism, "hexprism"},
+        {SdfOperationType_TriPrism, "triprism"},
         {SdfOperationType_Capsule, "capsule"},
         {SdfOperationType_Cone, "cone"},
         {SdfOperationType_Union, "union"},

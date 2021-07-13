@@ -198,7 +198,7 @@ std::string qb::RMFrame::compile()
         glsl += replaceArgs("uniform sampler2D $1;\n", {sa(i)});
     
     // in/out
-    if (hasUv) glsl += "in vec2 uv0;\n";
+    glsl += "in vec2 uv0;\n";
     glsl += "out vec4 fragColor;\n";
 
     glsl += "int resolution = " + std::to_string(resolution) + ";\n";
