@@ -27,14 +27,12 @@ bool Union::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in2 = pushOpOrInput(1,visitor, {1e10f,1e10f,1e10f,1e10f});
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opUnion($2,$3);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -60,14 +58,12 @@ bool Substraction::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in2 = pushOpOrInput(1,visitor, {1e10f,1e10f,1e10f,1e10f});
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opSubstraction($2,$3);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -93,14 +89,12 @@ bool Intersection::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in2 = pushOpOrInput(1,visitor, {1e10f,1e10f,1e10f,1e10f});
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opIntersection($2,$3);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -128,14 +122,12 @@ bool SmoothUnion::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opSmoothUnion($2,$3,$4);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2, in3});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -163,14 +155,12 @@ bool SmoothSubstraction::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opSmoothSubstraction($2,$3,$4);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2, in3});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -198,14 +188,12 @@ bool SmoothIntersection::sample(size_t index, qb::RMBuilderVisitor& visitor)
     std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
 
     size_t opId = context.getNextVa();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opSmoothIntersection($2,$3,$4);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2, in3});
 
     context.pushVa(opId);
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -285,13 +273,10 @@ HighResSdfOutput::HighResSdfOutput()
     preview.resolution = (int)std::pow(2.0,(float)resolution);
     makeInput("in", BaseOperationDataType::Float);
     makeProperty("resolution", BaseOperationDataType::Int, &resolution);
-
-    // if (defaultOutput == nullptr) defaultOutput = this;
 }
 //--------------------------------------------------------------
 HighResSdfOutput::~HighResSdfOutput()
 {
-    // if (defaultOutput == this) defaultOutput = nullptr;
 }
 //--------------------------------------------------------------
 bool HighResSdfOutput::sample(size_t index, qb::RMBuilderVisitor& visitor)
@@ -319,15 +304,6 @@ void HighResSdfOutput::uiProperties()
 {
     uiPreview();
     
-    /*if (defaultOutput == this)
-    {
-        ImGui::Text("Default output");
-    }
-    else if (ImGui::Button("Set as default output"))
-    {
-        defaultOutput = this;
-    }*/
-
     if (ImGui::SliderInt("power", &resolution, 0, 12))
     {
         preview.resolution = (int)std::pow(2.0,(float)resolution);

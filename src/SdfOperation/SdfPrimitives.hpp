@@ -4,7 +4,18 @@
 #include "SdfOperation/SdfOperation.hpp"
 
 //--------------------------------------------------------------
-struct Sphere : public SdfOperation
+struct SdfPrimitive : public SdfOperation
+{
+    SdfPrimitive(qb::SdfOperationType opType);
+    
+    void prepareOperation(qb::RMBuilderVisitor& visitor, size_t& opId, size_t& tfmrId);
+    void setupOperation(qb::RMBuilderVisitor& visitor, size_t opId, const std::string& glsl);
+
+    float rgb[3] = {1.0,1.0,1.0};
+};
+
+//--------------------------------------------------------------
+struct Sphere : public SdfPrimitive
 {
     Sphere();
     bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
@@ -14,11 +25,10 @@ struct Sphere : public SdfOperation
     void uiProperties() override;
 
     float r = 0.2f;
-    float rgb[3] = {1.0,1.0,1.0};
 };
 
 //--------------------------------------------------------------
-struct Box : public SdfOperation
+struct Box : public SdfPrimitive
 {
     Box();
     bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
@@ -27,11 +37,59 @@ struct Box : public SdfOperation
 
     void uiProperties() override;
 
-    float sx = 0.2f,sy = 0.2f, sz = 0.2f;
-    float rgb[3] = {1.0,1.0,1.0};
+    float sx = 0.2f, sy = 0.2f, sz = 0.2f;
 };
+//--------------------------------------------------------------
+struct RoundBox : public SdfPrimitive
+{
+    RoundBox();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
 
-struct Capsule : public SdfOperation
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float sx = 0.2f, sy = 0.2f, sz = 0.2f;
+    float r = 0.02f;
+};
+//--------------------------------------------------------------
+struct Torus : public SdfPrimitive
+{
+    Torus();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float t1 = 0.2f, t2 = 0.04f;
+};
+//--------------------------------------------------------------
+struct HexagonalPrism : public SdfPrimitive
+{
+    HexagonalPrism();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float h1 = 0.2f, h2 = 0.2f;
+};
+//--------------------------------------------------------------
+struct TriangularPrism : public SdfPrimitive
+{
+    TriangularPrism();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float t1 = 0.2f, t2 = 0.2f;
+};
+//--------------------------------------------------------------
+struct Capsule : public SdfPrimitive
 {
     Capsule();
     bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
@@ -41,10 +99,9 @@ struct Capsule : public SdfOperation
     void uiProperties() override;
 
     float h = 0.5f, r = 0.2f;
-    float rgb[3] = {1.0,1.0,1.0};
 };
-
-struct Cone : public SdfOperation
+//--------------------------------------------------------------
+struct Cone : public SdfPrimitive
 {
     Cone();
     bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
@@ -54,7 +111,6 @@ struct Cone : public SdfOperation
     void uiProperties() override;
 
     float r = 0.2f, h = 0.5f;
-    float rgb[3] = {1.0,1.0,1.0};
 };
 
 #endif // QUASAR_BELL_SDF_PRIMITIVES_HPP

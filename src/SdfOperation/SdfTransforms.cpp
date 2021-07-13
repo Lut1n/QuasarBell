@@ -16,9 +16,9 @@ Transform::Transform()
 {
     makeInput("in", BaseOperationDataType::Float);
     makeOutput("out", BaseOperationDataType::Float);
-    makeProperty("x",&x, -10.0, 10.0);
-    makeProperty("y",&y, -10.0, 10.0);
-    makeProperty("z",&z, -10.0, 10.0);
+    makeProperty("x",&x, -2.0, 2.0);
+    makeProperty("y",&y, -2.0, 2.0);
+    makeProperty("z",&z, -2.0, 2.0);
     makeProperty("rx",&rx, -180.0, 180.0);
     makeProperty("ry",&ry, -180.0, 180.0);
     makeProperty("rz",&rz, -180.0, 180.0);
@@ -44,13 +44,11 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
-    size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = opTransform($2.xyz, $3.xyz, $4);\n";
     glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in1, in2});
 
     context.pushCode(glsl);
-    frame.hasUv = true;
 
     frame.setFunctions(getNodeType(), getOperationCode());
 
@@ -75,7 +73,7 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
         "vec4 $1 = $2.x<gizmo_x.x?$2:gizmo_x;\n"
         "$1 = $1.x<gizmo_y.x?$1:gizmo_y;\n"
         "$1 = $1.x<gizmo_z.x?$1:gizmo_z;\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(op1), op0, qb::tfmr(pos1), in1, in2});
+        glsl = qb::replaceArgs(glsl, {qb::va(op1), op0, qb::tfmr(pos1)});
 
         context.pushVa(op1);
         context.pushCode(glsl);

@@ -2,6 +2,10 @@
 
 MAKE_GEOMETRY_NODE_CREATOR(Sphere, qb::SdfOperationType_Sphere)
 MAKE_GEOMETRY_NODE_CREATOR(Box, qb::SdfOperationType_Box)
+MAKE_GEOMETRY_NODE_CREATOR(RoundBox, qb::SdfOperationType_RoundBox)
+MAKE_GEOMETRY_NODE_CREATOR(Torus, qb::SdfOperationType_Torus)
+MAKE_GEOMETRY_NODE_CREATOR(HexagonalPrism, qb::SdfOperationType_HexPrism)
+MAKE_GEOMETRY_NODE_CREATOR(TriangularPrism, qb::SdfOperationType_TriPrism)
 MAKE_GEOMETRY_NODE_CREATOR(Capsule, qb::SdfOperationType_Capsule)
 MAKE_GEOMETRY_NODE_CREATOR(Cone, qb::SdfOperationType_Cone)
 MAKE_GEOMETRY_NODE_CREATOR(Union, qb::SdfOperationType_Union)

@@ -11,6 +11,10 @@ namespace qb
     {
         SdfOperationType_Sphere = 0,
         SdfOperationType_Box,
+        SdfOperationType_RoundBox,
+        SdfOperationType_Torus,
+        SdfOperationType_HexPrism,
+        SdfOperationType_TriPrism,
         SdfOperationType_Capsule,
         SdfOperationType_Cone,
         SdfOperationType_Union,

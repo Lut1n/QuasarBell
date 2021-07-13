@@ -60,7 +60,6 @@ namespace qb
     struct RMFrame
     {
         int resolution = 256;
-        bool hasUv = false;
         std::vector<vec4> inputs;
         std::vector<Kernel> kernels;
         std::vector<RMFrame> frames;

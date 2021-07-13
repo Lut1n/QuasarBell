@@ -51,7 +51,7 @@ void RMPreview::RenderFrame::compute(qb::RMFrame& frame)
     }
     
     opCode = frame.compile();
-    RenderInterface::updateCustomProgram((unsigned)glProgram, opCode, frame.hasUv);
+    RenderInterface::updateCustomProgram((unsigned)glProgram, opCode, true);
 
     firstFrameUniformId = frame.inputs.size();
 
