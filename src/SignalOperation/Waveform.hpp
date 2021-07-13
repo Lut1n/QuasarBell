@@ -16,7 +16,7 @@ struct Waveform : public SignalOperation
     };
 
     Waveform();
-    void startSampling() override;
+    void startSampling(int d) override;
     bool sample(size_t index, qb::PcmBuilderVisitor& visitor) override;
 
     void uiProperties() override;

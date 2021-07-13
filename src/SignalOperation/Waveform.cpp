@@ -19,7 +19,7 @@ Waveform::Waveform()
     makeProperty("noise-samples", BaseOperationDataType::Int, &noiseSamples);
 }
 //--------------------------------------------------------------
-void Waveform::startSampling()
+void Waveform::startSampling(int /*d*/)
 {
     if (type == Type::Noise) computeNoise();
 }

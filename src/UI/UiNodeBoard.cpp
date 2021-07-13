@@ -3,13 +3,12 @@
 UiNodeBoard::UiNodeBoard(const vec2& position, const vec2& size)
     : UiFrame(position, size)
 {
-    unsigned boardcolor = 0x010810FF;
+    unsigned boardcolor = 0x1E1E1EFF;
     color = boardcolor;
     colorOnOver = boardcolor;
     colorOnIdle = boardcolor;
     borderEnabled = false;
     connections = std::make_unique<UiConnections>();
-    add(connections.get());
 }
 
 UiNodeBoard::~UiNodeBoard()
@@ -64,6 +63,12 @@ void UiNodeBoard::onMove(const vec2& delta)
 
 bool UiNodeBoard::onEvent(const UiEvent& event)
 {
+    {
+        connections->parentPosition = parentPosition;
+        connections->parentClippingRect = parentClippingRect;
+        connections->onEvent(event);
+    }
+    
     bool ret = UiFrame::onEvent(event);
 
     while(nextRClicked())
@@ -83,6 +88,12 @@ bool UiNodeBoard::onEvent(const UiEvent& event)
 void UiNodeBoard::draw()
 {
     UiFrame::draw();
+    
+    {
+        connections->parentPosition = parentPosition;
+        connections->parentClippingRect = parentClippingRect;
+        connections->draw();
+    }
 
     if(areaSelection)
     {

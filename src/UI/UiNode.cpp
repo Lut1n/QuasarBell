@@ -107,7 +107,7 @@ bool UiNode::onEvent(const UiEvent& event)
         y += step_y;
     }
 
-    ret = UiFrame::onEvent(event) || ret;
+    if(!ret) ret = UiFrame::onEvent(event);
 
     while(nextClicked())
     {
@@ -185,7 +185,6 @@ void UiNode::addPin(int id, const std::string& label, bool isOutput, UiPin::Type
         inputs[id]->isInput = true;
         inputs[id]->type = type;
     }
-
 }
 
 UiNode* UiNode::getSourceNode(int id)
