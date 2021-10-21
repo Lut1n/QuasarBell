@@ -7,6 +7,11 @@ QuasarBell is a small sfx and texture nodal editor made with openal + imgui
 
 ![preview_texture](demo/preview_texture.jpg)
 
+### Some rendering results
+
+<img src="demo/results/render01.png" width="400"><img src="demo/results/render02.png" width="400">
+<img src="demo/results/anim01.gif" width="400"><img src="demo/results/anim02.gif" width="400">
+
 ### Dependencies
 - OpenAL (SDK 1.1 under Windows; 1.20 under Linux)
 - GLFW3 3.3.2
