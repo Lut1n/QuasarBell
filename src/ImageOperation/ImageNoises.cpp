@@ -433,12 +433,18 @@ std::string Mandelbrot::getOperationCode() const
     "    vec2 oft = vec2(res.y,res.z);\n"
     "    vec2 scale = vec2(res.w);\n"
     "    uv = ((uv-0.5) * scale+0.5) -oft;\n"
-    "    vec2 d = vec2(0.0);\n"
-    "    vec2 z0 = vec2(0.0);\n"
+    "    vec2 z = vec2(0.0);\n"
+    "    vec2 dz = vec2(0.0);\n"
+    "    float di = 1.0;\n"
+    "    float m2 = 0.0;\n"
     "    for(int k=0; k<iterations; ++k){\n"
-    "        d = vec2(d.x*d.x - d.y*d.y, 2.0*d.x*d.y) + uv;\n"
+    "        if (m2>1024.0) {di=0.0; break;}\n"
+    "        dz = 2.0*vec2(z.x*dz.x-z.y*dz.y, z.x*dz.y + z.y*dz.x) + vec2(1.0,0.0);\n"
+    "        z = vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + uv;\n"
+    "        m2 = dot(z,z);\n"
     "    };\n"
-    "    return vec4(vec3(length(d)),1.0);\n"
+    "    float d = 0.5*sqrt(dot(z,z)/dot(dz,dz))*log(dot(z,z));\n"
+    "    return vec4(vec3(d),1.0);\n"
     "}\n";
     return std::string(code);
 }
