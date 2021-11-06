@@ -22,6 +22,7 @@ Transform::Transform()
     makeProperty("rx",&rx, -180.0, 180.0);
     makeProperty("ry",&ry, -180.0, 180.0);
     makeProperty("rz",&rz, -180.0, 180.0);
+    makeProperty("s",&s, 0.1, 2.0);
 }
 //--------------------------------------------------------------
 void Transform::startSampling(int d)
@@ -35,7 +36,7 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,0.0f}));
+    std::string in1 = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,s}));
     quat qx = quat(vec4(1.0,0.0,0.0,0.0),rx * degToRad);
     quat qy = quat(vec4(0.0,1.0,0.0,0.0),ry * degToRad);
     quat qz = quat(vec4(0.0,0.0,1.0,0.0),rz * degToRad);
@@ -45,7 +46,7 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
 
-    std::string glsl = "vec4 $1 = opTransform($2.xyz, $3.xyz, $4);\n";
+    std::string glsl = "vec4 $1 = opTransform($2.xyz, $3.xyz, $4, $3.w);\n";
     glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in1, in2});
 
     context.pushCode(glsl);
@@ -64,16 +65,17 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
         size_t op1 = context.getNextVa();
 
         std::string glsl =
-        "vec4 gizmo_pos_x = opTransform($3.xyz, vec3(0.0), vec4(0.0,0.0,0.7,0.7));\n"
+        "vec4 gizmo_pos_x = opTransform($3.xyz, vec3(0.0), vec4(0.0,0.0,0.7,0.7), 1.0);\n"
         "vec4 gizmo_pos_y = vec4($3.xyz,0.0);\n"
-        "vec4 gizmo_pos_z = opTransform($3.xyz, vec3(0.0), vec4(-0.7,0.0,0.0,0.7));\n"
+        "vec4 gizmo_pos_z = opTransform($3.xyz, vec3(0.0), vec4(-0.7,0.0,0.0,0.7), 1.0);\n"
         "vec4 gizmo_x = vec4(sdGizmo(gizmo_pos_x.xyz),1.0,0.0,0.0);\n"
         "vec4 gizmo_y = vec4(sdGizmo(gizmo_pos_y.xyz),0.0,1.0,0.0);\n"
         "vec4 gizmo_z = vec4(sdGizmo(gizmo_pos_z.xyz),0.0,0.0,1.0);\n"
         "vec4 $1 = $2.x<gizmo_x.x?$2:gizmo_x;\n"
         "$1 = $1.x<gizmo_y.x?$1:gizmo_y;\n"
-        "$1 = $1.x<gizmo_z.x?$1:gizmo_z;\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(op1), op0, qb::tfmr(pos1)});
+        "$1 = $1.x<gizmo_z.x?$1:gizmo_z;\n"
+        "$1.x = $1.x*$4.w;\n";
+        glsl = qb::replaceArgs(glsl, {qb::va(op1), op0, qb::tfmr(pos1), in1});
 
         context.pushVa(op1);
         context.pushCode(glsl);
@@ -81,6 +83,21 @@ bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
         return true;
     }
     context.popTransform();
+
+    if (ret)
+    {
+        auto& frame = visitor.getCurrentFrame();
+        auto& context = frame.getContext();
+
+        std::string op2 = qb::va(context.popVa());
+        size_t op3 = context.getNextVa();
+
+        std::string glslPop = "vec4 $1 = opTransformPop($2, $3.w);\n";
+        glslPop = qb::replaceArgs(glslPop, {qb::va(op3), op2, in1});
+        
+        context.pushVa(op3);
+        context.pushCode(glslPop);
+    }
 
     return ret;
 }
@@ -107,11 +124,14 @@ std::string Transform::getOperationCode() const
     "        q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z\n"
     "    );\n"
     "}\n"
-    "vec4 opTransform(vec3 pos, vec3 t, vec4 q){\n"
-    "    vec4 p = vec4(pos-t,0.0);\n"
+    "vec4 opTransform(vec3 pos, vec3 t, vec4 q, float s){\n"
+    "    vec4 p = vec4(pos/s-t,0.0);\n"
     "    vec4 qi = vec4(-q.x,-q.y,-q.z,q.w);\n"
     "    p = multQuat(q,multQuat(p,qi));\n"
     "    return vec4(p.xyz,0.0);\n"
+    "}\n"
+    "vec4 opTransformPop(vec4 v, float s){\n"
+    "    return vec4(v.x*s,v.yzw);\n"
     "}\n";
     return std::string(code);
 }

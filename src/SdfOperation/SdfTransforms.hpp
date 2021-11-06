@@ -15,6 +15,7 @@ struct Transform : public SdfOperation
     bool showGizmo = false;
     float x = 0.0f,y = 0.0f, z = 0.0f;
     float rx = 0.0f,ry = 0.0f, rz = 0.0f;
+    float s = 1.0f;
 };
 
 #endif // QUASAR_BELL_SDF_TRANSFORMS_HPP
