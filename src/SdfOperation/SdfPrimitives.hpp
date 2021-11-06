@@ -112,5 +112,65 @@ struct Cone : public SdfPrimitive
 
     float r = 0.2f, h = 0.5f;
 };
+//--------------------------------------------------------------
+struct RoundedCone : public SdfPrimitive
+{
+    RoundedCone();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float r1 = 0.2f, r2 = 0.05f, h = 0.5f;
+};
+//--------------------------------------------------------------
+struct Cylinder : public SdfPrimitive
+{
+    Cylinder();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float r = 0.2f, h = 0.5f;
+};
+//--------------------------------------------------------------
+struct RoundedCylinder : public SdfPrimitive
+{
+    RoundedCylinder();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float r1 = 0.2f, r2 = 0.05f, h = 0.5f;
+};
+//--------------------------------------------------------------
+struct Octahedron : public SdfPrimitive
+{
+    Octahedron();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float s = 0.2f;
+};
+//--------------------------------------------------------------
+struct Pyramid : public SdfPrimitive
+{
+    Pyramid();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    void uiProperties() override;
+
+    float h = 0.2f;
+};
 
 #endif // QUASAR_BELL_SDF_PRIMITIVES_HPP
