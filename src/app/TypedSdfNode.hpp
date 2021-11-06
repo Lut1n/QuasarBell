@@ -27,6 +27,12 @@ MAKE_GEOMETRY_NODE(SmoothUnion, qb::SdfOperationType_SmoothUnion)
 MAKE_GEOMETRY_NODE(SmoothSubstraction, qb::SdfOperationType_SmoothSubstraction)
 MAKE_GEOMETRY_NODE(SmoothIntersection, qb::SdfOperationType_SmoothIntersection)
 MAKE_GEOMETRY_NODE(Transform, qb::SdfOperationType_Transform)
+MAKE_GEOMETRY_NODE(Repetition, qb::SdfOperationType_Repetition)
+MAKE_GEOMETRY_NODE(Displacement, qb::SdfOperationType_Displacement)
+MAKE_GEOMETRY_NODE(Twist, qb::SdfOperationType_Twist)
+MAKE_GEOMETRY_NODE(Bend, qb::SdfOperationType_Bend)
+MAKE_GEOMETRY_NODE(Elongation, qb::SdfOperationType_Elongation)
+MAKE_GEOMETRY_NODE(Symmetry, qb::SdfOperationType_Symmetry)
 MAKE_GEOMETRY_NODE(HighResSdfOutput, qb::SdfOperationType_HighResOutput)
 
 

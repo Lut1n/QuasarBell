@@ -135,3 +135,291 @@ std::string Transform::getOperationCode() const
     "}\n";
     return std::string(code);
 }
+
+
+//--------------------------------------------------------------
+Repetition::Repetition()
+    : SdfOperation(qb::SdfOperationType_Repetition)
+{
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+    makeProperty("c",&c, 0.0, 10.0);
+    makeProperty("x",&x, 0.0, 10.0);
+    makeProperty("y",&y, 0.0, 10.0);
+    makeProperty("z",&z, 0.0, 10.0);
+}
+//--------------------------------------------------------------
+bool Repetition::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in1 = qb::in(visitor.getCurrentFrame().pushInput({c,x,y,z}));
+
+    size_t pos0 = context.getTransformId();
+    size_t pos1 = context.getNextTransform();
+
+    std::string glsl = "vec4 $1 = vec4(opRepetition($2.xyz, $3.x, $3.yzw), 0.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in1});
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    context.pushTransform(pos1);
+    bool ret = sampleInput(0, visitor);
+    context.popTransform();
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+std::string Repetition::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec3 opRepetition(vec3 p, float c, vec3 l){\n"
+    "    vec3 q = p-c*clamp(round(p/c),-l,l);\n"
+    "    return q;\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
+Displacement::Displacement()
+    : SdfOperation(qb::SdfOperationType_Displacement)
+{
+    makeInput("in1", BaseOperationDataType::Float);
+    makeInput("in2", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+}
+//--------------------------------------------------------------
+bool Displacement::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
+    std::string in2 = pushOpOrInput(1,visitor, {1e10f,1e10f,1e10f,1e10f});
+
+    size_t opId = context.getNextVa();
+
+    std::string glsl = "vec4 $1 = opDisplacement($2, $3);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    return true;
+}
+
+//--------------------------------------------------------------
+std::string Displacement::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec4 opDisplacement(vec4 v1, vec4 v2){\n"
+    "    return vec4(v1.x+v2.x, v1.yzw);\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
+Twist::Twist()
+    : SdfOperation(qb::SdfOperationType_Twist)
+{
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+    makeProperty("k",&k, -100.0, 100.0);
+}
+//--------------------------------------------------------------
+bool Twist::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f}));
+
+    size_t pos0 = context.getTransformId();
+    size_t pos1 = context.getNextTransform();
+
+    std::string glsl = "vec4 $1 = vec4(opTwist($2.xyz, $3.x), 0.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in});
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    context.pushTransform(pos1);
+    bool ret = sampleInput(0, visitor);
+    context.popTransform();
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+std::string Twist::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec3 opTwist(vec3 p, float k){\n"
+    "    float c = cos(k*p.y);\n"
+    "    float s = sin(k*p.y);\n"
+    "    mat2  m = mat2(c,-s,s,c);\n"
+    "    vec3  q = vec3(m*p.xz,p.y);\n"
+    "    return q;\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
+Bend::Bend()
+    : SdfOperation(qb::SdfOperationType_Bend)
+{
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+    makeProperty("k",&k, -100.0, 100.0);
+}
+//--------------------------------------------------------------
+bool Bend::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f}));
+
+    size_t pos0 = context.getTransformId();
+    size_t pos1 = context.getNextTransform();
+
+    std::string glsl = "vec4 $1 = vec4(opBend($2.xyz, $3.x), 0.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in});
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    context.pushTransform(pos1);
+    bool ret = sampleInput(0, visitor);
+    context.popTransform();
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+std::string Bend::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec3 opBend(vec3 p, float k){\n"
+    "    float c = cos(k*p.x);\n"
+    "    float s = sin(k*p.x);\n"
+    "    mat2  m = mat2(c,-s,s,c);\n"
+    "    vec3  q = vec3(m*p.xy,p.z);\n"
+    "    return q;\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
+Elongation::Elongation()
+    : SdfOperation(qb::SdfOperationType_Elongation)
+{
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+    makeProperty("x",&x, -2.0, 2.0);
+    makeProperty("y",&y, -2.0, 2.0);
+    makeProperty("z",&z, -2.0, 2.0);
+}
+//--------------------------------------------------------------
+bool Elongation::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,0.0f}));
+
+    size_t pos0 = context.getTransformId();
+    size_t pos1 = context.getNextTransform();
+
+    std::string glsl = "vec4 $1 = vec4(opElongate($2.xyz, $3.xyz), 0.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in});
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    context.pushTransform(pos1);
+    bool ret = sampleInput(0, visitor);
+    context.popTransform();
+
+    if (ret)
+    {
+        auto& frame = visitor.getCurrentFrame();
+        auto& context = frame.getContext();
+
+        std::string op2 = qb::va(context.popVa());
+        size_t op3 = context.getNextVa();
+
+        std::string glslPop = "vec4 $1 = opElongatePop($2, $3.xyz, $4.xyz);\n";
+        glslPop = qb::replaceArgs(glslPop, {qb::va(op3), op2, qb::tfmr(pos0), in});
+        
+        context.pushVa(op3);
+        context.pushCode(glslPop);
+    }
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+std::string Elongation::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec3 opElongate(vec3 p, vec3 h){\n"
+    "    vec3 q = abs(p)-h;\n"
+    "    return max(q,0.0);\n"
+    "}\n"
+    "vec4 opElongatePop(vec4 v, vec3 p, vec3 h){\n"
+    "    vec3 q = abs(p)-h;\n"
+    "    return vec4(v.x + min(max(q.x,max(q.y,q.z)),0.0), v.yzw);\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
+Symmetry::Symmetry()
+    : SdfOperation(qb::SdfOperationType_Symmetry)
+{
+    makeInput("in", BaseOperationDataType::Float);
+    makeOutput("out", BaseOperationDataType::Float);
+    makeProperty("x",&x, 0, 1);
+    makeProperty("y",&y, 0, 1);
+    makeProperty("z",&z, 0, 1);
+}
+//--------------------------------------------------------------
+bool Symmetry::sample(size_t index, qb::RMBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    std::string in = qb::in(visitor.getCurrentFrame().pushInput({(float)x,(float)y,(float)z,0.0f}));
+
+    size_t pos0 = context.getTransformId();
+    size_t pos1 = context.getNextTransform();
+
+    std::string glsl = "vec4 $1 = vec4(opSymmetry($2.xyz, $3.xyz), 0.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::tfmr(pos1), qb::tfmr(pos0), in});
+    context.pushCode(glsl);
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+
+    context.pushTransform(pos1);
+    bool ret = sampleInput(0, visitor);
+    context.popTransform();
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+std::string Symmetry::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec3 opSymmetry(vec3 p, vec3 s){\n"
+    "    p = mix(p, abs(p), s);\n"
+    "    return p;\n"
+    "}\n";
+    return std::string(code);
+}

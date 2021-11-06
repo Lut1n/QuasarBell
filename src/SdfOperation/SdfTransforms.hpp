@@ -18,4 +18,75 @@ struct Transform : public SdfOperation
     float s = 1.0f;
 };
 
+//--------------------------------------------------------------
+struct Repetition : public SdfOperation
+{
+    Repetition();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    float c = 2.0f;
+    float x = 1.0f;
+    float y = 1.0f;
+    float z = 1.0f;
+};
+
+//--------------------------------------------------------------
+struct Displacement : public SdfOperation
+{
+    Displacement();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+};
+
+//--------------------------------------------------------------
+struct Twist : public SdfOperation
+{
+    Twist();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    float k = 10.0f;
+};
+
+//--------------------------------------------------------------
+struct Bend : public SdfOperation
+{
+    Bend();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+
+    float k = 10.0f;
+};
+
+//--------------------------------------------------------------
+struct Elongation : public SdfOperation
+{
+    Elongation();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+    
+    float x = 0.2f;
+    float y = 0.2f;
+    float z = 0.2f;
+};
+
+//--------------------------------------------------------------
+struct Symmetry : public SdfOperation
+{
+    Symmetry();
+    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+
+    std::string getOperationCode() const override;
+    
+    int x = 0.0f;
+    int y = 0.0f;
+    int z = 0.0f;
+};
+
 #endif // QUASAR_BELL_SDF_TRANSFORMS_HPP
