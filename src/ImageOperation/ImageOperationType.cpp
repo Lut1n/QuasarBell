@@ -41,6 +41,7 @@ namespace qb
         {ImageOperationType_UvDistortion, "distort-uv"},
         {ImageOperationType_UvMapping, "uv-mapping"},
         {ImageOperationType_UvInput, "uv-input"},
+        {ImageOperationType_SphericalCoord, "spherical-coord"},
         {ImageOperationType_Blur, "blur"},
         {ImageOperationType_Sharpen, "sharpen"},
         {ImageOperationType_Morpho, "morpho"},

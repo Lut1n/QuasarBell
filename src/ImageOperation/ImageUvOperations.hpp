@@ -11,6 +11,15 @@ struct UvInput : public ImageOperation
 };
 
 //--------------------------------------------------------------
+struct SphericalCoord : public ImageOperation
+{
+    SphericalCoord();
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
+    
+    std::string getOperationCode() const override;
+};
+
+//--------------------------------------------------------------
 struct UvDistortion : public ImageOperation
 {
     UvDistortion();

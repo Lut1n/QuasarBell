@@ -43,6 +43,7 @@ namespace qb
         ImageOperationType_UvDistortion,
         ImageOperationType_UvInput,
         ImageOperationType_UvMapping,
+        ImageOperationType_SphericalCoord,
         ImageOperationType_Blur,
         ImageOperationType_Sharpen,
         ImageOperationType_Morpho,

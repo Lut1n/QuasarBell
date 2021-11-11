@@ -31,6 +31,40 @@ bool UvInput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     return true;
 }
 //--------------------------------------------------------------
+SphericalCoord::SphericalCoord()
+    : ImageOperation(qb::ImageOperationType_SphericalCoord)
+{
+    makeOutput("uv", BaseOperationDataType::Float);
+}
+//--------------------------------------------------------------
+bool SphericalCoord::sample(size_t index, qb::GlslBuilderVisitor& visitor)
+{
+    auto& frame = visitor.getCurrentFrame();
+    auto& context = frame.getContext();
+
+    size_t opId = context.getNextVa();
+    std::string glsl = "vec4 $1 = vec4(uv_to_sphericalcoord(uv0),0.0,1.0);\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(opId)});
+
+    context.pushVa(opId);
+    context.pushCode(glsl);
+    frame.hasUv = true;
+
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
+}
+//--------------------------------------------------------------
+std::string SphericalCoord::getOperationCode() const
+{
+    static constexpr std::string_view code =
+    "vec2 uv_to_sphericalcoord(vec2 uv){\n"
+    "    float b = (uv.y - 0.5) * 3.141592;\n"
+    "    return vec2(uv.x, sin(b) * 0.5 + 0.5);\n"
+    "}\n";
+    return std::string(code);
+}
+
+//--------------------------------------------------------------
 UvDistortion::UvDistortion()
     : ImageOperation(qb::ImageOperationType_UvDistortion)
 {
