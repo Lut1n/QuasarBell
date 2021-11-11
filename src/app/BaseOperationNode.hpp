@@ -32,6 +32,7 @@ struct BaseOperationConnection
     std::vector<Ref> refs;
     BaseOperationDataType type = BaseOperationDataType::Undefined;
     std::string name;
+    UiPin::Type pinType = UiPin::TYPE_BOOL;
 };
 
 //--------------------------------------------------------------
@@ -92,6 +93,8 @@ struct BaseOperation
     
     void makeInput(const std::string& name, BaseOperationDataType type);
     void makeOutput(const std::string& name, BaseOperationDataType type);
+    void makeInput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType);
+    void makeOutput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType);
     void makeProperty(const std::string& name, BaseOperationDataType type, void* ptr);
     void makeProperty(const std::string& name, float* ptr, float minVal, float maxVal);
     void makeProperty(const std::string& name, int* ptr, int minVal, int maxVal);
@@ -103,6 +106,8 @@ struct BaseOperation
     virtual void loadCustomData(JsonValue& json);
 
     UiPin::Type getPinType() const {return _pinType;}
+    UiPin::Type getInputPinType(size_t i) const {return inputs[i].pinType;}
+    UiPin::Type getOutputPinType(size_t i) const {return outputs[i].pinType;}
     
     virtual void uiProperties();
     virtual void uiPreview() = 0;

@@ -210,17 +210,29 @@ void BaseOperation::makeProperty(const std::string& name, int* ptr, int minVal, 
 //--------------------------------------------------------------
 void BaseOperation::makeInput(const std::string& name, BaseOperationDataType type)
 {
-    BaseOperationConnection input;
-    input.name = name;
-    input.type = type;
-    inputs.push_back(input);
+    makeInput(name, type, _pinType);
 }
 //--------------------------------------------------------------
 void BaseOperation::makeOutput(const std::string& name, BaseOperationDataType type)
 {
+    makeOutput(name, type, _pinType);
+}
+//--------------------------------------------------------------
+void BaseOperation::makeInput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType)
+{
+    BaseOperationConnection input;
+    input.name = name;
+    input.type = type;
+    input.pinType = pinType;
+    inputs.push_back(input);
+}
+//--------------------------------------------------------------
+void BaseOperation::makeOutput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType)
+{
     BaseOperationConnection output;
     output.name = name;
     output.type = type;
+    output.pinType = pinType;
     outputs.push_back(output);
 }
 //--------------------------------------------------------------
@@ -332,12 +344,12 @@ BaseOperationNode::BaseOperationNode(const std::string& title, size_t nodeTypeId
     for(size_t i=0; i<_operation->getInputCount(); ++i)
     {
         auto input = _operation->getInput(i);
-        addPin((int)i, input->name, false, op->getPinType());
+        addPin((int)i, input->name, false, input->pinType);
     }
     for(size_t i=0; i<_operation->getOutputCount(); ++i)
     {
         auto output = _operation->getOutput(i);
-        addPin((int)i, output->name, true, op->getPinType());
+        addPin((int)i, output->name, true, output->pinType);
     }
 }
 //--------------------------------------------------------------
