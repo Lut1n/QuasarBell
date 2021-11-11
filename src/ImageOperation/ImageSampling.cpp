@@ -24,7 +24,7 @@ bool ImageFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& frame = visitor.getCurrentFrame();
 
     size_t inputFrame = 0;
-    visitor.pushFrame();
+    visitor.pushFrame(qb::GlslFrame::Type::Texture);
     bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 
@@ -122,7 +122,7 @@ bool MorphoFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& frame = visitor.getCurrentFrame();
 
     size_t inputFrame = 0;
-    visitor.pushFrame();
+    visitor.pushFrame(qb::GlslFrame::Type::Texture);
     bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 

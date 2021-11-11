@@ -9,6 +9,7 @@
 #include "Core/Vec2.h"
 #include "Core/Math.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
+#include "SdfOperation/SdfOperationType.hpp"
 #include "App/BaseOperationNode.hpp"
 
 //--------------------------------------------------------------
@@ -21,6 +22,7 @@ namespace qb
     std::string fu(size_t i);
     std::string sa(size_t i);
     std::string glslVec4(const vec4& v4);
+    std::string tfmr(size_t i);
 
     void replaceAll(std::string& glsl, const std::string& key, const std::string& val);
     std::string replaceArgs(const std::string& glslTemplate, const std::vector<std::string>& args);
@@ -31,9 +33,11 @@ namespace qb
 
         std::list<size_t> vaStack;
         std::list<size_t> uvStack;
+        std::list<size_t> tfmrStack;
 
         size_t nextUvId = 1;
         size_t nextVaId = 0;
+        size_t nextTfmrId = 1;
 
         void pushUv(size_t id);
         void popUv();
@@ -44,18 +48,31 @@ namespace qb
         size_t popVa();
         size_t getVa();
         size_t getNextVa();
+        
+        void pushTransform(size_t id);
+        void popTransform();
+        size_t getTransformId();
+        size_t getNextTransform();
 
         void pushCode(const std::string& toAdd);
     };
 
     struct GlslFrame
     {
+        enum class Type
+        {
+            Texture,
+            Sdf
+        };
+
         int resolution = 256;
         bool hasUv = false;
+        Type type = Type::Texture;
         std::vector<vec4> inputs;
         std::vector<Kernel> kernels;
         std::vector<GlslFrame> frames;
         std::unordered_map<ImageOperationType, std::string> functions;
+        std::unordered_map<SdfOperationType, std::string> sdfFunctions;
 
         GlslContext mainContext;
         std::vector<GlslContext> subContexts;
@@ -63,6 +80,7 @@ namespace qb
         std::list<size_t> contextStack;
 
         void setFunctions(ImageOperationType operationType, const std::string& functionCode);
+        void setFunctions(SdfOperationType operationType, const std::string& functionCode);
 
         size_t pushInput(const vec4& v4);
         size_t pushKernel(const Kernel& ke);
@@ -71,6 +89,7 @@ namespace qb
         size_t pushContext();
         void popContext();
 
+        void raymarcher(std::string& glsl);
         std::string compile();
     };
 
@@ -81,7 +100,7 @@ namespace qb
 
         GlslFrame& getCurrentFrame();
 
-        void pushFrame();
+        void pushFrame(GlslFrame::Type type);
         void popFrame();
     };
 };

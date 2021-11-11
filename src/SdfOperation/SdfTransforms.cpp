@@ -30,7 +30,7 @@ void Transform::startSampling(int d)
     showGizmo = (d==0);
 }
 //--------------------------------------------------------------
-bool Transform::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Transform::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     const float degToRad = std::acos(-1.0) / 180.0f;
     auto& frame = visitor.getCurrentFrame();
@@ -149,7 +149,7 @@ Repetition::Repetition()
     makeProperty("z",&z, 0.0, 10.0);
 }
 //--------------------------------------------------------------
-bool Repetition::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Repetition::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -188,37 +188,42 @@ Displacement::Displacement()
     : SdfOperation(qb::SdfOperationType_Displacement)
 {
     makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float);
+    makeInput("in2", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Displacement::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Displacement::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput(1,visitor, {1e10f,1e10f,1e10f,1e10f});
+    if (sampleTextureInput(1, visitor))
+    {
+        std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
+        std::string in2 = qb::sa(0);
 
-    size_t opId = context.getNextVa();
+        size_t opId = context.getNextVa();
 
-    std::string glsl = "vec4 $1 = opDisplacement($2, $3);\n";
-    glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
+        std::string glsl = "vec4 $1 = opDisplacement($2, $3);\n";
+        glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
 
-    context.pushVa(opId);
-    context.pushCode(glsl);
+        context.pushVa(opId);
+        context.pushCode(glsl);
 
-    frame.setFunctions(getNodeType(), getOperationCode());
-
-    return true;
+        frame.setFunctions(getNodeType(), getOperationCode());
+        return true;
+    }
+    
+    return false;
 }
 
 //--------------------------------------------------------------
 std::string Displacement::getOperationCode() const
 {
     static constexpr std::string_view code =
-    "vec4 opDisplacement(vec4 v1, vec4 v2){\n"
-    "    return vec4(v1.x+v2.x, v1.yzw);\n"
+    "vec4 opDisplacement(vec4 v1, sampler2D s2d){\n"
+    // "    return vec4(v1.x+texture2D(s2d,vec2(0,0)).x, v1.yzw);\n"
+    "    return vec4(v1.x, v1.yzw * texture2D(s2d,vec2(0.5,0.5)).xyz);\n"
     "}\n";
     return std::string(code);
 }
@@ -232,7 +237,7 @@ Twist::Twist()
     makeProperty("k",&k, -100.0, 100.0);
 }
 //--------------------------------------------------------------
-bool Twist::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Twist::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -278,7 +283,7 @@ Bend::Bend()
     makeProperty("k",&k, -100.0, 100.0);
 }
 //--------------------------------------------------------------
-bool Bend::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Bend::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -326,7 +331,7 @@ Elongation::Elongation()
     makeProperty("z",&z, -2.0, 2.0);
 }
 //--------------------------------------------------------------
-bool Elongation::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Elongation::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -390,7 +395,7 @@ Symmetry::Symmetry()
     makeProperty("z",&z, 0, 1);
 }
 //--------------------------------------------------------------
-bool Symmetry::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Symmetry::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();

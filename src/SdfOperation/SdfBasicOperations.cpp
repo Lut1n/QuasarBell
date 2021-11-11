@@ -18,7 +18,7 @@ Union::Union()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Union::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Union::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -49,7 +49,7 @@ Substraction::Substraction()
 }
 
 //--------------------------------------------------------------
-bool Substraction::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Substraction::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -80,7 +80,7 @@ Intersection::Intersection()
 }
 
 //--------------------------------------------------------------
-bool Intersection::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Intersection::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -112,7 +112,7 @@ SmoothUnion::SmoothUnion()
 }
 
 //--------------------------------------------------------------
-bool SmoothUnion::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool SmoothUnion::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -145,7 +145,7 @@ SmoothSubstraction::SmoothSubstraction()
 }
 
 //--------------------------------------------------------------
-bool SmoothSubstraction::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool SmoothSubstraction::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -178,7 +178,7 @@ SmoothIntersection::SmoothIntersection()
 }
 
 //--------------------------------------------------------------
-bool SmoothIntersection::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool SmoothIntersection::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {    
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -279,7 +279,7 @@ HighResSdfOutput::~HighResSdfOutput()
 {
 }
 //--------------------------------------------------------------
-bool HighResSdfOutput::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool HighResSdfOutput::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId;
     auto& frame = visitor.getCurrentFrame();

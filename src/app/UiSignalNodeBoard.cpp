@@ -264,7 +264,7 @@ void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
     auto* node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
     auto* node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
 
-    if(node1->getOperation()->getPinType() == node2->getOperation()->getPinType())
+    if(a->type == b->type)
     {
         bool node1_is_src = !a->isInput;
 

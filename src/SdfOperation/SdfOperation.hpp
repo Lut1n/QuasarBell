@@ -34,8 +34,8 @@ struct RMPreview
         ~RenderFrame();
 
         void reset();
-        void compute(qb::RMFrame& frame);
-        void updateUniforms(qb::RMFrame& frame);
+        void compute(qb::GlslFrame& frame);
+        void updateUniforms(qb::GlslFrame& frame);
         void render();
     };
 
@@ -57,12 +57,13 @@ struct SdfOperation : public BaseOperation
     virtual ~SdfOperation() = default;
 
     void update();
-    bool sampleInput(size_t index, qb::RMBuilderVisitor& visitor);
-    std::string pushOpOrInput(size_t index, qb::RMBuilderVisitor& visitor, const vec4& uniform);
+    bool sampleInput(size_t index, qb::GlslBuilderVisitor& visitor);
+    bool sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor);
+    std::string pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
 
     virtual std::string name() const;
     bool sample(size_t index, BaseOperationVisitor& visitor) override;
-    virtual bool sample(size_t index, qb::RMBuilderVisitor& visitor);
+    virtual bool sample(size_t index, qb::GlslBuilderVisitor& visitor);
     
     void uiPreview() override;
 

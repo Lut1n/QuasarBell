@@ -20,7 +20,7 @@ SdfPrimitive::SdfPrimitive(qb::SdfOperationType opType)
 {}
 
 //--------------------------------------------------------------
-void SdfPrimitive::prepareOperation(qb::RMBuilderVisitor& visitor, size_t& opId, size_t& tfmrId)
+void SdfPrimitive::prepareOperation(qb::GlslBuilderVisitor& visitor, size_t& opId, size_t& tfmrId)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -30,7 +30,7 @@ void SdfPrimitive::prepareOperation(qb::RMBuilderVisitor& visitor, size_t& opId,
 }
 
 //--------------------------------------------------------------
-void SdfPrimitive::setupOperation(qb::RMBuilderVisitor& visitor, size_t opId, const std::string& glsl)
+void SdfPrimitive::setupOperation(qb::GlslBuilderVisitor& visitor, size_t opId, const std::string& glsl)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -52,7 +52,7 @@ Sphere::Sphere()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Sphere::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Sphere::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -88,7 +88,7 @@ Box::Box()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Box::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Box::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -128,7 +128,7 @@ RoundBox::RoundBox()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool RoundBox::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool RoundBox::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -164,7 +164,7 @@ Torus::Torus()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Torus::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Torus::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -200,7 +200,7 @@ HexagonalPrism::HexagonalPrism()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool HexagonalPrism::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool HexagonalPrism::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -235,7 +235,7 @@ TriangularPrism::TriangularPrism()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool TriangularPrism::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool TriangularPrism::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -270,7 +270,7 @@ Capsule::Capsule()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Capsule::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Capsule::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -306,7 +306,7 @@ Cone::Cone()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Cone::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Cone::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -343,7 +343,7 @@ RoundedCone::RoundedCone()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool RoundedCone::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool RoundedCone::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -380,7 +380,7 @@ Cylinder::Cylinder()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Cylinder::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Cylinder::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -417,7 +417,7 @@ RoundedCylinder::RoundedCylinder()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool RoundedCylinder::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool RoundedCylinder::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -453,7 +453,7 @@ Octahedron::Octahedron()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Octahedron::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Octahedron::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -487,7 +487,7 @@ Pyramid::Pyramid()
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
-bool Pyramid::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool Pyramid::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);

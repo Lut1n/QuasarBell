@@ -8,8 +8,8 @@ struct SdfPrimitive : public SdfOperation
 {
     SdfPrimitive(qb::SdfOperationType opType);
     
-    void prepareOperation(qb::RMBuilderVisitor& visitor, size_t& opId, size_t& tfmrId);
-    void setupOperation(qb::RMBuilderVisitor& visitor, size_t opId, const std::string& glsl);
+    void prepareOperation(qb::GlslBuilderVisitor& visitor, size_t& opId, size_t& tfmrId);
+    void setupOperation(qb::GlslBuilderVisitor& visitor, size_t opId, const std::string& glsl);
 
     float rgb[3] = {1.0,1.0,1.0};
 };
@@ -18,7 +18,7 @@ struct SdfPrimitive : public SdfOperation
 struct Sphere : public SdfPrimitive
 {
     Sphere();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -31,7 +31,7 @@ struct Sphere : public SdfPrimitive
 struct Box : public SdfPrimitive
 {
     Box();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -43,7 +43,7 @@ struct Box : public SdfPrimitive
 struct RoundBox : public SdfPrimitive
 {
     RoundBox();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -56,7 +56,7 @@ struct RoundBox : public SdfPrimitive
 struct Torus : public SdfPrimitive
 {
     Torus();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -68,7 +68,7 @@ struct Torus : public SdfPrimitive
 struct HexagonalPrism : public SdfPrimitive
 {
     HexagonalPrism();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -80,7 +80,7 @@ struct HexagonalPrism : public SdfPrimitive
 struct TriangularPrism : public SdfPrimitive
 {
     TriangularPrism();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -92,7 +92,7 @@ struct TriangularPrism : public SdfPrimitive
 struct Capsule : public SdfPrimitive
 {
     Capsule();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -104,7 +104,7 @@ struct Capsule : public SdfPrimitive
 struct Cone : public SdfPrimitive
 {
     Cone();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -116,7 +116,7 @@ struct Cone : public SdfPrimitive
 struct RoundedCone : public SdfPrimitive
 {
     RoundedCone();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -128,7 +128,7 @@ struct RoundedCone : public SdfPrimitive
 struct Cylinder : public SdfPrimitive
 {
     Cylinder();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -140,7 +140,7 @@ struct Cylinder : public SdfPrimitive
 struct RoundedCylinder : public SdfPrimitive
 {
     RoundedCylinder();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -152,7 +152,7 @@ struct RoundedCylinder : public SdfPrimitive
 struct Octahedron : public SdfPrimitive
 {
     Octahedron();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -164,7 +164,7 @@ struct Octahedron : public SdfPrimitive
 struct Pyramid : public SdfPrimitive
 {
     Pyramid();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 

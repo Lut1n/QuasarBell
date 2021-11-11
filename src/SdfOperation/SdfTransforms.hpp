@@ -8,7 +8,7 @@ struct Transform : public SdfOperation
 {
     Transform();
     void startSampling(int d) override;
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -22,7 +22,7 @@ struct Transform : public SdfOperation
 struct Repetition : public SdfOperation
 {
     Repetition();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -36,7 +36,7 @@ struct Repetition : public SdfOperation
 struct Displacement : public SdfOperation
 {
     Displacement();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -45,7 +45,7 @@ struct Displacement : public SdfOperation
 struct Twist : public SdfOperation
 {
     Twist();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -56,7 +56,7 @@ struct Twist : public SdfOperation
 struct Bend : public SdfOperation
 {
     Bend();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -67,7 +67,7 @@ struct Bend : public SdfOperation
 struct Elongation : public SdfOperation
 {
     Elongation();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
     
@@ -80,7 +80,7 @@ struct Elongation : public SdfOperation
 struct Symmetry : public SdfOperation
 {
     Symmetry();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
     

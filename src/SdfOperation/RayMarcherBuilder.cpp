@@ -63,7 +63,7 @@ std::string qb::replaceArgs(const std::string& glslTemplate, const std::vector<s
     }
     return glsl;
 }*/
-std::string qb::tfmr(size_t i)
+/*std::string qb::tfmr(size_t i)
 {
     return std::string("tfmr_") + std::to_string(i);
 }
@@ -180,9 +180,9 @@ size_t qb::RMFrame::pushContext()
 void qb::RMFrame::popContext()
 {
     contextStack.pop_back();
-}
+}*/
 //--------------------------------------------------------------
-std::string qb::RMFrame::compile()
+/*std::string qb::RMFrame::compile()
 {
     std::string glsl;
     glsl += "#version 330\n";
@@ -273,24 +273,27 @@ std::string qb::RMFrame::compile()
     glsl += "fragColor = render(uv0);\n};\n";
     
     return glsl;
-}
+}*/
 //--------------------------------------------------------------
-qb::RMFrame& qb::RMBuilderVisitor::getCurrentFrame()
+/*qb::RMFrame& qb::RMBuilderVisitor::getCurrentFrame()
 {
     if(frameStack.size() > 0)
-        return *frameStack.back();
+        return *dynamic_cast<RMFrame*>(frameStack.back().get());
     return mainFrame;
 }
 //--------------------------------------------------------------
-void qb::RMBuilderVisitor::pushFrame()
+void qb::RMBuilderVisitor::pushFrame(bool glsl)
 {
     auto& frames = getCurrentFrame().frames;
-    frames.push_back(RMFrame());
-    frames.back().resolution = mainFrame.resolution;
-    frameStack.push_back(&frames.back());
+    if (glsl)
+        frames.push_back(std::unique_ptr<GlslFrame>());
+    else
+        frames.push_back(std::unique_ptr<RMFrame>());
+    frames.back()->resolution = mainFrame.resolution;
+    frameStack.push_back(frames.back());
 }
 //--------------------------------------------------------------
 void qb::RMBuilderVisitor::popFrame()
 {
     frameStack.pop_back();
-}
+}*/

@@ -7,7 +7,7 @@
 struct Union : public SdfOperation
 {
     Union();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -16,7 +16,7 @@ struct Union : public SdfOperation
 struct Substraction : public SdfOperation
 {
     Substraction();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -25,7 +25,7 @@ struct Substraction : public SdfOperation
 struct Intersection : public SdfOperation
 {
     Intersection();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 };
@@ -34,7 +34,7 @@ struct Intersection : public SdfOperation
 struct SmoothUnion : public SdfOperation
 {
     SmoothUnion();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
 
@@ -45,7 +45,7 @@ struct SmoothUnion : public SdfOperation
 struct SmoothSubstraction : public SdfOperation
 {
     SmoothSubstraction();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
     
@@ -56,7 +56,7 @@ struct SmoothSubstraction : public SdfOperation
 struct SmoothIntersection : public SdfOperation
 {
     SmoothIntersection();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     std::string getOperationCode() const override;
     
@@ -68,7 +68,7 @@ struct HighResSdfOutput : public SdfOperation
 {
     HighResSdfOutput();
     ~HighResSdfOutput();
-    bool sample(size_t index, qb::RMBuilderVisitor& visitor) override;
+    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
 
     void uiProperties() override;
 

@@ -10,6 +10,7 @@
 #include "Core/Math.hpp"
 #include "SdfOperation/SdfOperationType.hpp"
 #include "App/BaseOperationNode.hpp"
+#include "ImageOperation/GlslBuilder.hpp"
 
 //--------------------------------------------------------------
 namespace qb
@@ -25,7 +26,7 @@ namespace qb
     void replaceAll(std::string& glsl, const std::string& key, const std::string& val);
     std::string replaceArgs(const std::string& glslTemplate, const std::vector<std::string>& args);
 */
-    std::string tfmr(size_t i);
+    /*std::string tfmr(size_t i);
 
     struct RMContext
     {
@@ -55,18 +56,18 @@ namespace qb
         size_t getNextVa();
 
         void pushCode(const std::string& toAdd);
-    };
+    };*/
 
-    struct RMFrame
+    /*struct RMFrame : public BaseGlslFrame
     {
         int resolution = 256;
         std::vector<vec4> inputs;
         std::vector<Kernel> kernels;
-        std::vector<RMFrame> frames;
+        std::vector<std::unique_ptr<BaseGlslFrame>> frames;
         std::unordered_map<SdfOperationType, std::string> functions;
 
-        RMContext mainContext;
-        std::vector<RMContext> subContexts;
+        GlslContext mainContext;
+        std::vector<GlslContext> subContexts;
         
         std::list<size_t> contextStack;
 
@@ -74,24 +75,25 @@ namespace qb
 
         size_t pushInput(const vec4& v4);
         size_t pushKernel(const Kernel& ke);
-        RMContext& getContext();
+        GlslContext& getContext();
 
         size_t pushContext();
         void popContext();
 
         std::string compile();
-    };
+    };*/
 
-    struct RMBuilderVisitor : public BaseOperationVisitor
+    /*struct RMBuilderVisitor : public BaseOperationVisitor
     {
         RMFrame mainFrame;
-        std::list<RMFrame*> frameStack;
+        std::list<GlslFrame*> frameStack;
 
         RMFrame& getCurrentFrame();
+        GlslFrame& getCurrentGlslFrame();
 
-        void pushFrame();
+        void pushFrame(bool glsl = false);
         void popFrame();
-    };
+    };*/
 };
 
 

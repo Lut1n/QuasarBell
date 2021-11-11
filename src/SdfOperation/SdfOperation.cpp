@@ -37,7 +37,7 @@ void RMPreview::RenderFrame::reset()
 }
 
 //--------------------------------------------------------------
-void RMPreview::RenderFrame::compute(qb::RMFrame& frame)
+void RMPreview::RenderFrame::compute(qb::GlslFrame& frame)
 {
     // if recompile
     size_t frameId = 0;
@@ -61,7 +61,7 @@ void RMPreview::RenderFrame::compute(qb::RMFrame& frame)
 }
 
 //--------------------------------------------------------------
-void RMPreview::RenderFrame::updateUniforms(qb::RMFrame& frame)
+void RMPreview::RenderFrame::updateUniforms(qb::GlslFrame& frame)
 {
     size_t frameId = 0;
     for(auto& f2 : frame.frames) frames[frameId++]->updateUniforms(f2);
@@ -127,7 +127,8 @@ void RMPreview::compute(SdfOperation* operation)
 
     operation->startSamplingGraph();
 
-    qb::RMBuilderVisitor visitor;
+    qb::GlslBuilderVisitor visitor;
+    visitor.mainFrame.type = qb::GlslFrame::Type::Sdf;
     visitor.mainFrame.resolution = resolution;
     bool opValid = operation->sample(0, visitor);
 
@@ -151,7 +152,7 @@ void RMPreview::compute(SdfOperation* operation)
     hasChange = false;
 }
 //--------------------------------------------------------------
-bool SdfOperation::sampleInput(size_t index, qb::RMBuilderVisitor& visitor)
+bool SdfOperation::sampleInput(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto* co = getInput(index);
     if (co->refs.size() > 0 && co->refs[0].operation)
@@ -162,7 +163,22 @@ bool SdfOperation::sampleInput(size_t index, qb::RMBuilderVisitor& visitor)
         return false;
 }
 //--------------------------------------------------------------
-std::string SdfOperation::pushOpOrInput(size_t index, qb::RMBuilderVisitor& visitor, const vec4& uniform)
+bool SdfOperation::sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor)
+{
+    auto* co = getInput(index);
+    if (co->refs.size() > 0 && co->refs[0].operation)
+    {
+        visitor.pushFrame(qb::GlslFrame::Type::Texture);
+        bool ret = co->refs[0].operation->sample(co->refs[0].index, visitor);
+        visitor.popFrame();
+
+        return ret;
+    }
+    else
+        return false;
+}
+//--------------------------------------------------------------
+std::string SdfOperation::pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -179,10 +195,10 @@ std::string SdfOperation::name() const
 //--------------------------------------------------------------
 bool SdfOperation::sample(size_t index, BaseOperationVisitor& visitor)
 {
-    return sample(index, dynamic_cast<qb::RMBuilderVisitor&>(visitor));
+    return sample(index, dynamic_cast<qb::GlslBuilderVisitor&>(visitor));
 }
 //--------------------------------------------------------------
-bool SdfOperation::sample(size_t index, qb::RMBuilderVisitor& visitor)
+bool SdfOperation::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     // to implement by children
     // frame.setFunctions(getNodeType(), getOperationCode());
