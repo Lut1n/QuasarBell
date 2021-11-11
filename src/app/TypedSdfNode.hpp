@@ -5,6 +5,7 @@
 #include "SdfOperation/SdfOperation.hpp"
 #include "SdfOperation/SdfPrimitives.hpp"
 #include "SdfOperation/SdfTransforms.hpp"
+#include "SdfOperation/SdfSampling.hpp"
 #include "SdfOperation/SdfBasicOperations.hpp"
 
 MAKE_GEOMETRY_NODE(Sphere, qb::SdfOperationType_Sphere)
@@ -28,11 +29,12 @@ MAKE_GEOMETRY_NODE(SmoothSubstraction, qb::SdfOperationType_SmoothSubstraction)
 MAKE_GEOMETRY_NODE(SmoothIntersection, qb::SdfOperationType_SmoothIntersection)
 MAKE_GEOMETRY_NODE(Transform, qb::SdfOperationType_Transform)
 MAKE_GEOMETRY_NODE(Repetition, qb::SdfOperationType_Repetition)
-MAKE_GEOMETRY_NODE(Displacement, qb::SdfOperationType_Displacement)
 MAKE_GEOMETRY_NODE(Twist, qb::SdfOperationType_Twist)
 MAKE_GEOMETRY_NODE(Bend, qb::SdfOperationType_Bend)
 MAKE_GEOMETRY_NODE(Elongation, qb::SdfOperationType_Elongation)
 MAKE_GEOMETRY_NODE(Symmetry, qb::SdfOperationType_Symmetry)
+MAKE_GEOMETRY_NODE(Displacement, qb::SdfOperationType_Displacement)
+MAKE_GEOMETRY_NODE(Texturing, qb::SdfOperationType_Texturing)
 MAKE_GEOMETRY_NODE(HighResSdfOutput, qb::SdfOperationType_HighResOutput)
 
 

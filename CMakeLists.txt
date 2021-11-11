@@ -62,6 +62,7 @@ add_executable(
     src/SdfOperation/SdfPrimitives.hpp
     src/SdfOperation/SdfBasicOperations.hpp
     src/SdfOperation/SdfTransforms.hpp
+    src/SdfOperation/SdfSampling.hpp
     src/Core/Version.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
@@ -147,6 +148,7 @@ add_executable(
     src/SdfOperation/SdfPrimitives.cpp
     src/SdfOperation/SdfBasicOperations.cpp
     src/SdfOperation/SdfTransforms.cpp
+    src/SdfOperation/SdfSampling.cpp
     src/Core/Vec2.cpp
     src/Core/Quat.cpp
     src/Core/PseudoRand.cpp

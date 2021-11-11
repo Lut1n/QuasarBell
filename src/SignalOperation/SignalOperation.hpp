@@ -41,7 +41,7 @@ struct SignalOperation : public BaseOperation
     void uiPreview() override;
     void onInputConnectionChanged() override;
     void onPropertiesChanged() override;
-    void dirty();
+    void dirty(bool recompile = false) override;
 
     SignalPreview preview;
 

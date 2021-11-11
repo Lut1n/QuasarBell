@@ -73,6 +73,7 @@ namespace qb
         std::vector<GlslFrame> frames;
         std::unordered_map<ImageOperationType, std::string> functions;
         std::unordered_map<SdfOperationType, std::string> sdfFunctions;
+        std::unordered_map<std::string, std::string> optFunctions;
 
         GlslContext mainContext;
         std::vector<GlslContext> subContexts;
@@ -81,6 +82,7 @@ namespace qb
 
         void setFunctions(ImageOperationType operationType, const std::string& functionCode);
         void setFunctions(SdfOperationType operationType, const std::string& functionCode);
+        void setFunctions(const std::string& id, const std::string& functionCode);
 
         size_t pushInput(const vec4& v4);
         size_t pushKernel(const Kernel& ke);
@@ -100,7 +102,7 @@ namespace qb
 
         GlslFrame& getCurrentFrame();
 
-        void pushFrame(GlslFrame::Type type);
+        size_t pushFrame(GlslFrame::Type type);
         void popFrame();
     };
 };

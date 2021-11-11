@@ -33,15 +33,6 @@ struct Repetition : public SdfOperation
 };
 
 //--------------------------------------------------------------
-struct Displacement : public SdfOperation
-{
-    Displacement();
-    bool sample(size_t index, qb::GlslBuilderVisitor& visitor) override;
-
-    std::string getOperationCode() const override;
-};
-
-//--------------------------------------------------------------
 struct Twist : public SdfOperation
 {
     Twist();

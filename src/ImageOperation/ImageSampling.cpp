@@ -23,8 +23,7 @@ bool ImageFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 
     auto& frame = visitor.getCurrentFrame();
 
-    size_t inputFrame = 0;
-    visitor.pushFrame(qb::GlslFrame::Type::Texture);
+    size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
     bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 
@@ -38,7 +37,7 @@ bool ImageFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
         size_t uvId = context.getUvId();
 
         std::string glsl = "vec4 v$1 = image_filter($3, $4, $5, int($2.x));\n";
-        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId), qb::ke(ke1)});
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(frameId), qb::uv(uvId), qb::ke(ke1)});
         context.pushVa(opId);
         context.pushCode(glsl);
 
@@ -121,8 +120,7 @@ bool MorphoFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
 
-    size_t inputFrame = 0;
-    visitor.pushFrame(qb::GlslFrame::Type::Texture);
+    size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
     bool inputValid = sampleInput(0, visitor);
     visitor.popFrame();
 
@@ -152,7 +150,7 @@ bool MorphoFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
         "        v$1.xyz = max(v$1.xyz, texture2D($3,kuv$1).xyz);\n"
         "}}\n";
 
-        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(inputFrame), qb::uv(uvId), radiusId});
+        glsl = qb::replaceArgs(glsl, {std::to_string(opId), qb::in(in1), qb::sa(frameId), qb::uv(uvId), radiusId});
         context.pushVa(opId);
         context.pushCode(glsl);
 

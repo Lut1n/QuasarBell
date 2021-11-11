@@ -28,11 +28,12 @@ namespace qb
         {SdfOperationType_SmoothIntersection, "s-inter"},
         {SdfOperationType_Transform, "transform"},
         {SdfOperationType_Repetition, "repetition"},
-        {SdfOperationType_Displacement, "displacement"},
         {SdfOperationType_Twist, "twist"},
         {SdfOperationType_Bend, "bend"},
         {SdfOperationType_Elongation, "elongation"},
         {SdfOperationType_Symmetry, "symmetry"},
+        {SdfOperationType_Displacement, "displacement"},
+        {SdfOperationType_Texturing, "texturing"},
         {SdfOperationType_HighResOutput, "high-res"}
     };
 }

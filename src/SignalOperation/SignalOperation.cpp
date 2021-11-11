@@ -96,10 +96,10 @@ void SignalOperation::onInputConnectionChanged()
 //--------------------------------------------------------------
 void SignalOperation::onPropertiesChanged()
 {
-    dirty();
+    dirty(false);
 }
 //--------------------------------------------------------------
-void SignalOperation::dirty()
+void SignalOperation::dirty(bool /*recompile*/)
 {
     preview.dirty();
     for(auto& output : outputs)

@@ -163,12 +163,12 @@ bool SdfOperation::sampleInput(size_t index, qb::GlslBuilderVisitor& visitor)
         return false;
 }
 //--------------------------------------------------------------
-bool SdfOperation::sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor)
+bool SdfOperation::sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor, size_t& frameId)
 {
     auto* co = getInput(index);
     if (co->refs.size() > 0 && co->refs[0].operation)
     {
-        visitor.pushFrame(qb::GlslFrame::Type::Texture);
+        frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
         bool ret = co->refs[0].operation->sample(co->refs[0].index, visitor);
         visitor.popFrame();
 
@@ -260,9 +260,7 @@ void SdfOperation::dirty(bool recompile)
     for(auto& output : outputs)
     {
         for(auto& ref : output.refs)
-        {
-            dynamic_cast<SdfOperation*>(ref.operation)->dirty(recompile);
-        }
+            ref.operation->dirty(recompile);
     }
 }
 

@@ -114,6 +114,7 @@ struct BaseOperation
     
     virtual void onInputConnectionChanged() = 0;
     virtual void onPropertiesChanged() = 0;
+    virtual void dirty(bool recompile = false) = 0;
 
 protected:
     std::vector<BaseOperationConnection> inputs;

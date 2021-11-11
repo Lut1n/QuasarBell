@@ -58,7 +58,7 @@ struct SdfOperation : public BaseOperation
 
     void update();
     bool sampleInput(size_t index, qb::GlslBuilderVisitor& visitor);
-    bool sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor);
+    bool sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visitor, size_t& frameId);
     std::string pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
 
     virtual std::string name() const;
@@ -69,7 +69,7 @@ struct SdfOperation : public BaseOperation
 
     void onInputConnectionChanged() override;
     void onPropertiesChanged() override;
-    void dirty(bool recompile = false);
+    void dirty(bool recompile = false) override;
 
     qb::SdfOperationType getNodeType() const;
 

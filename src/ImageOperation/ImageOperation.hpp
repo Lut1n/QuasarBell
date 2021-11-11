@@ -68,7 +68,7 @@ struct ImageOperation : public BaseOperation
 
     void onInputConnectionChanged() override;
     void onPropertiesChanged() override;
-    void dirty(bool recompile = false);
+    void dirty(bool recompile = false) override;
 
     qb::ImageOperationType getNodeType() const;
 

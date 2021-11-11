@@ -30,11 +30,12 @@ namespace qb
         SdfOperationType_SmoothIntersection,
         SdfOperationType_Transform,
         SdfOperationType_Repetition,
-        SdfOperationType_Displacement,
         SdfOperationType_Twist,
         SdfOperationType_Bend,
         SdfOperationType_Elongation,
         SdfOperationType_Symmetry,
+        SdfOperationType_Displacement,
+        SdfOperationType_Texturing,
         SdfOperationType_HighResOutput,
 
         SdfOperationType_Count,

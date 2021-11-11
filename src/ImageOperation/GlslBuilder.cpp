@@ -151,6 +151,12 @@ void qb::GlslFrame::setFunctions(SdfOperationType operationType, const std::stri
         sdfFunctions[operationType] = functionCode;
 }
 //--------------------------------------------------------------
+void qb::GlslFrame::setFunctions(const std::string& id, const std::string& functionCode)
+{
+    if(optFunctions.find(id) == optFunctions.end())
+        optFunctions[id] = functionCode;
+}
+//--------------------------------------------------------------
 size_t qb::GlslFrame::pushInput(const vec4& v4)
 {
     size_t id = inputs.size();
@@ -262,6 +268,7 @@ std::string qb::GlslFrame::compile()
     glsl += "int resolution = " + std::to_string(resolution) + ";\n";
 
     // functions
+    for(auto& func : optFunctions) glsl += func.second;
     for(auto& func : functions) glsl += func.second;
     for(auto& func : sdfFunctions) glsl += func.second;
 
@@ -300,13 +307,15 @@ qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
     return mainFrame;
 }
 //--------------------------------------------------------------
-void qb::GlslBuilderVisitor::pushFrame(GlslFrame::Type type)
+size_t qb::GlslBuilderVisitor::pushFrame(GlslFrame::Type type)
 {
     auto& frames = getCurrentFrame().frames;
+    size_t idx = frames.size();
     frames.push_back(GlslFrame());
     frames.back().type = type;
     frames.back().resolution = mainFrame.resolution;
     frameStack.push_back(&frames.back());
+    return idx;
 }
 //--------------------------------------------------------------
 void qb::GlslBuilderVisitor::popFrame()

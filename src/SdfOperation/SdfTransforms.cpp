@@ -184,51 +184,6 @@ std::string Repetition::getOperationCode() const
 }
 
 //--------------------------------------------------------------
-Displacement::Displacement()
-    : SdfOperation(qb::SdfOperationType_Displacement)
-{
-    makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
-    makeOutput("out", BaseOperationDataType::Float);
-}
-//--------------------------------------------------------------
-bool Displacement::sample(size_t index, qb::GlslBuilderVisitor& visitor)
-{
-    auto& frame = visitor.getCurrentFrame();
-    auto& context = frame.getContext();
-
-    if (sampleTextureInput(1, visitor))
-    {
-        std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
-        std::string in2 = qb::sa(0);
-
-        size_t opId = context.getNextVa();
-
-        std::string glsl = "vec4 $1 = opDisplacement($2, $3);\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(opId), in1, in2});
-
-        context.pushVa(opId);
-        context.pushCode(glsl);
-
-        frame.setFunctions(getNodeType(), getOperationCode());
-        return true;
-    }
-    
-    return false;
-}
-
-//--------------------------------------------------------------
-std::string Displacement::getOperationCode() const
-{
-    static constexpr std::string_view code =
-    "vec4 opDisplacement(vec4 v1, sampler2D s2d){\n"
-    // "    return vec4(v1.x+texture2D(s2d,vec2(0,0)).x, v1.yzw);\n"
-    "    return vec4(v1.x, v1.yzw * texture2D(s2d,vec2(0.5,0.5)).xyz);\n"
-    "}\n";
-    return std::string(code);
-}
-
-//--------------------------------------------------------------
 Twist::Twist()
     : SdfOperation(qb::SdfOperationType_Twist)
 {

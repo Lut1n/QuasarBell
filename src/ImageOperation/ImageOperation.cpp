@@ -242,9 +242,7 @@ void ImageOperation::dirty(bool recompile)
     for(auto& output : outputs)
     {
         for(auto& ref : output.refs)
-        {
-            dynamic_cast<ImageOperation*>(ref.operation)->dirty(recompile);
-        }
+            ref.operation->dirty(recompile);
     }
 }
 
