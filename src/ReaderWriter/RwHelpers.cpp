@@ -22,11 +22,8 @@ void jsonTo(JsonValue& json, vec2& v)
 //--------------------------------------------------------------
 void writeInfo(JsonValue& root)
 {
-    struct tm buf;
-    auto now = std::chrono::system_clock::now();
-    auto t_c = std::chrono::system_clock::to_time_t(now);
-    ::localtime_s(&buf, &t_c);
-    std::stringstream date; date << std::put_time(&buf, "%Y-%m-%d %X");
+    time_t t = time(NULL);
+    std::stringstream date; date << std::put_time(localtime(&t), "%Y-%m-%d %X");
 
     std::string app = "QuasarBell (https://www.github.com/Lut1n/QuasarBell)";
 

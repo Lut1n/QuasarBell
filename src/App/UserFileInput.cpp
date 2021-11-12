@@ -3,6 +3,17 @@
 
 #include "imgui.h"
 
+#include <string>
+
+namespace qb
+{
+    void strcpy(char* dst, size_t dstSize, const char* src, size_t srcSize)
+    {
+        size_t n = dstSize < srcSize ? dstSize : srcSize;
+        for(size_t i=0; i<n; ++i) dst[i] = src[i];
+    }
+}
+
 //--------------------------------------------------------------
 UserFileInput::UserFileInput(const std::string& title, const std::string& ext, const std::string& defaultPath)
     : _title(title)
@@ -46,7 +57,7 @@ void UserFileInput::display()
             if (std::string::npos != last_slash_idx)
                 filepath.erase(0, last_slash_idx + 1);
         }
-        strcpy_s(_editBuffer, 512, filepath.c_str());
+        qb::strcpy(_editBuffer, 512, filepath.c_str(), filepath.size()+1);
         requestOpen = false;
     }
     
@@ -71,7 +82,7 @@ void UserFileInput::display()
                 if(ImGui::Selectable(info.name.c_str(), info.name == filepath))
                 {
                     filepath = info.name;
-                    strcpy_s(_editBuffer, 512, filepath.c_str());
+                    qb::strcpy(_editBuffer, 512, filepath.c_str(), filepath.size()+1);
                 }
             }
             else if (info.isDir)

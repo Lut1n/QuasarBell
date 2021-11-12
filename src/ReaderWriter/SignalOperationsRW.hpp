@@ -1,7 +1,7 @@
 #ifndef JSON_SIGNAL_OPERATIONS_H
 #define JSON_SIGNAL_OPERATIONS_H
 
-#include "Json/json.hpp"
+#include "Json/Json.hpp"
 #include "Ui/UiPin.h"
 #include "App/BaseOperationNode.hpp"
 

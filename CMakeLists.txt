@@ -10,8 +10,7 @@ set(glfw3_DIR "C:/Program Files (x86)/glfw/lib/cmake/glfw3")
 find_package(glfw3 3.3 REQUIRED CONFIG)
 find_package(OpenAL REQUIRED)
 
-add_executable(
-    ${PROJECT_NAME}
+set(QB_SOURCES
     src/App/UiSignalNodeBoard.hpp
     src/App/AppInterface.hpp
     src/App/UserFileInput.hpp
@@ -22,8 +21,8 @@ add_executable(
     src/App/SdfNode.hpp
     src/App/TypedSdfNode.hpp
     src/App/BaseOperationNode.hpp
-    src/Json/json.hpp
-    src/Json/jsonrw.hpp
+    src/Json/Json.hpp
+    src/Json/JsonReaderWriter.hpp
     src/ReaderWriter/FileIO.hpp
     src/ReaderWriter/RwHelpers.hpp
     src/ReaderWriter/FileExplorer.hpp
@@ -109,8 +108,8 @@ add_executable(
     src/App/SdfNode.cpp
     src/App/TypedSdfNode.cpp
     src/App/BaseOperationNode.cpp
-    src/Json/json.cpp
-    src/Json/jsonrw.cpp
+    src/Json/Json.cpp
+    src/Json/JsonReaderWriter.cpp
     src/ReaderWriter/FileIO.cpp
     src/ReaderWriter/RwHelpers.cpp
     src/ReaderWriter/FileExplorer.cpp
@@ -187,7 +186,9 @@ add_executable(
     
     # this one is included in src/App/Gui.cpp
     # thirdparty/glad/src/glad.c
-    )
+)
+
+add_executable(${PROJECT_NAME} ${QB_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
