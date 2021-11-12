@@ -25,7 +25,10 @@ void UiRect::draw()
     surface = surface.clampTo(parentClippingRect);
     
     RenderInterface::setColor(color);
-    RenderInterface::fill(surface.p0, surface.p1);
+    if (rounded)
+        RenderInterface::fillRounded(surface.p0, surface.p1, cornerRadius);
+    else
+        RenderInterface::fill(surface.p0, surface.p1);
     if (borderEnabled)
     {
         RenderInterface::setColor(0xFFFFFFFF);

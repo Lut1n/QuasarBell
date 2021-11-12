@@ -9,7 +9,7 @@
 #include <list>
 
 #include "SdfOperation/SdfOperationType.hpp"
-#include "SdfOperation/RayMarcherBuilder.hpp"
+#include "ImageOperation/GlslBuilder.hpp"
 #include "App/BaseOperationNode.hpp"
 
 #include "Core/Math.hpp"

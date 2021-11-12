@@ -17,6 +17,8 @@ public:
     unsigned color = 0x000000FF;
     bool visible = true;
     bool borderEnabled = true;
+    bool rounded = false;
+    float cornerRadius = 5.0f;
 };
 
 #endif // UI_RECT_H

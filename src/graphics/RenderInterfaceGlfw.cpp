@@ -144,6 +144,7 @@ static GlQuad* s_quad = nullptr;
 static GlSprite* s_sprite = nullptr;
 static GlSpriteShader* s_spriteShader = nullptr;
 static GlQuadShader* s_quadShader = nullptr;
+static GlRoundedShader* s_roundedShader = nullptr;
 static GlLineShader* s_lineShader = nullptr;
 
 void RenderInterface::deleteTarget(unsigned id)
@@ -198,6 +199,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         s_quad = new GlQuad();
         s_sprite = new GlSprite();
         s_spriteShader = new GlSpriteShader();
+        s_roundedShader = new GlRoundedShader();
         s_quadShader = new GlQuadShader();
         s_lineShader = new GlLineShader();
         GL_CHECKERROR("create window");
@@ -392,6 +394,19 @@ void RenderInterface::fill(const vec2& tl, const vec2& br)
     s_quadShader->bindAttributes();
     s_quad->draw();
     s_quadShader->unbindAttributes();
+}
+void RenderInterface::fillRounded(const vec2& tl, const vec2& br, float radius)
+{
+    vec2 size = br-tl;
+    vec2 vp = vec2((float) s_targets[s_currentTarget].width, (float) s_targets[s_currentTarget].height);
+    float colorf[4] = {comp(s_color,0), comp(s_color,1), comp(s_color,2), comp(s_color,3)};
+    s_roundedShader->setup(colorf, radius / size.y);
+    GL_CHECKERROR("rounded::setup --- rounded::update");
+    s_sprite->update(tl, size, vec2(0.0,0.0), vec2(1.0,1.0), vp, true);
+    GL_CHECKERROR("rounded::update --- bindAttrib");
+    s_roundedShader->bindAttributes();
+    s_sprite->draw();
+    s_roundedShader->unbindAttributes();
 }
 void RenderInterface::copy(unsigned srcTarget, const Rect& srcRect, const Rect& dstRect, bool ySrcInverted, bool yDstInverted)
 {

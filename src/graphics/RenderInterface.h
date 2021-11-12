@@ -32,6 +32,7 @@ struct RenderInterface
     static void arc(const vec2& center, float r, float a1 , float a2);
     static void rect(const vec2& tl, const vec2& br);
     static void fill(const vec2& tl, const vec2& br);
+    static void fillRounded(const vec2& tl, const vec2& br, float radius = 5.0f);
     static void copy(unsigned srcTarget, const Rect& srcRect, const Rect& dstRect, bool ySrcInverted = false, bool yDstInverted = false);
     static bool begin();
     static void end();

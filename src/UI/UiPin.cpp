@@ -9,6 +9,9 @@ UiPin::UiPin(UiNode* node, const std::string& label, const vec2& position, const
 {
     borderEnabled = false;
     parentNode = node;
+    rounded = true;
+    cornerRadius = 2.5f;
+    color = 0x26599dFF;
     this->label = std::make_unique<UiText>(label, position, 6.0f, 0xFFFFFFFF);
 }
 

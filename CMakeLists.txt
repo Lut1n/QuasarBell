@@ -56,7 +56,6 @@ add_executable(
     src/ImageOperation/ImageBasicOperators.hpp
     src/ImageOperation/ImageOperation.hpp
     src/ImageOperation/ImageOperationType.hpp
-    src/SdfOperation/RayMarcherBuilder.hpp
     src/SdfOperation/SdfOperation.hpp
     src/SdfOperation/SdfOperationType.hpp
     src/SdfOperation/SdfPrimitives.hpp
@@ -142,7 +141,6 @@ add_executable(
     src/ImageOperation/ImageBasicOperators.cpp
     src/ImageOperation/ImageOperation.cpp
     src/ImageOperation/ImageOperationType.cpp
-    src/SdfOperation/RayMarcherBuilder.cpp
     src/SdfOperation/SdfOperation.cpp
     src/SdfOperation/SdfOperationType.cpp
     src/SdfOperation/SdfPrimitives.cpp

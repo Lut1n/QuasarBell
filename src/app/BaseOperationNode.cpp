@@ -334,11 +334,11 @@ BaseOperationNode::BaseOperationNode(const std::string& title, size_t nodeTypeId
     : UiNode(title, vec2(0.0,0.0), vec2(70,70))
     , _nodetypeId(nodeTypeId)
 {
-    // unsigned basecolor = 0x010810FF;
-    unsigned basecolor = 0x505050FF;
+    unsigned basecolor = 0x001b1bFF;
     color = basecolor;
-    colorOnOver = 0x606060FF;
+    colorOnOver = 0x505050FF;
     colorOnIdle = basecolor;
+    rounded = true;
     _operation.reset(op);
     
     for(size_t i=0; i<_operation->getInputCount(); ++i)
