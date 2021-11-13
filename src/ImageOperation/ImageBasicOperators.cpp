@@ -12,8 +12,8 @@ ImageBasicOperators::ImageBasicOperators(qb::ImageOperationType type, const std:
     : ImageOperation(type)
     , _operatorSymbol(operatorSymbol)
 {
-    makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float);
+    makeInput("in1", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
+    makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("in1", &_in1, 0.0f, 10.0f);
     makeProperty("in2", &_in2, 0.0f, 10.0f);
@@ -23,9 +23,19 @@ bool ImageBasicOperators::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
+
+    bool samples3d0 = inputHasFlag(0, UiPin::Type_S3d);
+    bool samples3d1 = inputHasFlag(1, UiPin::Type_S3d);
     
-    std::string operand1 = pushOpOrInput(0,visitor, {_in1,_in1,_in1,1.0f});
-    std::string operand2 = pushOpOrInput(1,visitor, {_in2,_in2,_in2,1.0f});
+    std::string operand1, operand2, uvArg;
+    if ( samples3d0 )
+        operand1 = sampleSdfInput(0, visitor, {_in1,_in1,_in1,1.0f});
+    else
+        operand1 = pushOpOrInput(0,visitor, {_in1,_in1,_in1,1.0f});
+    if ( samples3d1 )
+        operand2 = sampleSdfInput(1, visitor, {_in2,_in2,_in2,1.0f});
+    else
+        operand2 = pushOpOrInput(1,visitor, {_in2,_in2,_in2,1.0f});
 
     size_t opId = context.getNextVa();
     std::string glsl = "vec4 $1 = vec4($2.xyz $3 $4.xyz, 1.0);\n";

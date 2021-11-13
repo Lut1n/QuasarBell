@@ -42,7 +42,7 @@ UiConnections::UiConnections()
 
 std::uint64_t UiConnections::createLink(UiPin* a, UiPin* b, bool useCallback)
 {
-    if(a == b || a->type != b->type || a->isInput == b->isInput) return 0;
+    if(a == b || !qb::hasFlag(a->typeFlags, b->typeFlags) || a->isInput == b->isInput) return 0;
 
     if (cycleCheck(a, b))
     {

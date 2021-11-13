@@ -32,7 +32,7 @@ struct BaseOperationConnection
     std::vector<Ref> refs;
     BaseOperationDataType type = BaseOperationDataType::Undefined;
     std::string name;
-    UiPin::Type pinType = UiPin::TYPE_BOOL;
+    size_t pinTypeFlags = UiPin::Type_None;
 };
 
 //--------------------------------------------------------------
@@ -52,7 +52,7 @@ struct BaseOperation
 
     using PropertyWrapper = std::tuple<std::string,BaseOperationDataType,void*,MinMaxVal>;
 
-    BaseOperation(UiPin::Type pinType);
+    BaseOperation(size_t defaultTypeFlags);
     virtual ~BaseOperation() = default;
 
     BaseOperationDataType getInputType(size_t index) const;
@@ -93,8 +93,8 @@ struct BaseOperation
     
     void makeInput(const std::string& name, BaseOperationDataType type);
     void makeOutput(const std::string& name, BaseOperationDataType type);
-    void makeInput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType);
-    void makeOutput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType);
+    void makeInput(const std::string& name, BaseOperationDataType type, size_t typeFlags);
+    void makeOutput(const std::string& name, BaseOperationDataType type, size_t typeFlags);
     void makeProperty(const std::string& name, BaseOperationDataType type, void* ptr);
     void makeProperty(const std::string& name, float* ptr, float minVal, float maxVal);
     void makeProperty(const std::string& name, int* ptr, int minVal, int maxVal);
@@ -105,9 +105,11 @@ struct BaseOperation
     virtual void saveCustomData(JsonValue& json);
     virtual void loadCustomData(JsonValue& json);
 
-    UiPin::Type getPinType() const {return _pinType;}
-    UiPin::Type getInputPinType(size_t i) const {return inputs[i].pinType;}
-    UiPin::Type getOutputPinType(size_t i) const {return outputs[i].pinType;}
+    size_t getDefaultTypeFlags() const {return _defaultTypeFlags;}
+    size_t getInputTypeFlags(size_t i) const {return inputs[i].pinTypeFlags;}
+    size_t getOutputTypeFlags(size_t i) const {return outputs[i].pinTypeFlags;}
+
+    bool inputHasFlag(size_t index, size_t typeFlag) const;
     
     virtual void uiProperties();
     virtual void uiPreview() = 0;
@@ -121,7 +123,7 @@ protected:
     std::vector<BaseOperationConnection> outputs;
     std::vector<PropertyWrapper> propertyWrappers;
 
-    UiPin::Type _pinType;
+    size_t _defaultTypeFlags;
     bool _hasCustomData = false;
 };
 

@@ -15,9 +15,9 @@ Transform::Transform()
     : SdfOperation(qb::SdfOperationType_Transform)
 {
     makeInput("in", BaseOperationDataType::Float);
-    makeInput("p", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
-    makeInput("r", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
-    makeInput("s", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("p", BaseOperationDataType::Float, UiPin::Type_S2d);
+    makeInput("r", BaseOperationDataType::Float, UiPin::Type_S2d);
+    makeInput("s", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("x",&x, -2.0, 2.0);
     makeProperty("y",&y, -2.0, 2.0);
@@ -233,7 +233,7 @@ Twist::Twist()
     : SdfOperation(qb::SdfOperationType_Twist)
 {
     makeInput("in", BaseOperationDataType::Float);
-    makeInput("k", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("k", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("k",&k, -10.0, 10.0);
 }
@@ -285,7 +285,7 @@ Bend::Bend()
     : SdfOperation(qb::SdfOperationType_Bend)
 {
     makeInput("in", BaseOperationDataType::Float);
-    makeInput("k", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("k", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("k",&k, -10.0, 10.0);
 }
@@ -337,7 +337,7 @@ Elongation::Elongation()
     : SdfOperation(qb::SdfOperationType_Elongation)
 {
     makeInput("in", BaseOperationDataType::Float);
-    makeInput("xyz", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("xyz", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("x",&x, -2.0, 2.0);
     makeProperty("y",&y, -2.0, 2.0);

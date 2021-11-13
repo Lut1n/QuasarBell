@@ -33,7 +33,7 @@ struct OperationConnections
     };
     std::vector<Entry> entries;
 
-    void fill(UiConnections* ui, const OperationCollection& coll, UiPin::Type pinType);
+    void fill(UiConnections* ui, const OperationCollection& coll, size_t pinType);
 };
 
 class OutputOperation;

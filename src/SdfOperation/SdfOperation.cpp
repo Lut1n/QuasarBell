@@ -104,7 +104,7 @@ void RMPreview::RenderFrame::render()
 
 //--------------------------------------------------------------
 SdfOperation::SdfOperation(qb::SdfOperationType opType)
-    : BaseOperation(UiPin::TYPE_FLOAT3)
+    : BaseOperation(UiPin::Type_S3d)
     , _operationType(opType)
 {
 }

@@ -23,14 +23,14 @@
 
 #include "ImageOperation/HighResOutput.hpp"
 
-void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll, UiPin::Type pinType)
+void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll, size_t typeFlags)
 {
     for (auto link : ui->links)
     {
         auto co = link.second;
         auto pin1 = co.first;
         auto pin2 = co.second;
-        if (pin1->type != pinType || pin2->type != pinType) continue;
+        if (qb::hasFlag(pin1->typeFlags, typeFlags) || qb::hasFlag(pin2->typeFlags, typeFlags)) continue;
         auto node1 = dynamic_cast<BaseOperationNode*>(pin1->parentNode);
         auto node2 = dynamic_cast<BaseOperationNode*>(pin2->parentNode);
         if(!node1 || !node2) continue;
@@ -169,11 +169,11 @@ void UiSignalNodeBoard::load(const std::string& path)
     cleanup();
     OperationConnections connections;
     JsonValue root = loadJsonFile(path);
-    loadFrom(root, operations, connections, "sfx-nodal", UiPin::TYPE_FLOAT1,
+    loadFrom(root, operations, connections, "sfx-nodal", UiPin::Type_S1d,
             [](const std::string& type){return Factory<SignalNode>::create(qb::getOperationType(type));});
-    loadFrom(root, operations, connections, "texture-nodal", UiPin::TYPE_FLOAT2,
+    loadFrom(root, operations, connections, "texture-nodal", UiPin::Type_S2d,
             [](const std::string& type){return Factory<ImageNode>::create(qb::getImageOperationType(type));});
-    loadFrom(root, operations, connections, "sdf-nodal", UiPin::TYPE_FLOAT3,
+    loadFrom(root, operations, connections, "sdf-nodal", UiPin::Type_S3d,
             [](const std::string& type){return Factory<GeometryNode>::create(qb::getSdfOperationType(type));});
 
     operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
@@ -193,14 +193,14 @@ void UiSignalNodeBoard::save(const std::string& path)
     JsonValue root;
     writeInfo(root);
     OperationConnections connections, iconnections, sconnections;
-    connections.fill(uiConnections, operations, UiPin::TYPE_FLOAT1);
-    saveInto(root, operations, connections, "sfx-nodal", UiPin::TYPE_FLOAT1,
+    connections.fill(uiConnections, operations, UiPin::Type_S1d);
+    saveInto(root, operations, connections, "sfx-nodal", UiPin::Type_S1d,
             [](BaseOperationNode* node){return qb::getOperationName(static_cast<qb::OperationType>(node->nodeTypeId()));});
-    iconnections.fill(uiConnections, operations, UiPin::TYPE_FLOAT2);
-    saveInto(root, operations, iconnections, "texture-nodal", UiPin::TYPE_FLOAT2,
+    iconnections.fill(uiConnections, operations, UiPin::Type_S2d);
+    saveInto(root, operations, iconnections, "texture-nodal", UiPin::Type_S2d,
             [](BaseOperationNode* node){return qb::getImageOperationName(static_cast<qb::ImageOperationType>(node->nodeTypeId()));});
-    sconnections.fill(uiConnections, operations, UiPin::TYPE_FLOAT3);
-    saveInto(root, operations, sconnections, "sdf-nodal", UiPin::TYPE_FLOAT3,
+    sconnections.fill(uiConnections, operations, UiPin::Type_S3d);
+    saveInto(root, operations, sconnections, "sdf-nodal", UiPin::Type_S3d,
             [](BaseOperationNode* node){return qb::getSdfOperationName(static_cast<qb::SdfOperationType>(node->nodeTypeId()));});
     saveJsonFile(path, root);
 }
@@ -238,7 +238,7 @@ void UiSignalNodeBoard::onConnect(UiPin* a, UiPin* b)
 {
     auto* node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
     auto* node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
-    if(a->type == b->type)
+    if(qb::hasFlag(a->typeFlags, b->typeFlags))
     {
         bool node1_is_src = !a->isInput;
 
@@ -264,7 +264,7 @@ void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
     auto* node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
     auto* node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
 
-    if(a->type == b->type)
+    if(qb::hasFlag(a->typeFlags, b->typeFlags))
     {
         bool node1_is_src = !a->isInput;
 

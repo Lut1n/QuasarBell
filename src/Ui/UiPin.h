@@ -7,6 +7,16 @@
 #include "Ui/UiRect.h"
 #include "Ui/UiText.h"
 
+using std::size_t;
+
+namespace qb
+{
+    static inline bool hasFlag(size_t flagSet, size_t flag)
+    {
+        return (flagSet & flag) != 0;
+    }
+}
+
 struct UiNode;
 
 struct UiPin : public UiRect
@@ -29,28 +39,14 @@ public:
     bool isInput = false;
     bool rightClicking = false;
 
-    enum Type
-    {
-        TYPE_BOOL,
-        TYPE_INT1,
-        TYPE_INT2,
-        TYPE_INT3,
-        TYPE_INT4,
-        TYPE_FLOAT1,
-        TYPE_FLOAT2,
-        TYPE_FLOAT3,
-        TYPE_FLOAT4,
-        TYPE_MATRIX3,
-        TYPE_MATRIX4,
-        TYPE_TEXTURE,
-        TYPE_GEOMETRY,
-        TYPE_TEXT,
-        TYPE_PCM,
+    // input flags
+    static constexpr size_t Type_None = 0;
+    static constexpr size_t Type_S1d = 0x1;
+    static constexpr size_t Type_S2d = 0x2;
+    static constexpr size_t Type_S3d = 0x4;
+    static constexpr size_t Type_S2d_3d = Type_S2d | Type_S3d;
 
-        TYPE_COUNT
-    };
-
-    Type type = TYPE_BOOL;
+    size_t typeFlags = Type_None;
 };
 
 #endif // UI_PIN_H

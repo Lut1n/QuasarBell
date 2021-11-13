@@ -78,7 +78,7 @@ Displacement::Displacement()
     : SdfOperation(qb::SdfOperationType_Displacement)
 {
     makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("intensity",&intensity, 0.0, 1.0);
     makeProperty("mode",&cubemapMode, 0, 1);
@@ -137,7 +137,7 @@ Texturing::Texturing()
     : SdfOperation(qb::SdfOperationType_Texturing)
 {
     makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float, UiPin::TYPE_FLOAT2);
+    makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("factor",&factor, 0.0, 1.0);
     makeProperty("mode",&cubemapMode, 0, 1);

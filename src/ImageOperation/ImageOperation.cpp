@@ -49,7 +49,7 @@ void ImagePreview::RenderFrame::compute(qb::GlslFrame& frame)
     }
     
     opCode = frame.compile();
-    RenderInterface::updateCustomProgram((unsigned)glProgram, opCode, frame.hasUv);
+    RenderInterface::updateCustomProgram((unsigned)glProgram, opCode, frame.needUv());
 
     firstFrameUniformId = frame.inputs.size();
 
@@ -102,7 +102,7 @@ void ImagePreview::RenderFrame::render()
 
 //--------------------------------------------------------------
 ImageOperation::ImageOperation(qb::ImageOperationType opType)
-    : BaseOperation(UiPin::TYPE_FLOAT2)
+    : BaseOperation(UiPin::Type_S2d)
     , _operationType(opType)
 {
 }
@@ -158,6 +158,25 @@ bool ImageOperation::sampleInput(size_t index, qb::GlslBuilderVisitor& visitor)
     }
     else
         return false;
+}
+//--------------------------------------------------------------
+std::string ImageOperation::sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
+{
+    auto& currFrame = visitor.getCurrentFrame();
+    auto& context = currFrame.getContext();
+    auto* co = getInput(index);
+    if (co->refs.size() > 0 && co->refs[0].operation)
+    {
+        size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Sdf);
+        bool res = co->refs[0].operation->sample(co->refs[0].index, visitor);
+        visitor.popFrame();
+        if (res)
+        {
+            currFrame.hasUv = true;
+            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
+        }
+    }
+    return qb::in(currFrame.pushInput(uniform));
 }
 //--------------------------------------------------------------
 std::string ImageOperation::pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)

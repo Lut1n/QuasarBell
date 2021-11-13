@@ -19,8 +19,8 @@ namespace qb
 };
 
 //--------------------------------------------------------------
-BaseOperation::BaseOperation(UiPin::Type pinType)
-    : _pinType(pinType)
+BaseOperation::BaseOperation(size_t defaultTypeFlags)
+    : _defaultTypeFlags(defaultTypeFlags)
 {
 }
 //--------------------------------------------------------------
@@ -210,29 +210,29 @@ void BaseOperation::makeProperty(const std::string& name, int* ptr, int minVal, 
 //--------------------------------------------------------------
 void BaseOperation::makeInput(const std::string& name, BaseOperationDataType type)
 {
-    makeInput(name, type, _pinType);
+    makeInput(name, type, _defaultTypeFlags);
 }
 //--------------------------------------------------------------
 void BaseOperation::makeOutput(const std::string& name, BaseOperationDataType type)
 {
-    makeOutput(name, type, _pinType);
+    makeOutput(name, type, _defaultTypeFlags);
 }
 //--------------------------------------------------------------
-void BaseOperation::makeInput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType)
+void BaseOperation::makeInput(const std::string& name, BaseOperationDataType type, size_t typeFlags)
 {
     BaseOperationConnection input;
     input.name = name;
     input.type = type;
-    input.pinType = pinType;
+    input.pinTypeFlags = typeFlags;
     inputs.push_back(input);
 }
 //--------------------------------------------------------------
-void BaseOperation::makeOutput(const std::string& name, BaseOperationDataType type, UiPin::Type pinType)
+void BaseOperation::makeOutput(const std::string& name, BaseOperationDataType type, size_t typeFlags)
 {
     BaseOperationConnection output;
     output.name = name;
     output.type = type;
-    output.pinType = pinType;
+    output.pinTypeFlags = typeFlags;
     outputs.push_back(output);
 }
 //--------------------------------------------------------------
@@ -326,9 +326,19 @@ bool BaseOperation::hasCustomData() const
 {
     return _hasCustomData;
 }
+//--------------------------------------------------------------
+bool BaseOperation::inputHasFlag(size_t index, size_t typeFlag) const
+{
+    if (index >= inputs.size()) return false;
 
-
-
+    auto& co = inputs[index];
+    if (co.refs.size() > 0 && co.refs[0].operation)
+    {
+        size_t inputTypeFlags = co.refs[0].operation->getOutputTypeFlags(co.refs[0].index);
+        return qb::hasFlag(inputTypeFlags, typeFlag);
+    }
+    return false;
+}
 //--------------------------------------------------------------
 BaseOperationNode::BaseOperationNode(const std::string& title, size_t nodeTypeId, BaseOperation* op)
     : UiNode(title, vec2(0.0,0.0), vec2(70,70))
@@ -344,12 +354,12 @@ BaseOperationNode::BaseOperationNode(const std::string& title, size_t nodeTypeId
     for(size_t i=0; i<_operation->getInputCount(); ++i)
     {
         auto input = _operation->getInput(i);
-        addPin((int)i, input->name, false, input->pinType);
+        addPin((int)i, input->name, false, input->pinTypeFlags);
     }
     for(size_t i=0; i<_operation->getOutputCount(); ++i)
     {
         auto output = _operation->getOutput(i);
-        addPin((int)i, output->name, true, output->pinType);
+        addPin((int)i, output->name, true, output->pinTypeFlags);
     }
 }
 //--------------------------------------------------------------

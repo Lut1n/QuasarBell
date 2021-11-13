@@ -36,7 +36,7 @@ void SignalPreview::compute(SignalOperation* operation)
 }
 //--------------------------------------------------------------
 SignalOperation::SignalOperation()
-    : BaseOperation(UiPin::TYPE_FLOAT1)
+    : BaseOperation(UiPin::Type_S1d)
 {
 }
 //--------------------------------------------------------------
