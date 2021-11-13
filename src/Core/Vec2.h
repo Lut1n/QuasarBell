@@ -4,6 +4,8 @@
 #include <vector>
 #include <initializer_list>
 
+using std::size_t;
+
 float mix(float a, float b, float f);
 
 struct vec2

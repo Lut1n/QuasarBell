@@ -19,7 +19,7 @@ namespace qb
         "vec2 toPolar(vec3 p)\n"
         "{\n"
         "    p = normalize(p);\n"
-        "    float a = atan(p.z,p.x);\n"
+        "    float a = atan(p.z,p.x) * sign(p.x);\n"
         "    float b = atan(p.y, length(p.xz));\n"
         "    return vec2(a,b) / 3.14 + 0.5;\n"
         "}\n"

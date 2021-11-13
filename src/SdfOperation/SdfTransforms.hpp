@@ -26,10 +26,10 @@ struct Repetition : public SdfOperation
 
     std::string getOperationCode() const override;
 
-    float c = 2.0f;
-    float x = 1.0f;
-    float y = 1.0f;
-    float z = 1.0f;
+    float c = 0.4f;
+    int x = 1;
+    int y = 1;
+    int z = 1;
 };
 
 //--------------------------------------------------------------
@@ -40,7 +40,7 @@ struct Twist : public SdfOperation
 
     std::string getOperationCode() const override;
 
-    float k = 10.0f;
+    float k = 0.0f;
 };
 
 //--------------------------------------------------------------
@@ -51,7 +51,7 @@ struct Bend : public SdfOperation
 
     std::string getOperationCode() const override;
 
-    float k = 10.0f;
+    float k = 0.0f;
 };
 
 //--------------------------------------------------------------
@@ -62,9 +62,9 @@ struct Elongation : public SdfOperation
 
     std::string getOperationCode() const override;
     
-    float x = 0.2f;
-    float y = 0.2f;
-    float z = 0.2f;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
 };
 
 //--------------------------------------------------------------

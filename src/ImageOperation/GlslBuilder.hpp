@@ -93,6 +93,8 @@ namespace qb
 
         void raymarcher(std::string& glsl);
         std::string compile();
+
+        bool needUv() const { return hasUv || type == Type::Sdf; }
     };
 
     struct GlslBuilderVisitor : public BaseOperationVisitor
