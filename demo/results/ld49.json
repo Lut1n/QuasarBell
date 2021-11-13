@@ -1,14 +1,14 @@
 {
     "info":{
         "app":"QuasarBell (https://www.github.com/Lut1n/QuasarBell)",
-        "version":3,
-        "date":"2021-10-04 19:26:03"
+        "version":4,
+        "date":"2021-11-13 16:31:14"
     },
     "sfx-nodal":{
         "operations":[{
             "type":"oscillator",
             "id":76,
-            "position":[1082.5,1309],
+            "position":[1082.5,1388],
             "properties":{
                 "freq":440,
                 "ampl":1
@@ -16,7 +16,7 @@
         },{
             "type":"pitch",
             "id":78,
-            "position":[904.5,1224],
+            "position":[904.5,1303],
             "properties":{
                 "octave":4,
                 "semitone":0
@@ -24,7 +24,7 @@
         },{
             "type":"key-sampler",
             "id":82,
-            "position":[490.5,1115],
+            "position":[490.5,1194],
             "properties":{
                 "count":4,
                 "interpo":0
@@ -35,14 +35,14 @@
         },{
             "type":"repeater",
             "id":83,
-            "position":[750.5,1213],
+            "position":[750.5,1292],
             "properties":{
                 "count":3
             }
         },{
             "type":"audio-output",
             "id":87,
-            "position":[1213.5,1236],
+            "position":[1213.5,1315],
             "properties":{
                 "range":1,
                 "duration":3,
@@ -52,7 +52,7 @@
         },{
             "type":"envelop",
             "id":88,
-            "position":[757.5,1318],
+            "position":[757.5,1397],
             "properties":{
                 "attack":0.1,
                 "decay":0.2,
@@ -62,7 +62,7 @@
         },{
             "type":"waveform",
             "id":89,
-            "position":[758.5,1401],
+            "position":[758.5,1480],
             "properties":{
                 "period":1,
                 "min":-1,
@@ -74,7 +74,7 @@
         },{
             "type":"key-sampler",
             "id":75,
-            "position":[488.5,1197],
+            "position":[488.5,1276],
             "properties":{
                 "count":5,
                 "interpo":0
@@ -85,7 +85,7 @@
         },{
             "type":"key-sampler",
             "id":77,
-            "position":[482.5,1028],
+            "position":[482.5,1107],
             "properties":{
                 "count":10,
                 "interpo":0
@@ -128,17 +128,319 @@
     },
     "texture-nodal":{
         "operations":[{
+            "type":"mult",
+            "id":79,
+            "position":[2030.5,57.5],
+            "properties":{
+                "in1":0,
+                "in2":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":74,
+            "position":[2895,228],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":73,
+            "position":[2511,588],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":72,
+            "position":[2467,820],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":71,
+            "position":[1997,1039],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":70,
+            "position":[1689,562],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":69,
+            "position":[1655,188],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"high-resolution",
+            "id":68,
+            "position":[567,720],
+            "properties":{
+                "resolution":10
+            }
+        },{
+            "type":"mix",
+            "id":67,
+            "position":[1862,1017],
+            "properties":{
+                "in1":0,
+                "in2":0,
+                "delta":0
+            }
+        },{
+            "type":"color",
+            "id":66,
+            "position":[1717,854],
+            "properties":{
+                "r":0.859323,
+                "g":0.099481,
+                "b":0.882353
+            }
+        },{
+            "type":"color",
+            "id":65,
+            "position":[1687,934],
+            "properties":{
+                "r":0.220588,
+                "g":0.0313581,
+                "b":0.131539
+            }
+        },{
+            "type":"clamp",
+            "id":60,
+            "position":[1685,1021],
+            "properties":{
+                "in1":0,
+                "edge0":0,
+                "edge1":1
+            }
+        },{
+            "type":"value-noise",
+            "id":63,
+            "position":[1122,1037],
+            "properties":{
+                "octaves":4,
+                "frequency":3.371,
+                "persistance":0.7,
+                "smoothness":1
+            }
+        },{
+            "type":"distort-uv",
+            "id":62,
+            "position":[1432,1047],
+            "properties":{
+                "force":0.671
+            }
+        },{
+            "type":"uv-mapping",
+            "id":61,
+            "position":[1543,983],
+            "properties":{
+                "u offset":0,
+                "v offset":0,
+                "u factor":1,
+                "v factor":1
+            }
+        },{
+            "type":"sub",
+            "id":59,
+            "position":[1315,923],
+            "properties":{
+                "in1":0,
+                "in2":0
+            }
+        },{
+            "type":"log",
+            "id":58,
+            "position":[1186,897],
+            "properties":{
+                "in":0
+            }
+        },{
+            "type":"mandelbrot",
+            "id":56,
+            "position":[1070,920],
+            "properties":{
+                "iterations":20,
+                "oftx":0.776,
+                "ofty":0.588,
+                "scale":1.244
+            }
+        },{
+            "type":"mix",
+            "id":55,
+            "position":[2333,813],
+            "properties":{
+                "in1":0,
+                "in2":0,
+                "delta":0
+            }
+        },{
+            "type":"color",
+            "id":54,
+            "position":[2237,717],
+            "properties":{
+                "r":1,
+                "g":1,
+                "b":1
+            }
+        },{
+            "type":"color",
+            "id":53,
+            "position":[2112,762],
+            "properties":{
+                "r":0.0595164,
+                "g":0,
+                "b":1
+            }
+        },{
+            "type":"dynamics",
+            "id":37,
+            "position":[2166,854],
+            "properties":{
+                "brightness":0.059,
+                "contrast":2.294
+            }
+        },{
+            "type":"worley-noise",
+            "id":57,
+            "position":[1969,831],
+            "properties":{
+                "octaves":1,
+                "frequency":9.024,
+                "persistance":0.7,
+                "mode":0
+            }
+        },{
+            "type":"mix",
+            "id":52,
+            "position":[2398,562],
+            "properties":{
+                "in1":0,
+                "in2":0,
+                "delta":0
+            }
+        },{
+            "type":"color",
+            "id":51,
+            "position":[2281,450],
+            "properties":{
+                "r":0.916661,
+                "g":0.745915,
+                "b":0.916667
+            }
+        },{
+            "type":"color",
+            "id":50,
+            "position":[2199,520],
+            "properties":{
+                "r":0.774409,
+                "g":0.521674,
+                "b":0.818627
+            }
+        },{
+            "type":"value-noise",
+            "id":17,
+            "position":[911,292],
+            "properties":{
+                "octaves":4,
+                "frequency":11.576,
+                "persistance":0.441,
+                "smoothness":1
+            }
+        },{
+            "type":"color",
+            "id":19,
+            "position":[1312,168],
+            "properties":{
+                "r":0.666667,
+                "g":0.666667,
+                "b":0.630719
+            }
+        },{
+            "type":"struct-3",
+            "id":23,
+            "position":[947,109],
+            "properties":{
+                "c1":-1,
+                "c2":-1,
+                "c3":-1
+            }
+        },{
+            "type":"color",
+            "id":24,
+            "position":[927,203],
+            "properties":{
+                "r":1,
+                "g":1,
+                "b":1
+            }
+        },{
+            "type":"color",
+            "id":28,
+            "position":[886,598],
+            "properties":{
+                "r":1,
+                "g":1,
+                "b":1
+            }
+        },{
+            "type":"mix",
+            "id":29,
+            "position":[1045,593],
+            "properties":{
+                "in1":0,
+                "in2":0,
+                "delta":0
+            }
+        },{
+            "type":"abs",
+            "id":30,
+            "position":[1166,557],
+            "properties":{
+                "in":0
+            }
+        },{
+            "type":"mix",
+            "id":16,
+            "position":[400,756],
+            "properties":{
+                "in1":0,
+                "in2":0,
+                "delta":0
+            }
+        },{
+            "type":"abs",
+            "id":18,
+            "position":[1185,213],
+            "properties":{
+                "in":0
+            }
+        },{
             "type":"dynamics",
             "id":64,
-            "position":[1287,953],
+            "position":[1287,1032],
             "properties":{
                 "brightness":0,
                 "contrast":5.176
             }
         },{
+            "type":"high-resolution",
+            "id":5,
+            "position":[531,130],
+            "properties":{
+                "resolution":10
+            }
+        },{
             "type":"worley-noise",
             "id":0,
-            "position":[44,133],
+            "position":[44,212],
             "properties":{
                 "octaves":5,
                 "frequency":5.376,
@@ -148,7 +450,7 @@
         },{
             "type":"color",
             "id":1,
-            "position":[72,30],
+            "position":[72,109],
             "properties":{
                 "r":0.318627,
                 "g":0.249904,
@@ -157,7 +459,7 @@
         },{
             "type":"color",
             "id":2,
-            "position":[228,2],
+            "position":[228,81],
             "properties":{
                 "r":0.552818,
                 "g":0.617647,
@@ -166,7 +468,7 @@
         },{
             "type":"dynamics",
             "id":3,
-            "position":[231,122],
+            "position":[231,201],
             "properties":{
                 "brightness":-0.376,
                 "contrast":6.353
@@ -174,23 +476,16 @@
         },{
             "type":"mix",
             "id":4,
-            "position":[386,68],
+            "position":[386,147],
             "properties":{
                 "in1":0,
                 "in2":0,
                 "delta":0
             }
         },{
-            "type":"high-resolution",
-            "id":5,
-            "position":[531,51],
-            "properties":{
-                "resolution":10
-            }
-        },{
             "type":"worley-noise",
             "id":6,
-            "position":[92,429],
+            "position":[92,508],
             "properties":{
                 "octaves":4,
                 "frequency":2,
@@ -200,7 +495,7 @@
         },{
             "type":"dynamics",
             "id":7,
-            "position":[266,427],
+            "position":[266,506],
             "properties":{
                 "brightness":1,
                 "contrast":3.294
@@ -208,7 +503,7 @@
         },{
             "type":"color",
             "id":8,
-            "position":[87,338],
+            "position":[87,417],
             "properties":{
                 "r":0.629349,
                 "g":0.754902,
@@ -217,7 +512,7 @@
         },{
             "type":"color",
             "id":9,
-            "position":[233,322],
+            "position":[233,401],
             "properties":{
                 "r":0.460784,
                 "g":0,
@@ -226,7 +521,7 @@
         },{
             "type":"mix",
             "id":10,
-            "position":[431,383],
+            "position":[431,462],
             "properties":{
                 "in1":0,
                 "in2":0,
@@ -235,14 +530,14 @@
         },{
             "type":"high-resolution",
             "id":11,
-            "position":[576,369],
+            "position":[576,448],
             "properties":{
                 "resolution":10
             }
         },{
             "type":"worley-noise",
             "id":12,
-            "position":[0,703],
+            "position":[0,782],
             "properties":{
                 "octaves":1,
                 "frequency":11.576,
@@ -252,7 +547,7 @@
         },{
             "type":"dynamics",
             "id":13,
-            "position":[212,710],
+            "position":[212,789],
             "properties":{
                 "brightness":0.235,
                 "contrast":3.471
@@ -260,7 +555,7 @@
         },{
             "type":"color",
             "id":14,
-            "position":[103,630],
+            "position":[103,709],
             "properties":{
                 "r":1,
                 "g":1,
@@ -269,7 +564,7 @@
         },{
             "type":"color",
             "id":15,
-            "position":[231,583],
+            "position":[231,662],
             "properties":{
                 "r":0.274125,
                 "g":0.73755,
@@ -277,78 +572,25 @@
             }
         },{
             "type":"mix",
-            "id":16,
-            "position":[400,677],
-            "properties":{
-                "in1":0,
-                "in2":0,
-                "delta":0
-            }
-        },{
-            "type":"abs",
-            "id":18,
-            "position":[1185,134],
-            "properties":{
-                "in":0
-            }
-        },{
-            "type":"value-noise",
-            "id":17,
-            "position":[911,213],
-            "properties":{
-                "octaves":4,
-                "frequency":11.576,
-                "persistance":0.441,
-                "smoothness":1
-            }
-        },{
-            "type":"mix",
             "id":22,
-            "position":[1052,140],
+            "position":[1052,219],
             "properties":{
                 "in1":0,
                 "in2":0,
                 "delta":0
-            }
-        },{
-            "type":"struct-3",
-            "id":23,
-            "position":[947,30],
-            "properties":{
-                "c1":-1,
-                "c2":-1,
-                "c3":-1
-            }
-        },{
-            "type":"color",
-            "id":24,
-            "position":[927,124],
-            "properties":{
-                "r":1,
-                "g":1,
-                "b":1
             }
         },{
             "type":"dynamics",
             "id":20,
-            "position":[1310,187],
+            "position":[1310,266],
             "properties":{
                 "brightness":1,
                 "contrast":2.353
             }
         },{
             "type":"color",
-            "id":19,
-            "position":[1312,89],
-            "properties":{
-                "r":0.666667,
-                "g":0.666667,
-                "b":0.630719
-            }
-        },{
-            "type":"color",
             "id":21,
-            "position":[1230,0],
+            "position":[1230,79],
             "properties":{
                 "r":0.922721,
                 "g":0.980392,
@@ -357,7 +599,7 @@
         },{
             "type":"mix",
             "id":25,
-            "position":[1524,94],
+            "position":[1524,173],
             "properties":{
                 "in1":0,
                 "in2":0,
@@ -366,41 +608,16 @@
         },{
             "type":"struct-3",
             "id":27,
-            "position":[940,434],
+            "position":[940,513],
             "properties":{
                 "c1":-1,
                 "c2":-1,
                 "c3":-1
             }
         },{
-            "type":"color",
-            "id":28,
-            "position":[886,519],
-            "properties":{
-                "r":1,
-                "g":1,
-                "b":1
-            }
-        },{
-            "type":"mix",
-            "id":29,
-            "position":[1045,514],
-            "properties":{
-                "in1":0,
-                "in2":0,
-                "delta":0
-            }
-        },{
-            "type":"abs",
-            "id":30,
-            "position":[1166,478],
-            "properties":{
-                "in":0
-            }
-        },{
             "type":"dynamics",
             "id":31,
-            "position":[1259,568],
+            "position":[1259,647],
             "properties":{
                 "brightness":0.824,
                 "contrast":1.941
@@ -408,7 +625,7 @@
         },{
             "type":"value-noise",
             "id":26,
-            "position":[897,601],
+            "position":[897,680],
             "properties":{
                 "octaves":4,
                 "frequency":1.547,
@@ -418,7 +635,7 @@
         },{
             "type":"uv-mapping",
             "id":32,
-            "position":[1401,525],
+            "position":[1401,604],
             "properties":{
                 "u offset":0.494,
                 "v offset":0,
@@ -428,7 +645,7 @@
         },{
             "type":"color",
             "id":33,
-            "position":[1398,385],
+            "position":[1398,464],
             "properties":{
                 "r":0.0710853,
                 "g":0.818627,
@@ -437,7 +654,7 @@
         },{
             "type":"color",
             "id":34,
-            "position":[1319,454],
+            "position":[1319,533],
             "properties":{
                 "r":0.284314,
                 "g":0.135516,
@@ -446,7 +663,7 @@
         },{
             "type":"mix",
             "id":35,
-            "position":[1554,474],
+            "position":[1554,553],
             "properties":{
                 "in1":0,
                 "in2":0,
@@ -455,7 +672,7 @@
         },{
             "type":"mandelbrot",
             "id":36,
-            "position":[1909,46],
+            "position":[1899,0],
             "properties":{
                 "iterations":20,
                 "oftx":1.176,
@@ -463,16 +680,9 @@
                 "scale":2.654
             }
         },{
-            "type":"log",
-            "id":38,
-            "position":[2043,54],
-            "properties":{
-                "in":0
-            }
-        },{
             "type":"sub",
             "id":39,
-            "position":[2201,57],
+            "position":[2201,136],
             "properties":{
                 "in1":1.059,
                 "in2":0
@@ -480,14 +690,14 @@
         },{
             "type":"distort-uv",
             "id":40,
-            "position":[2214,228],
+            "position":[2214,307],
             "properties":{
                 "force":1
             }
         },{
             "type":"uv-mapping",
             "id":41,
-            "position":[2339,147],
+            "position":[2339,226],
             "properties":{
                 "u offset":0.024,
                 "v offset":0,
@@ -497,7 +707,7 @@
         },{
             "type":"worley-noise",
             "id":42,
-            "position":[1997,277],
+            "position":[1997,356],
             "properties":{
                 "octaves":4,
                 "frequency":2,
@@ -507,7 +717,7 @@
         },{
             "type":"uv-mapping",
             "id":43,
-            "position":[2470,188],
+            "position":[2470,267],
             "properties":{
                 "u offset":0.188,
                 "v offset":0,
@@ -517,7 +727,7 @@
         },{
             "type":"color",
             "id":44,
-            "position":[2480,92],
+            "position":[2480,171],
             "properties":{
                 "r":0.284314,
                 "g":0.0905902,
@@ -526,7 +736,7 @@
         },{
             "type":"color",
             "id":45,
-            "position":[2515,6],
+            "position":[2515,85],
             "properties":{
                 "r":1,
                 "g":0,
@@ -535,7 +745,7 @@
         },{
             "type":"mix",
             "id":46,
-            "position":[2609,169],
+            "position":[2609,248],
             "properties":{
                 "in1":0,
                 "in2":0,
@@ -544,7 +754,7 @@
         },{
             "type":"clamp",
             "id":47,
-            "position":[2751,122],
+            "position":[2751,201],
             "properties":{
                 "in1":0,
                 "edge0":0,
@@ -553,7 +763,7 @@
         },{
             "type":"gradient-noise",
             "id":48,
-            "position":[2059,497],
+            "position":[2059,576],
             "properties":{
                 "octaves":1,
                 "frequency":10.3,
@@ -563,222 +773,88 @@
         },{
             "type":"dynamics",
             "id":49,
-            "position":[2208,518],
+            "position":[2208,597],
             "properties":{
                 "brightness":0.153,
                 "contrast":10
             }
-        },{
-            "type":"color",
-            "id":50,
-            "position":[2199,441],
-            "properties":{
-                "r":0.774409,
-                "g":0.521674,
-                "b":0.818627
-            }
-        },{
-            "type":"color",
-            "id":51,
-            "position":[2281,371],
-            "properties":{
-                "r":0.916661,
-                "g":0.745915,
-                "b":0.916667
-            }
-        },{
-            "type":"mix",
-            "id":52,
-            "position":[2398,483],
-            "properties":{
-                "in1":0,
-                "in2":0,
-                "delta":0
-            }
-        },{
-            "type":"worley-noise",
-            "id":57,
-            "position":[1969,752],
-            "properties":{
-                "octaves":1,
-                "frequency":9.024,
-                "persistance":0.7,
-                "mode":0
-            }
-        },{
-            "type":"dynamics",
-            "id":37,
-            "position":[2166,775],
-            "properties":{
-                "brightness":0.059,
-                "contrast":2.294
-            }
-        },{
-            "type":"color",
-            "id":53,
-            "position":[2112,683],
-            "properties":{
-                "r":0.0595164,
-                "g":0,
-                "b":1
-            }
-        },{
-            "type":"color",
-            "id":54,
-            "position":[2237,638],
-            "properties":{
-                "r":1,
-                "g":1,
-                "b":1
-            }
-        },{
-            "type":"mix",
-            "id":55,
-            "position":[2333,734],
-            "properties":{
-                "in1":0,
-                "in2":0,
-                "delta":0
-            }
-        },{
-            "type":"mandelbrot",
-            "id":56,
-            "position":[1070,841],
-            "properties":{
-                "iterations":20,
-                "oftx":0.776,
-                "ofty":0.588,
-                "scale":1.244
-            }
-        },{
-            "type":"log",
-            "id":58,
-            "position":[1186,818],
-            "properties":{
-                "in":0
-            }
-        },{
-            "type":"sub",
-            "id":59,
-            "position":[1315,844],
-            "properties":{
-                "in1":0,
-                "in2":0
-            }
-        },{
-            "type":"uv-mapping",
-            "id":61,
-            "position":[1543,904],
-            "properties":{
-                "u offset":0,
-                "v offset":0,
-                "u factor":1,
-                "v factor":1
-            }
-        },{
-            "type":"distort-uv",
-            "id":62,
-            "position":[1432,968],
-            "properties":{
-                "force":0.671
-            }
-        },{
-            "type":"value-noise",
-            "id":63,
-            "position":[1122,958],
-            "properties":{
-                "octaves":4,
-                "frequency":3.371,
-                "persistance":0.7,
-                "smoothness":1
-            }
-        },{
-            "type":"clamp",
-            "id":60,
-            "position":[1685,942],
-            "properties":{
-                "in1":0,
-                "edge0":0,
-                "edge1":1
-            }
-        },{
-            "type":"color",
-            "id":65,
-            "position":[1687,855],
-            "properties":{
-                "r":0.220588,
-                "g":0.0313581,
-                "b":0.131539
-            }
-        },{
-            "type":"color",
-            "id":66,
-            "position":[1717,775],
-            "properties":{
-                "r":0.859323,
-                "g":0.099481,
-                "b":0.882353
-            }
-        },{
-            "type":"mix",
-            "id":67,
-            "position":[1862,938],
-            "properties":{
-                "in1":0,
-                "in2":0,
-                "delta":0
-            }
-        },{
-            "type":"high-resolution",
-            "id":68,
-            "position":[567,641],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":69,
-            "position":[1655,109],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":70,
-            "position":[1689,483],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":71,
-            "position":[1997,960],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":72,
-            "position":[2467,741],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":73,
-            "position":[2511,509],
-            "properties":{
-                "resolution":10
-            }
-        },{
-            "type":"high-resolution",
-            "id":74,
-            "position":[2895,149],
-            "properties":{
-                "resolution":10
-            }
         }],
         "connections":[{
+            "src":79,
+            "src-pin":0,
+            "dst":39,
+            "dst-pin":1
+        },{
+            "src":36,
+            "src-pin":0,
+            "dst":79,
+            "dst-pin":0
+        },{
+            "src":47,
+            "src-pin":0,
+            "dst":74,
+            "dst-pin":0
+        },{
+            "src":52,
+            "src-pin":0,
+            "dst":73,
+            "dst-pin":0
+        },{
+            "src":60,
+            "src-pin":0,
+            "dst":67,
+            "dst-pin":2
+        },{
+            "src":59,
+            "src-pin":0,
+            "dst":61,
+            "dst-pin":0
+        },{
+            "src":64,
+            "src-pin":0,
+            "dst":62,
+            "dst-pin":1
+        },{
+            "src":62,
+            "src-pin":0,
+            "dst":61,
+            "dst-pin":1
+        },{
+            "src":58,
+            "src-pin":0,
+            "dst":59,
+            "dst-pin":1
+        },{
+            "src":56,
+            "src-pin":0,
+            "dst":58,
+            "dst-pin":0
+        },{
+            "src":54,
+            "src-pin":0,
+            "dst":55,
+            "dst-pin":0
+        },{
+            "src":53,
+            "src-pin":0,
+            "dst":55,
+            "dst-pin":1
+        },{
+            "src":50,
+            "src-pin":0,
+            "dst":52,
+            "dst-pin":1
+        },{
+            "src":45,
+            "src-pin":0,
+            "dst":46,
+            "dst-pin":0
+        },{
+            "src":44,
+            "src-pin":0,
+            "dst":46,
+            "dst-pin":1
+        },{
             "src":9,
             "src-pin":0,
             "dst":10,
@@ -792,11 +868,6 @@
             "src":8,
             "src-pin":0,
             "dst":10,
-            "dst-pin":1
-        },{
-            "src":38,
-            "src-pin":0,
-            "dst":39,
             "dst-pin":1
         },{
             "src":2,
@@ -1014,11 +1085,6 @@
             "dst":35,
             "dst-pin":2
         },{
-            "src":36,
-            "src-pin":0,
-            "dst":38,
-            "dst-pin":0
-        },{
             "src":39,
             "src-pin":0,
             "dst":41,
@@ -1043,71 +1109,24 @@
             "src-pin":0,
             "dst":46,
             "dst-pin":2
-        },{
-            "src":44,
+        }]
+    },
+    "sdf-nodal":{
+        "connections":[{
+            "src":79,
             "src-pin":0,
-            "dst":46,
+            "dst":39,
             "dst-pin":1
         },{
-            "src":45,
+            "src":36,
             "src-pin":0,
-            "dst":46,
-            "dst-pin":0
-        },{
-            "src":50,
-            "src-pin":0,
-            "dst":52,
-            "dst-pin":1
-        },{
-            "src":53,
-            "src-pin":0,
-            "dst":55,
-            "dst-pin":1
-        },{
-            "src":54,
-            "src-pin":0,
-            "dst":55,
-            "dst-pin":0
-        },{
-            "src":56,
-            "src-pin":0,
-            "dst":58,
+            "dst":79,
             "dst-pin":0
         },{
             "src":58,
             "src-pin":0,
             "dst":59,
             "dst-pin":1
-        },{
-            "src":62,
-            "src-pin":0,
-            "dst":61,
-            "dst-pin":1
-        },{
-            "src":64,
-            "src-pin":0,
-            "dst":62,
-            "dst-pin":1
-        },{
-            "src":59,
-            "src-pin":0,
-            "dst":61,
-            "dst-pin":0
-        },{
-            "src":60,
-            "src-pin":0,
-            "dst":67,
-            "dst-pin":2
-        },{
-            "src":52,
-            "src-pin":0,
-            "dst":73,
-            "dst-pin":0
-        },{
-            "src":47,
-            "src-pin":0,
-            "dst":74,
-            "dst-pin":0
         }]
     }
 }
