@@ -160,33 +160,42 @@ bool ImageOperation::sampleInput(size_t index, qb::GlslBuilderVisitor& visitor)
         return false;
 }
 //--------------------------------------------------------------
-std::string ImageOperation::sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
+bool ImageOperation::sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visitor, size_t& frameId)
 {
-    auto& currFrame = visitor.getCurrentFrame();
-    auto& context = currFrame.getContext();
     auto* co = getInput(index);
     if (co->refs.size() > 0 && co->refs[0].operation)
     {
-        size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Sdf);
+        frameId = visitor.pushFrame(qb::GlslFrame::Type::Sdf);
         bool res = co->refs[0].operation->sample(co->refs[0].index, visitor);
         visitor.popFrame();
-        if (res)
-        {
-            currFrame.hasUv = true;
-            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
-        }
+        return res;
     }
-    return qb::in(currFrame.pushInput(uniform));
+    return false;
 }
 //--------------------------------------------------------------
 std::string ImageOperation::pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-    if (sampleInput(index, visitor))
-        return qb::va(context.popVa());
-    else
-        return qb::in(frame.pushInput(uniform));
+    auto* co = getInput(index);
+    size_t pinTypeFlags = co->pinTypeFlags;
+
+    if (qb::hasFlag(pinTypeFlags, UiPin::Type_S3d) && inputHasFlag(index, UiPin::Type_S3d))
+    {
+        size_t frameId;
+        if (sampleSdfInput(index, visitor, frameId))
+        {
+            frame.hasUv = true;
+            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
+        }
+    }
+    else if (qb::hasFlag(pinTypeFlags, UiPin::Type_S2d) && inputHasFlag(index, UiPin::Type_S2d))
+    {
+        if (sampleInput(index, visitor))
+            return qb::va(context.popVa());
+    }
+        
+    return qb::in(frame.pushInput(uniform));
 }
 //--------------------------------------------------------------
 std::string ImageOperation::name() const

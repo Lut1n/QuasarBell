@@ -54,9 +54,9 @@ Construct3f::Construct3f()
     makeProperty("c1", BaseOperationDataType::Float, &c1);
     makeProperty("c2", BaseOperationDataType::Float, &c2);
     makeProperty("c3", BaseOperationDataType::Float, &c3);
-    makeInput("in1", BaseOperationDataType::Float);
-    makeInput("in2", BaseOperationDataType::Float);
-    makeInput("in3", BaseOperationDataType::Float);
+    makeInput("in1", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
+    makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
+    makeInput("in3", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
     makeOutput("out", BaseOperationDataType::Float);
 }
 //--------------------------------------------------------------
@@ -195,7 +195,7 @@ bool RadialSignal::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 Dynamics::Dynamics()
     : ImageOperation(qb::ImageOperationType_Dynamics)
 {
-    makeInput("in", BaseOperationDataType::Float);
+    makeInput("in", BaseOperationDataType::Float, UiPin::Type_S2d_3d);
     makeInput("brightness", BaseOperationDataType::Float);
     makeInput("contrast", BaseOperationDataType::Float);
     makeOutput("out", BaseOperationDataType::Float);
@@ -207,22 +207,19 @@ bool Dynamics::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-    if(sampleInput(0, visitor))
-    {
-        std::string inId = qb::va(context.popVa());
-        size_t outId = context.getNextVa();
-        
-        std::string briId = pushOpOrInput(1,visitor, {brightness,brightness,brightness,brightness});
-        std::string contId = pushOpOrInput(2,visitor, {contrast,contrast,contrast,contrast});
-        
-        std::string glsl = "vec4 $1 = dynamics($2, vec4($3.x,$4.x,0.0,0.0));\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(outId), inId, briId, contId});
-        context.pushVa(outId);
-        context.pushCode(glsl);
-        frame.setFunctions(getNodeType(), getOperationCode());
-        return true;
-    }
-    return false;
+
+    std::string inId = pushOpOrInput(0,visitor, {1.0f,1.0f,1.0f,1.0f});
+    std::string briId = pushOpOrInput(1,visitor, {brightness,brightness,brightness,brightness});
+    std::string contId = pushOpOrInput(2,visitor, {contrast,contrast,contrast,contrast});
+    
+    size_t outId = context.getNextVa();
+    
+    std::string glsl = "vec4 $1 = dynamics($2, vec4($3.x,$4.x,0.0,0.0));\n";
+    glsl = qb::replaceArgs(glsl, {qb::va(outId), inId, briId, contId});
+    context.pushVa(outId);
+    context.pushCode(glsl);
+    frame.setFunctions(getNodeType(), getOperationCode());
+    return true;
 }
 //--------------------------------------------------------------
 std::string Dynamics::getOperationCode() const

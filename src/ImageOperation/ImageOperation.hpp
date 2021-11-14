@@ -58,7 +58,7 @@ struct ImageOperation : public BaseOperation
 
     void update();
     bool sampleInput(size_t index, qb::GlslBuilderVisitor& visitor);
-    std::string sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
+    bool sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visitor, size_t& frameId);
     std::string pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform);
 
     virtual std::string name() const;

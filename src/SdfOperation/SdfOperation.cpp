@@ -174,18 +174,32 @@ bool SdfOperation::sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visi
 
         return ret;
     }
-    else
-        return false;
+    return false;
 }
 //--------------------------------------------------------------
 std::string SdfOperation::pushOpOrInput(size_t index, qb::GlslBuilderVisitor& visitor, const vec4& uniform)
 {
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
-    if (sampleInput(index, visitor))
-        return qb::va(context.popVa());
-    else
-        return qb::in(frame.pushInput(uniform));
+    auto* co = getInput(index);
+    size_t pinTypeFlags = co->pinTypeFlags;
+
+    if (qb::hasFlag(pinTypeFlags, UiPin::Type_S2d) && inputHasFlag(index, UiPin::Type_S2d))
+    {
+        size_t frameId;
+        if (sampleTextureInput(index, visitor, frameId))
+        {
+            frame.hasUv = true;
+            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
+        }
+    }
+    else if (qb::hasFlag(pinTypeFlags, UiPin::Type_S3d) && inputHasFlag(index, UiPin::Type_S3d))
+    {
+        if (sampleInput(index, visitor))
+            return qb::va(context.popVa());
+    }
+
+    return qb::in(frame.pushInput(uniform));
 }
 //--------------------------------------------------------------
 std::string SdfOperation::name() const

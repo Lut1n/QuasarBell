@@ -244,9 +244,8 @@ bool Twist::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& context = frame.getContext();
     
     std::string in;
-    size_t frameId;
-    if (sampleTextureInput(1, visitor, frameId))
-        in = "texture2D(" + qb::sa(frameId) + ",vec2(0.0,0.0)).x * 20.0 - 10.0";
+    if ( inputHasFlag(1 , UiPin::Type_S2d))
+        in = pushOpOrInput(1, visitor, {k / 20.0f + 0.5f,0.0f,0.0f,0.0f}) + ".x * 20.0 - 10.0";
     else
         in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f})) + ".x";
 
@@ -296,9 +295,8 @@ bool Bend::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& context = frame.getContext();
 
     std::string in;
-    size_t frameId;
-    if (sampleTextureInput(1, visitor, frameId))
-        in = "texture2D(" + qb::sa(frameId) + ",vec2(0.0,0.0)).x * 20.0 - 10.0";
+    if ( inputHasFlag(1 , UiPin::Type_S2d))
+        in = pushOpOrInput(1, visitor, {k / 20.0f + 0.5f,0.0f,0.0f,0.0f}) + ".x * 20.0 - 10.0";
     else
         in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f})) + ".x";
 
@@ -350,9 +348,8 @@ bool Elongation::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& context = frame.getContext();
 
     std::string in;
-    size_t frameId;
-    if (sampleTextureInput(1, visitor, frameId))
-        in = "texture2D(" + qb::sa(frameId) + ",vec2(0.0,0.0)).xyz * 4.0 - 2.0";
+    if ( inputHasFlag(1 , UiPin::Type_S2d))
+        in = pushOpOrInput(1, visitor, {x / 4.0f + 0.5f,y / 4.0f + 0.5f,z / 4.0f + 0.5f,0.0f}) + ".xyz * 4.0 - 2.0";
     else
         in = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,0.0f})) + ".xyz";
 

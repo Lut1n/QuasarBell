@@ -24,18 +24,8 @@ bool ImageBasicOperators::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    bool samples3d0 = inputHasFlag(0, UiPin::Type_S3d);
-    bool samples3d1 = inputHasFlag(1, UiPin::Type_S3d);
-    
-    std::string operand1, operand2, uvArg;
-    if ( samples3d0 )
-        operand1 = sampleSdfInput(0, visitor, {_in1,_in1,_in1,1.0f});
-    else
-        operand1 = pushOpOrInput(0,visitor, {_in1,_in1,_in1,1.0f});
-    if ( samples3d1 )
-        operand2 = sampleSdfInput(1, visitor, {_in2,_in2,_in2,1.0f});
-    else
-        operand2 = pushOpOrInput(1,visitor, {_in2,_in2,_in2,1.0f});
+    std::string operand1 = pushOpOrInput(0,visitor, {_in1,_in1,_in1,1.0f});
+    std::string operand2 = pushOpOrInput(1,visitor, {_in2,_in2,_in2,1.0f});
 
     size_t opId = context.getNextVa();
     std::string glsl = "vec4 $1 = vec4($2.xyz $3 $4.xyz, 1.0);\n";
@@ -56,7 +46,7 @@ ImageBuiltInFunc::ImageBuiltInFunc(qb::ImageOperationType type, const std::strin
     for(size_t i=0; i<argNames.size(); ++i)
     {
         makeProperty(argNames[i], BaseOperationDataType::Float, &argValues[i]);
-        makeInput(argNames[i], BaseOperationDataType::Float);
+        makeInput(argNames[i], BaseOperationDataType::Float, UiPin::Type_S2d_3d);
         if(i>0) glslTemplate += ",";
         glslTemplate += "$" + std::to_string(i+2) + ".xyz";
     }
