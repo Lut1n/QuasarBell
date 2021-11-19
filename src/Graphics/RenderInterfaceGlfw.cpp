@@ -41,6 +41,10 @@ struct GLfwTarget
 static std::vector<GLfwTarget> s_targets;
 static std::vector<GlCustomProgram*> s_CustomPrograms;
 
+static vec2 lastCursorPosition;
+static bool qbIsFocused = true;
+static UiEvent::State s_buttonStates[3] = {UiEvent::STATE_RELEASED,UiEvent::STATE_RELEASED,UiEvent::STATE_RELEASED};
+
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -63,6 +67,9 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
  
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    if (!qbIsFocused)
+        return;
+    
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     
@@ -78,16 +85,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 static void character_callback(GLFWwindow* window, unsigned int codepoint)
 {
+    if (!qbIsFocused)
+        return;
+    
     UiEvent evn;
     evn.type = UiEvent::TYPE_CHAR;
     evn.input = codepoint;
     UiSystem::instance()->onEvent(evn);
 }
 
-static vec2 lastCursorPosition;
-
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    if (!qbIsFocused)
+        return;
+    
     lastCursorPosition = vec2((float) xpos, (float) ypos);
     UiEvent evn;
     evn.type = UiEvent::TYPE_MOUSE_MOVE;
@@ -95,11 +106,23 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
     UiSystem::instance()->onEvent(evn);
 }
 
-
-static UiEvent::State s_buttonStates[3] = {UiEvent::STATE_RELEASED,UiEvent::STATE_RELEASED,UiEvent::STATE_RELEASED};
+static void focus_callback(GLFWwindow* window, int focused)
+{
+    if (!focused)
+        qbIsFocused = false;
+}
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+    // imgui has no mechanics to know if a imgui window is hovered after a focus on the app
+    // this skip the first click after a defocus of the os window, giving the strict priority to imgui
+    if (!qbIsFocused)
+    {
+        if(action == GLFW_RELEASE)
+            qbIsFocused = true;
+        return;
+    }
+
     // imgui has priority
     ImGuiHoveredFlags flags = ImGuiHoveredFlags_AnyWindow
                             | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem
@@ -137,6 +160,8 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    if (!qbIsFocused)
+        return;
 }
 
 
@@ -187,6 +212,7 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
+        glfwSetWindowFocusCallback(window, focus_callback);
     
         glfwMakeContextCurrent(window);
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
