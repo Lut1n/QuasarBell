@@ -58,8 +58,8 @@ std::string SphericalCoord::getOperationCode() const
 {
     static constexpr std::string_view code =
     "vec2 uv_to_sphericalcoord(vec2 uv){\n"
-    "    float b = (uv.y - 0.5) * 3.141592;\n"
-    "    return vec2(uv.x, sin(b) * 0.5 + 0.5);\n"
+    "    float b = (uv.y - 0.5) * 2.0;\n"
+    "    return vec2(uv.x, asin(b) / 3.141592 + 0.5);\n"
     "}\n";
     return std::string(code);
 }
