@@ -7,6 +7,7 @@
 #include "SdfOperation/SdfTransforms.hpp"
 #include "SdfOperation/SdfSampling.hpp"
 #include "SdfOperation/SdfBasicOperations.hpp"
+#include "SdfOperation/SdfVoxel.hpp"
 
 MAKE_GEOMETRY_NODE(Sphere, qb::SdfOperationType_Sphere)
 MAKE_GEOMETRY_NODE(Box, qb::SdfOperationType_Box)
@@ -36,6 +37,7 @@ MAKE_GEOMETRY_NODE(Symmetry, qb::SdfOperationType_Symmetry)
 MAKE_GEOMETRY_NODE(Displacement, qb::SdfOperationType_Displacement)
 MAKE_GEOMETRY_NODE(Texturing, qb::SdfOperationType_Texturing)
 MAKE_GEOMETRY_NODE(HighResSdfOutput, qb::SdfOperationType_HighResOutput)
+MAKE_GEOMETRY_NODE(VoxelOutput, qb::SdfOperationType_Voxel)
 
 
 #endif // GUI_TYPED_RM_NODE_H

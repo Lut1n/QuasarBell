@@ -191,6 +191,7 @@ void qb::GlslFrame::popContext()
     contextStack.pop_back();
 }
 
+//--------------------------------------------------------------
 void qb::GlslFrame::raymarcher(std::string& glsl)
 {
     glsl +=
@@ -246,6 +247,33 @@ void qb::GlslFrame::raymarcher(std::string& glsl)
 }
 
 //--------------------------------------------------------------
+void qb::GlslFrame::zProjection(std::string& glsl)
+{
+    glsl +=
+    "vec4 sdMain(vec3 tfmr_0){\n";
+    glsl += mainContext.code;
+    glsl += replaceArgs("return $1;\n};\n", {va(mainContext.getVa())});
+
+    glsl +=
+    "vec4 zProject(vec3 pos){\n"
+    "    float res = 0.0;\n"
+    "    vec3 c = vec3(0.0,0.0,0.0);\n"
+    "    vec4 hitc = sdMain(pos);\n"
+    "    if (abs(hitc.x) < u_zEpsilon*0.5){\n"
+    "       c=hitc.yzw;\n"
+    "       res = 1.0;\n"
+    "    }\n"
+    "    return vec4(res,c);\n"
+    "}\n"
+    "vec4 render(vec2 uv){\n"
+    "    vec2 xy = uv * 4.0 - 2.0;\n"
+    "    vec3 pos = vec3(floor(xy/u_zEpsilon + 0.5)*u_zEpsilon, u_zTargetPlan);\n"
+    "    vec4 res = zProject(pos);\n"
+    "    return vec4(res.yzw,res.x);\n"
+    "}\n";
+}
+
+//--------------------------------------------------------------
 std::string qb::GlslFrame::compile()
 {
     std::string glsl;
@@ -260,6 +288,12 @@ std::string qb::GlslFrame::compile()
 
     for(size_t i=0; i<frames.size(); ++i)
         glsl += replaceArgs("uniform sampler2D $1;\n", {sa(i)});
+
+    if (type == Type::VoxelPlan)
+    {
+        glsl += "uniform float u_zTargetPlan;\n";
+        glsl += "uniform float u_zEpsilon;\n";
+    }
     
     // in/out
     if (needUv()) glsl += "in vec2 uv0;\n";
@@ -281,12 +315,17 @@ std::string qb::GlslFrame::compile()
         glsl += replaceArgs(contextTemplate, {fu(contextId), context.code, va(context.getVa())});
         contextId--;
     }
-
     
     // main context
     if (type == Type::Sdf)
     {
         raymarcher(glsl);
+        glsl += "void main(){\n";
+        glsl += "fragColor = render(uv0);\n};\n";
+    }
+    else if (type == Type::VoxelPlan)
+    {
+        zProjection(glsl);
         glsl += "void main(){\n";
         glsl += "fragColor = render(uv0);\n};\n";
     }

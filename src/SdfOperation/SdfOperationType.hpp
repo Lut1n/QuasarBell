@@ -37,6 +37,7 @@ namespace qb
         SdfOperationType_Displacement,
         SdfOperationType_Texturing,
         SdfOperationType_HighResOutput,
+        SdfOperationType_Voxel,
 
         SdfOperationType_Count,
 

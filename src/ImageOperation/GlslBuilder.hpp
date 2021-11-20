@@ -62,10 +62,13 @@ namespace qb
         enum class Type
         {
             Texture,
-            Sdf
+            Sdf,
+            VoxelPlan
         };
 
         int resolution = 256;
+        float targetZ = 0.0f;
+        float voxelSize = 0.1f;
         bool hasUv = false;
         Type type = Type::Texture;
         std::vector<vec4> inputs;
@@ -92,9 +95,10 @@ namespace qb
         void popContext();
 
         void raymarcher(std::string& glsl);
+        void zProjection(std::string& glsl);
         std::string compile();
 
-        bool needUv() const { return hasUv || type == Type::Sdf; }
+        bool needUv() const { return hasUv || type == Type::Sdf || type == Type::VoxelPlan; }
     };
 
     struct GlslBuilderVisitor : public BaseOperationVisitor

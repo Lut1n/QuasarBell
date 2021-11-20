@@ -61,11 +61,14 @@ set(QB_SOURCES
     src/SdfOperation/SdfBasicOperations.hpp
     src/SdfOperation/SdfTransforms.hpp
     src/SdfOperation/SdfSampling.hpp
+    src/SdfOperation/SdfVoxel.hpp
+    src/SdfOperation/VoxelExporter.hpp
     src/Core/Version.hpp
     src/Core/Vec2.h
     src/Core/Factory.h
     src/Core/Quat.hpp
     src/Core/Math.hpp
+    src/Core/ProgressiveWork.hpp
     src/Core/PseudoRand.hpp
     src/Font/DefaultFontMaker.h
     src/Font/FontMaker.h
@@ -146,6 +149,8 @@ set(QB_SOURCES
     src/SdfOperation/SdfBasicOperations.cpp
     src/SdfOperation/SdfTransforms.cpp
     src/SdfOperation/SdfSampling.cpp
+    src/SdfOperation/SdfVoxel.cpp
+    src/SdfOperation/VoxelExporter.cpp
     src/Core/Vec2.cpp
     src/Core/Quat.cpp
     src/Core/PseudoRand.cpp

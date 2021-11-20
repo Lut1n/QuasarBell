@@ -85,6 +85,14 @@ void GlCustomProgram::use()
     GL_CHECKERROR("custom program use");
 }
 
+void GlCustomProgram::setUniform(const std::string& id, float v)
+{
+    use();
+    int loc = glGetUniformLocation(program, id.c_str());
+    glUniform1f(loc, v);
+    GL_CHECKERROR("customProgram: set uniform (maybe unused)");
+}
+
 void GlCustomProgram::setUniform(size_t id, const vec4& v4)
 {
     use();

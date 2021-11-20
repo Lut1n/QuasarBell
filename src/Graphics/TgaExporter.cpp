@@ -1,7 +1,28 @@
 #include "Graphics/TgaExporter.hpp"
 
+#include "Core/Math.hpp"
+
 #include <fstream>
 
+//--------------------------------------------------------------
+unsigned int qb::ImageData::sample(float u, float v)
+{
+    int x = (int)(u * (float)width-1.0f);
+    int y = (int)(v * (float)height-1.0f);
+    x = (size_t)qb::clamp(x, 0, (int)width-1);
+    y = (size_t)qb::clamp(y, 0, (int)height-1);
+
+    size_t idx = y * width*channels + x*channels;
+    unsigned int color = 0;
+    color = data[idx + 0] << 24;
+    if (channels > 1)
+        color |= data[idx + 1] << 16;
+    if (channels > 2)
+        color |= data[idx + 2] << 8;
+    if (channels > 3)
+        color |= data[idx + 3];
+    return color;
+}
 
 //--------------------------------------------------------------
 void qb::exportTGA(const std::string& filename, const ImageData& image)

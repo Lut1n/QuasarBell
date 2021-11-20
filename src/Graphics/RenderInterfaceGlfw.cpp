@@ -538,6 +538,11 @@ void RenderInterface::updateCustomProgram(unsigned customId, const std::string& 
     GL_CHECKERROR("customProgram: update");
 }
 
+void RenderInterface::setInputCustomProgram(unsigned customId, const std::string& id, float v)
+{
+    s_CustomPrograms[customId]->setUniform(id, v);
+}
+
 void RenderInterface::setInputCustomProgram(unsigned customId, size_t uniformId, const vec4& v4)
 {
     s_CustomPrograms[customId]->setUniform(uniformId, v4);

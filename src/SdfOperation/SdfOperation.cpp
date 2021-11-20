@@ -65,6 +65,14 @@ void RMPreview::RenderFrame::updateUniforms(qb::GlslFrame& frame)
 {
     size_t frameId = 0;
     for(auto& f2 : frame.frames) frames[frameId++]->updateUniforms(f2);
+
+    if (frame.type == qb::GlslFrame::Type::VoxelPlan)
+    {
+        RenderInterface::debugCheck("Before update uniforms");
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, "u_zEpsilon", frame.voxelSize);
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, "u_zTargetPlan", frame.targetZ);
+        RenderInterface::debugCheck("After update uniforms");
+    }
     
     size_t inId = 0;
     for(auto& input : frame.inputs)

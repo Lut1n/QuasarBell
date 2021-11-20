@@ -34,7 +34,8 @@ namespace qb
         {SdfOperationType_Symmetry, "symmetry"},
         {SdfOperationType_Displacement, "displacement"},
         {SdfOperationType_Texturing, "texturing"},
-        {SdfOperationType_HighResOutput, "high-res"}
+        {SdfOperationType_HighResOutput, "high-res"},
+        {SdfOperationType_Voxel, "voxel"}
     };
 }
 //--------------------------------------------------------------

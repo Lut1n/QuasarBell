@@ -1,8 +1,7 @@
 #include "SdfOperation/SdfBasicOperations.hpp"
 #include "ImageOperation/GlslBuilder.hpp"
 
-#include "ImageOperation/GlslBuilder.hpp"
-
+#include <fstream>
 #include <array>
 #include <string>
 #include "imgui.h"

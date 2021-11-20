@@ -12,6 +12,8 @@ namespace qb
         size_t width = 256;
         size_t height = 256;
         size_t channels = 3;
+
+        unsigned int sample(float u, float v);
     };
 
     void exportTGA(const std::string& filename, const ImageData& image);
