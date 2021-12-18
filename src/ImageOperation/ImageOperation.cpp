@@ -127,7 +127,9 @@ void ImagePreview::compute(ImageOperation* operation)
 
     qb::GlslBuilderVisitor visitor;
     visitor.mainFrame.resolution = resolution;
+    visitor.setCurrentOperation(nullptr);
     bool opValid = operation->sample(0, visitor);
+    visitor.unsetCurrentOperation();
 
     if(toRecompile)
     {
@@ -165,9 +167,24 @@ bool ImageOperation::sampleSdfInput(size_t index, qb::GlslBuilderVisitor& visito
     auto* co = getInput(index);
     if (co->refs.size() > 0 && co->refs[0].operation)
     {
-        frameId = visitor.pushFrame(qb::GlslFrame::Type::Sdf);
-        bool res = co->refs[0].operation->sample(co->refs[0].index, visitor);
+        auto targetOperation = co->refs[0].operation;
+        auto& visited = visitor.visited;
+        auto it = visited.find(targetOperation);
+        bool res = false;
+        visitor.setCurrentOperation(targetOperation);
+        if (it != visited.end())
+        {
+            frameId = visitor.repushall();
+            res = it->second;
+        }
+        else
+        {
+            frameId = visitor.pushFrame(qb::GlslFrame::Type::Sdf);
+            res = targetOperation->sample(co->refs[0].index, visitor);
+            visited.emplace(targetOperation, res);
+        }
         visitor.popFrame();
+        visitor.unsetCurrentOperation();
         return res;
     }
     return false;
@@ -205,7 +222,28 @@ std::string ImageOperation::name() const
 //--------------------------------------------------------------
 bool ImageOperation::sample(size_t index, BaseOperationVisitor& visitor)
 {
-    return sample(index, dynamic_cast<qb::GlslBuilderVisitor&>(visitor));
+    auto& glslBuilder = dynamic_cast<qb::GlslBuilderVisitor&>(visitor);
+    glslBuilder.setCurrentOperation(this);
+
+    auto& context = glslBuilder.getCurrentFrame().getContext();
+    auto& visited = context.visited;
+    auto it = visited.find(this);
+
+    bool ret = false;
+
+    if (it != visited.end())
+    {
+        context.repushall();
+        ret = it->second;
+    }
+    else
+    {
+        ret = sample(index, glslBuilder);
+        visited.emplace(this, ret);
+    }
+    
+    glslBuilder.unsetCurrentOperation();
+    return ret;
 }
 //--------------------------------------------------------------
 bool ImageOperation::sample(size_t index, qb::GlslBuilderVisitor& visitor)

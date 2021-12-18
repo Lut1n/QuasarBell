@@ -138,7 +138,9 @@ void RMPreview::compute(SdfOperation* operation)
     qb::GlslBuilderVisitor visitor;
     visitor.mainFrame.type = qb::GlslFrame::Type::Sdf;
     visitor.mainFrame.resolution = resolution;
+    visitor.setCurrentOperation(nullptr);
     bool opValid = operation->sample(0, visitor);
+    visitor.unsetCurrentOperation();
 
     if(toRecompile)
     {
@@ -176,11 +178,25 @@ bool SdfOperation::sampleTextureInput(size_t index, qb::GlslBuilderVisitor& visi
     auto* co = getInput(index);
     if (co->refs.size() > 0 && co->refs[0].operation)
     {
-        frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
-        bool ret = co->refs[0].operation->sample(co->refs[0].index, visitor);
+        auto targetOperation = co->refs[0].operation;
+        auto& visited = visitor.visited;
+        auto it = visited.find(targetOperation);
+        bool res = false;
+        visitor.setCurrentOperation(targetOperation);
+        if (it != visited.end())
+        {
+            frameId = visitor.repushall();
+            res = it->second;
+        }
+        else
+        {
+            frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
+            res = targetOperation->sample(co->refs[0].index, visitor);
+            visited.emplace(targetOperation, res);
+        }
         visitor.popFrame();
-
-        return ret;
+        visitor.unsetCurrentOperation();
+        return res;
     }
     return false;
 }
@@ -217,7 +233,27 @@ std::string SdfOperation::name() const
 //--------------------------------------------------------------
 bool SdfOperation::sample(size_t index, BaseOperationVisitor& visitor)
 {
-    return sample(index, dynamic_cast<qb::GlslBuilderVisitor&>(visitor));
+    auto& glslBuilder = dynamic_cast<qb::GlslBuilderVisitor&>(visitor);
+    glslBuilder.setCurrentOperation(this);
+
+    auto& context = glslBuilder.getCurrentFrame().getContext();
+    auto& visited = context.visited;
+    auto it = visited.find(this);
+
+    bool ret = false;
+
+    if (it != visited.end())
+    {
+        context.repushall();
+        ret = it->second;
+    }
+    else
+    {
+        ret = sample(index, glslBuilder);
+        visited.emplace(this, ret);
+    }
+    glslBuilder.unsetCurrentOperation();
+    return ret;
 }
 //--------------------------------------------------------------
 bool SdfOperation::sample(size_t index, qb::GlslBuilderVisitor& visitor)

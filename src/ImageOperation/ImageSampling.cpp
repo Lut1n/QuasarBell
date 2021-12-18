@@ -23,9 +23,31 @@ bool ImageFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 
     auto& frame = visitor.getCurrentFrame();
 
-    size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
-    bool inputValid = sampleInput(0, visitor);
-    visitor.popFrame();
+    size_t frameId = 0;
+    bool inputValid = false;
+    {
+        auto& visited = visitor.visited;
+        auto it = visited.end();
+        
+        auto* co = getInput(0);
+        auto targetOperation = co->refs[0].operation;
+        it = visited.find(targetOperation);
+
+        visitor.setCurrentOperation(targetOperation);
+        if (it != visited.end())
+        {
+            frameId = visitor.repushall();
+            inputValid = it->second;
+        }
+        else
+        {
+            frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
+            inputValid = sampleInput(0, visitor);
+            visited.emplace(targetOperation, inputValid);
+        }
+        visitor.popFrame();
+        visitor.unsetCurrentOperation();
+    }
 
     if(inputValid)
     {
@@ -119,10 +141,32 @@ MorphoFilter::MorphoFilter()
 bool MorphoFilter::sample(size_t index, qb::GlslBuilderVisitor& visitor)
 {
     auto& frame = visitor.getCurrentFrame();
+    
+    size_t frameId = 0;
+    bool inputValid = false;
+    {
+        auto& visited = visitor.visited;
+        auto it = visited.end();
+        
+        auto* co = getInput(0);
+        auto targetOperation = co->refs[0].operation;
+        it = visited.find(targetOperation);
 
-    size_t frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
-    bool inputValid = sampleInput(0, visitor);
-    visitor.popFrame();
+        visitor.setCurrentOperation(targetOperation);
+        if (it != visited.end())
+        {
+            frameId = visitor.repushall();
+            inputValid = it->second;
+        }
+        else
+        {
+            frameId = visitor.pushFrame(qb::GlslFrame::Type::Texture);
+            inputValid = sampleInput(0, visitor);
+            visited.emplace(targetOperation, inputValid);
+        }
+        visitor.popFrame();
+        visitor.unsetCurrentOperation();
+    }
 
     if(inputValid)
     {

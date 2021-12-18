@@ -15,6 +15,58 @@
 //--------------------------------------------------------------
 namespace qb
 {
+    template<typename ID, typename T>
+    struct Stack
+    {
+        std::vector<std::pair<ID,T>> data;
+        std::list<size_t> idStack;
+
+        void push(ID id, T value)
+        {
+            idStack.push_back(data.size());
+            data.push_back(std::make_pair(id,value));
+        }
+
+        void repush(ID id)
+        {
+            std::vector<T> topush;
+            for(auto& item : data)
+            {
+                if (item.first == id)
+                    topush.push_back(item.second);
+            }
+            for(auto& value : topush)
+                push((ID)0, value);
+        }
+
+        void pop()
+        {
+            idStack.pop_back();
+        }
+
+        void ipop()
+        {
+            idStack.pop_front();
+        }
+
+        T& get()
+        {
+            return data[idStack.back()].second;
+        }
+
+        T& iget()
+        {
+            return data[idStack.front()].second;
+        }
+
+        size_t size()
+        {
+            return idStack.size();
+        }
+    };
+
+    using IdStack = Stack<BaseOperation*,size_t>;
+
     std::string uv(size_t i);
     std::string va(size_t i);
     std::string in(size_t i);
@@ -29,11 +81,12 @@ namespace qb
 
     struct GlslContext
     {
+        std::unordered_map<BaseOperation*, bool> visited;
         std::string code;
 
-        std::list<size_t> vaStack;
-        std::list<size_t> uvStack;
-        std::list<size_t> tfmrStack;
+        IdStack vaStack;
+        IdStack uvStack;
+        IdStack tfmrStack;
 
         size_t nextUvId = 1;
         size_t nextVaId = 0;
@@ -55,6 +108,8 @@ namespace qb
         size_t getNextTransform();
 
         void pushCode(const std::string& toAdd);
+
+        void repushall();
     };
 
     struct GlslFrame
@@ -74,6 +129,7 @@ namespace qb
         std::vector<vec4> inputs;
         std::vector<Kernel> kernels;
         std::vector<GlslFrame> frames;
+
         std::unordered_map<ImageOperationType, std::string> functions;
         std::unordered_map<SdfOperationType, std::string> sdfFunctions;
         std::unordered_map<std::string, std::string> optFunctions;
@@ -81,7 +137,10 @@ namespace qb
         GlslContext mainContext;
         std::vector<GlslContext> subContexts;
         
-        std::list<size_t> contextStack;
+        IdStack inputStack;
+        IdStack kernelStack;
+        IdStack frameStack;
+        IdStack contextStack;
 
         void setFunctions(ImageOperationType operationType, const std::string& functionCode);
         void setFunctions(SdfOperationType operationType, const std::string& functionCode);
@@ -99,17 +158,25 @@ namespace qb
         std::string compile();
 
         bool needUv() const { return hasUv || type == Type::Sdf || type == Type::VoxelPlan; }
+
+        void repushall();
     };
 
     struct GlslBuilderVisitor : public BaseOperationVisitor
     {
+        std::unordered_map<BaseOperation*, bool> visited;
+
         GlslFrame mainFrame;
-        std::list<GlslFrame*> frameStack;
+        Stack<BaseOperation*, GlslFrame*> frameStack;
 
         GlslFrame& getCurrentFrame();
 
         size_t pushFrame(GlslFrame::Type type);
         void popFrame();
+
+        void setCurrentOperation(BaseOperation* o);
+        void unsetCurrentOperation();
+        size_t repushall();
     };
 };
 

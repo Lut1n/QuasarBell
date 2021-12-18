@@ -1,5 +1,9 @@
 #include "ImageOperation/GlslBuilder.hpp"
 
+namespace qb
+{
+    static Stack<void*, BaseOperation*> s_currentOperation;
+}
 
 //--------------------------------------------------------------
 std::string qb::uv(size_t i)
@@ -69,13 +73,13 @@ std::string qb::tfmr(size_t i)
 size_t qb::GlslContext::getUvId()
 {
     if(uvStack.size() > 0)
-        return uvStack.back();
+        return uvStack.get();
     return 0;
 }
 //--------------------------------------------------------------
 void qb::GlslContext::pushUv(size_t id)
 {
-    uvStack.push_back(id);
+    uvStack.push(s_currentOperation.get(), id);
     nextUvId++;
 }
 //--------------------------------------------------------------
@@ -86,24 +90,24 @@ size_t qb::GlslContext::getNextUv()
 //--------------------------------------------------------------
 void qb::GlslContext::popUv()
 {
-    uvStack.pop_back();
+    uvStack.pop();
 }
 //--------------------------------------------------------------
 void qb::GlslContext::pushTransform(size_t id)
 {
-    tfmrStack.push_back(id);
+    tfmrStack.push(s_currentOperation.get(), id);
     nextTfmrId++;
 }
 //--------------------------------------------------------------
 void qb::GlslContext::popTransform()
 {
-    tfmrStack.pop_back();
+    tfmrStack.pop();
 }
 //--------------------------------------------------------------
 size_t qb::GlslContext::getTransformId()
 {
     if(tfmrStack.size() > 0)
-        return tfmrStack.back();
+        return tfmrStack.get();
     return 0;
 }
 //--------------------------------------------------------------
@@ -114,19 +118,19 @@ size_t qb::GlslContext::getNextTransform()
 //--------------------------------------------------------------
 void qb::GlslContext::pushVa(size_t id)
 {
-    vaStack.push_back(id);
+    vaStack.push(s_currentOperation.get(), id);
     nextVaId++;
 }
 //--------------------------------------------------------------
 size_t qb::GlslContext::popVa()
 {
-    size_t id = vaStack.front(); vaStack.pop_front();
+    size_t id = vaStack.iget(); vaStack.ipop();
     return id;
 }
 //--------------------------------------------------------------
 size_t qb::GlslContext::getVa()
 {
-    return vaStack.front();
+    return vaStack.iget();
 }
 //--------------------------------------------------------------
 size_t qb::GlslContext::getNextVa()
@@ -137,6 +141,12 @@ size_t qb::GlslContext::getNextVa()
 void qb::GlslContext::pushCode(const std::string& toAdd)
 {
     code += toAdd;
+}
+void qb::GlslContext::repushall()
+{
+    vaStack.repush(s_currentOperation.get());
+    // uvStack.repush(s_currentOperation);
+    // tfmrStack.repush(s_currentOperation);
 }
 //--------------------------------------------------------------
 void qb::GlslFrame::setFunctions(ImageOperationType operationType, const std::string& functionCode)
@@ -161,6 +171,7 @@ size_t qb::GlslFrame::pushInput(const vec4& v4)
 {
     size_t id = inputs.size();
     inputs.push_back(v4);
+    inputStack.push(s_currentOperation.get(), id);
     return id;
 }
 //--------------------------------------------------------------
@@ -168,13 +179,14 @@ size_t qb::GlslFrame::pushKernel(const Kernel& ke)
 {
     size_t id = kernels.size();
     kernels.push_back(ke);
+    kernelStack.push(s_currentOperation.get(), id);
     return id;
 }
 //--------------------------------------------------------------
 qb::GlslContext& qb::GlslFrame::getContext()
 {
     if(contextStack.size() > 0)
-        return subContexts[contextStack.back()];
+        return subContexts[contextStack.get()];
     return mainContext;
 }
 //--------------------------------------------------------------
@@ -182,13 +194,13 @@ size_t qb::GlslFrame::pushContext()
 {
     size_t idx = subContexts.size();
     subContexts.push_back(GlslContext());
-    contextStack.push_back(idx);
+    contextStack.push(s_currentOperation.get(), idx);
     return idx;
 }
 //--------------------------------------------------------------
 void qb::GlslFrame::popContext()
 {
-    contextStack.pop_back();
+    contextStack.pop();
 }
 
 //--------------------------------------------------------------
@@ -273,6 +285,14 @@ void qb::GlslFrame::zProjection(std::string& glsl)
     "}\n";
 }
 
+void qb::GlslFrame::repushall()
+{
+    // inputStack.repush(s_currentOperation);
+    // kernelStack.repush(s_currentOperation);
+    // frameStack.repush(s_currentOperation);
+    contextStack.repush(s_currentOperation.get());
+}
+
 //--------------------------------------------------------------
 std::string qb::GlslFrame::compile()
 {
@@ -342,7 +362,7 @@ std::string qb::GlslFrame::compile()
 qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
 {
     if(frameStack.size() > 0)
-        return *frameStack.back();
+        return *frameStack.get();
     return mainFrame;
 }
 //--------------------------------------------------------------
@@ -353,11 +373,35 @@ size_t qb::GlslBuilderVisitor::pushFrame(GlslFrame::Type type)
     frames.push_back(GlslFrame());
     frames.back().type = type;
     frames.back().resolution = mainFrame.resolution;
-    frameStack.push_back(&frames.back());
+    frameStack.push(s_currentOperation.get(), &frames.back());
     return idx;
 }
 //--------------------------------------------------------------
 void qb::GlslBuilderVisitor::popFrame()
 {
-    frameStack.pop_back();
+    frameStack.pop();
+}
+
+void qb::GlslBuilderVisitor::setCurrentOperation(BaseOperation* o)
+{
+    s_currentOperation.push(0,o);
+}
+
+void qb::GlslBuilderVisitor::unsetCurrentOperation()
+{
+    s_currentOperation.pop();
+}
+
+size_t qb::GlslBuilderVisitor::repushall()
+{
+    size_t id = 0;
+    for(auto& item : frameStack.data)
+    {
+        if (item.first == s_currentOperation.get())
+            break;
+        id++;
+    }
+
+    frameStack.repush(s_currentOperation.get());
+    return id;
 }
