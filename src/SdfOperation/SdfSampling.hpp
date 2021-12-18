@@ -12,7 +12,7 @@ struct Displacement : public SdfOperation
     std::string getOperationCode() const override;
     
     float intensity = 0.5f;
-    int cubemapMode = 1;
+    int mode = 1;
 };
 
 //--------------------------------------------------------------
@@ -24,7 +24,7 @@ struct Texturing : public SdfOperation
     std::string getOperationCode() const override;
     
     float factor = 1.0f;
-    int cubemapMode = 1;
+    int mode = 1;
 };
 
 #endif // QUASAR_BELL_SDF_SAMPLING_HPP

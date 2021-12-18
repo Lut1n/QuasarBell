@@ -24,7 +24,21 @@ namespace qb
         "    float b = acos(p.y);\n"
         "    return vec2(a,b) / PI;\n"
         "}\n"
-        "vec4 fetchCubemap(sampler2D s2d, vec3 p)\n"
+        "vec4 fetchSphereMap(sampler2D s2d, vec3 p)\n"
+        "{\n"
+        "    vec2 s2d_uv = toPolar(p);\n"
+        "    return texture2D(s2d,s2d_uv);\n"
+        "}\n"
+        "vec4 fetchTriplanarMap(sampler2D s2d, vec3 p)\n"
+        "{\n"
+        "    p = normalize(p);\n"
+        "    vec4 x = texture2D(s2d, p.yz);\n"
+        "    vec4 y = texture2D(s2d, p.zx);\n"
+        "    vec4 z = texture2D(s2d, p.xy);\n"
+        "    vec3 m = pow(abs(p), vec3(2.2));\n"
+        "    return (x*m.x+y*m.y+z*m.z) / (m.x+m.y+m.z);\n"
+        "}\n"
+        "vec4 fetchCubeMap(sampler2D s2d, vec3 p)\n"
         "{\n"
         "    p = normalize(p);\n"
         "    \n"
@@ -82,7 +96,7 @@ Displacement::Displacement()
     makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("intensity",&intensity, 0.0, 1.0);
-    makeProperty("mode",&cubemapMode, 0, 1);
+    makeProperty("mode",&mode, 0, 2);
 }
 
 //--------------------------------------------------------------
@@ -95,7 +109,7 @@ bool Displacement::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     if (sampleTextureInput(1, visitor, frameId))
     {
         std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
-        std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({intensity,(float)cubemapMode,0.0f,0.0f}));
+        std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({intensity,(float)mode,0.0f,0.0f}));
         std::string in3 = qb::sa(frameId);
 
         size_t opId = context.getNextVa();
@@ -120,13 +134,15 @@ std::string Displacement::getOperationCode() const
 {
     static constexpr std::string_view code =
      "vec4 opDisplacement(vec4 v1, vec3 p, vec2 intensityMode, sampler2D s2d){\n"
-     "    if (intensityMode.y == 1.0){\n"
-     "        return vec4(v1.x + intensityMode.x*(fetchCubemap(s2d, p).x * 2.0 - 1.0),v1.yzw);\n"
-     "    }\n"
-     "    else{\n"
-     "        vec2 s2d_uv = toPolar(p);\n"
-     "        return vec4(v1.x + intensityMode.x*(texture2D(s2d,s2d_uv).x * 2.0 - 1.0),v1.yzw);\n"
-     "    }\n"
+     "    int mode = int(intensityMode.y);\n"
+     "    vec4 ret = vec4(0.0);\n"
+     "    if (mode == 0)\n"
+     "      ret = fetchCubeMap(s2d, p);\n"
+     "    else if (mode == 1)\n"
+     "      ret = fetchSphereMap(s2d, p);\n"
+     "    else if (mode == 2)\n"
+     "      ret = fetchTriplanarMap(s2d, p);\n"
+     "    return vec4(v1.x + intensityMode.x*(ret.x * 2.0 - 1.0),v1.yzw);\n"
      "}\n";
 
     return std::string(code);
@@ -141,7 +157,7 @@ Texturing::Texturing()
     makeInput("in2", BaseOperationDataType::Float, UiPin::Type_S2d);
     makeOutput("out", BaseOperationDataType::Float);
     makeProperty("factor",&factor, 0.0, 1.0);
-    makeProperty("mode",&cubemapMode, 0, 1);
+    makeProperty("mode",&mode, 0, 2);
 }
 
 //--------------------------------------------------------------
@@ -154,7 +170,7 @@ bool Texturing::sample(size_t index, qb::GlslBuilderVisitor& visitor)
     if (sampleTextureInput(1, visitor, frameId))
     {
         std::string in1 = pushOpOrInput(0,visitor, {1e10f,1e10f,1e10f,1e10f});
-        std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({factor,(float)cubemapMode,0.0f,0.0f}));
+        std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({factor,(float)mode,0.0f,0.0f}));
         std::string in3 = qb::sa(frameId);
 
         size_t opId = context.getNextVa();
@@ -179,13 +195,15 @@ std::string Texturing::getOperationCode() const
 {
     static constexpr std::string_view code =
     "vec4 opTexturing(vec4 v1, vec3 p, vec2 factorMode, sampler2D s2d){\n"
-    "    if (factorMode.y == 1.0){\n"
-    "        return vec4(v1.x, mix(v1.yzw,fetchCubemap(s2d,p).xyz,factorMode.x));\n"
-    "    }\n"
-    "    else{\n"
-    "        vec2 s2d_uv = toPolar(p);\n"
-    "        return vec4(v1.x, mix(v1.yzw,texture2D(s2d,s2d_uv).xyz,factorMode.x));\n"
-    "    }\n"
+     "    int mode = int(factorMode.y);\n"
+     "    vec4 ret = vec4(0.0);\n"
+     "    if (mode == 0)\n"
+     "      ret = fetchCubeMap(s2d, p);\n"
+     "    else if (mode == 1)\n"
+     "      ret = fetchSphereMap(s2d, p);\n"
+     "    else if (mode == 2)\n"
+     "      ret = fetchTriplanarMap(s2d, p);\n"
+     "    return vec4(v1.x, mix(v1.yzw,ret.xyz,factorMode.x));\n"
     "}\n";
     return std::string(code);
 }
