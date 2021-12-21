@@ -5,32 +5,30 @@
 #include <string>
 #include <unordered_map>
 
-#include "Ui/UiNode.h"
-#include "SignalOperation/SignalOperation.hpp"
+#include "App/BaseOperationNode.hpp"
 #include "SignalOperation/OperationType.hpp"
 #include "Core/Factory.h"
 
 //--------------------------------------------------------------
 struct SignalNode : public BaseOperationNode
 {
-    SignalNode(qb::OperationType opType, BaseOperation* operation)
-        : BaseOperationNode(qb::getOperationName(opType), (size_t)opType, operation)
-        {}
-    
-    void drawPreview(const Rect& previewArea) override;
+    SignalNode(size_t opType, BaseAttributes* attributes)
+        : BaseOperationNode(qb::getOperationName((qb::OperationType)opType), opType, attributes)
+        {
+        }
 };
 //--------------------------------------------------------------
-template<typename OpObject, qb::OperationType OpType>
+template<typename OpObject>
 struct TypedSignalNode : public SignalNode
 {
-    TypedSignalNode() : SignalNode(OpType, new OpObject()) {}
+    TypedSignalNode() : SignalNode(OpObject::TypeId, new OpObject()) {}
 };
 //--------------------------------------------------------------
-#define MAKE_SIGNAL_NODE(opclass, optype)\
-    struct opclass ## Node : public TypedSignalNode<opclass, optype> {};
+#define MAKE_SIGNAL_NODE(opclass)\
+    struct opclass ## Node : public TypedSignalNode<opclass> {};
 //--------------------------------------------------------------
-#define MAKE_SIGNAL_NODE_CREATOR(opclass, optype)\
-    static TypedCreator<SignalNode, opclass ## Node> opclass ## Creator(optype);
+#define MAKE_SIGNAL_NODE_CREATOR(opclass)\
+    static TypedCreator<SignalNode, opclass ## Node> opclass ## Creator(opclass::TypeId);
 
 
 #endif // GUI_SIGNAL_OP_NODE_H

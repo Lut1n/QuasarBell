@@ -3,60 +3,67 @@
 #include "ReaderWriter/RwHelpers.hpp"
 
 #include "SignalOperation/OperationType.hpp"
-#include "ImageOperation/ImageOperationType.hpp"
+// #include "ImageOperation/ImageOperationType.hpp"
 
 #include "App/SignalNode.hpp"
-#include "App/ImageNode.hpp"
+// #include "App/ImageNode.hpp"
 #include "App/UiSignalNodeBoard.hpp"
 
 #include "Core/Factory.h"
 
 //--------------------------------------------------------------
-void saveInto(JsonValue& root, OperationCollection& collection, const OperationConnections& co, const std::string& category, size_t typeFlags, std::function<std::string(BaseOperationNode*)> typeIdGetter)
+void saveInto(JsonValue& root, OperationCollection& collection, const OperationConnections& co, std::function<std::string(BaseOperationNode*)> typeIdGetter)
 {
     Rect boxed = collection.getBoundingBox();
-    auto& jsonOp = root.setPath(category,"operations");
+    auto& jsonOp = root.setPath("operations");
     auto& ops = collection.operations;
     int index = 0;
     for(auto it = ops.begin(); it != ops.end(); ++it)
     {
-        if(it->second->getOperation()->getDefaultTypeFlags() != typeFlags) continue;
         auto& jNode = jsonOp.setPath(index++);
         std::string typeName = typeIdGetter(it->second.get());
         jNode.setPath("type").set(typeName);
         jNode.setPath("id").set((float)it->first);
         toJson(jNode.setPath("position"), it->second->position-boxed.p0);
         
-        auto op = it->second->getOperation();
-        for(size_t i=0; i<op->getPropertyCount(); ++i)
+        auto attributes = it->second->getAttributes();
+        for(size_t i=0; i<attributes->count(); ++i)
         {
-            float f = 0.0f;
-            int k = 0;
-            bool b = false;
-            if (op->getPropertyType(i) == BaseOperationDataType::Float)
+            auto type = attributes->typeAt(i);
+            auto& jattr = jNode.setPath("attributes", attributes->nameAt(i));
+            if (type == BaseAttributes::Type::Float)
             {
-                op->getProperty(i, f);
-                jNode.setPath("properties", op->getPropertyName(i)).set(f);
+                float f = 0.0f;
+                attributes->get(i, f);
+                jattr.set(f);
             }
-            else if (op->getPropertyType(i) == BaseOperationDataType::Int)
+            else if (type == BaseAttributes::Type::Int)
             {
-                op->getProperty(i, k);
-                jNode.setPath("properties", op->getPropertyName(i)).set((float)k);
+                int k = 0;
+                attributes->get(i, k);
+                jattr.set((float)k);
             }
-            else if (op->getPropertyType(i) == BaseOperationDataType::Bool)
+            else if (type == BaseAttributes::Type::Bool)
             {
-                op->getProperty(i, b);
-                jNode.setPath("properties", op->getPropertyName(i)).set(b);
+                bool b = false;
+                attributes->get(i, b);
+                jattr.set(b);
+            }
+            else if (type == BaseAttributes::Type::Color3)
+            {
+                float color[3];
+                attributes->get(i, color);
+                toJson(jattr, color, 3);
             }
         }
 
-        if(op->hasCustomData())
+        if(attributes->hasCustomData())
         {
-            op->saveCustomData(jNode.setPath("data"));
+            attributes->saveCustomData(jNode.setPath("data"));
         }
     }
 
-    auto& jsonCo = root.setPath(category,"connections");
+    auto& jsonCo = root.setPath("connections");
     int coIndex = 0;
     for (auto entry : co.entries)
     {
@@ -68,54 +75,69 @@ void saveInto(JsonValue& root, OperationCollection& collection, const OperationC
     }
 }
 
-void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnections& co, const std::string& category, size_t typeFlags, std::function<BaseOperationNode*(const std::string&)> nodeCreator)
+void loadAttribute(BaseAttributes* attributes, JsonValue& json, const std::string& dataName)
 {
-    auto& jsonOp = root.setPath(category,"operations");
-    auto& ops = collection.operations;
-    int index = 0;
-    for(auto& jNode : jsonOp.array.values)
+    for(size_t i=0; i<attributes->count(); ++i)
     {
-        // if(it->second->getOperation()->getPinType() != pinType) continue;
-        int id = (int) jNode.setPath("id").getNumeric();
+        auto type = attributes->typeAt(i);
+        auto& jattr = json.setPath(dataName, attributes->nameAt(i));
+        if (type == BaseAttributes::Type::Float)
+        {
+            float f = (float) jattr.getNumeric();
+            attributes->set(i, f);
+        }
+        else if (type == BaseAttributes::Type::Int)
+        {
+            int k = (int) jattr.getNumeric();
+            attributes->set(i, k);
+        }
+        else if (type == BaseAttributes::Type::Bool)
+        {
+            bool b = jattr.getBoolean();
+            attributes->set(i, b);
+        }
+        else if (type == BaseAttributes::Type::Color3)
+        {
+            float color[3];
+            if (dataName == "properties")
+            {
+                color[0] = (float) json.setPath(dataName, "red").getNumeric();
+                color[1] = (float) json.setPath(dataName, "green").getNumeric();
+                color[2] = (float) json.setPath(dataName, "blue").getNumeric();
+            }
+            else
+            {
+                jsonTo(jattr, color, 3);
+            }
+            attributes->set(i, color);
+        }
+    }
+
+    if(attributes->hasCustomData())
+        attributes->loadCustomData(json.setPath("data"));
+}
+
+void loadNodes(OperationCollection& collection, JsonValue& json, const std::string& dataName, std::function<BaseOperationNode*(const std::string&)> nodeCreator)
+{
+    auto& ops = collection.operations;
+    for(auto& jNode : json.array.values)
+    {
         std::string type = jNode.setPath("type").getString();
-        vec2 position;
-        jsonTo(jNode.setPath("position"), position);
         std::unique_ptr<BaseOperationNode> ptr;
         ptr.reset( nodeCreator(type) );
         
-        auto op = ptr->getOperation();
-        for(size_t i=0; i<op->getPropertyCount(); ++i)
-        {
-            float f = 0.0f;
-            int k = 0;
-            bool b = false;
-            if (op->getPropertyType(i) == BaseOperationDataType::Float)
-            {
-                f = (float) jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
-                op->setProperty(i, f);
-            }
-            else if (op->getPropertyType(i) == BaseOperationDataType::Int)
-            {
-                k = (int) jNode.setPath("properties", op->getPropertyName(i)).getNumeric();
-                op->setProperty(i, k);
-            }
-            else if (op->getPropertyType(i) == BaseOperationDataType::Bool)
-            {
-                b = jNode.setPath("properties", op->getPropertyName(i)).getBoolean();
-                op->setProperty(i, b);
-            }
-        }
-
-        if(op->hasCustomData())
-        {
-            op->loadCustomData(jNode.setPath("data"));
-        }
-        ptr->position = position;
+        auto attributes = ptr->getAttributes();
+        loadAttribute(attributes, jNode, dataName);
+        
+        jsonTo(jNode.setPath("position"), ptr->position);
+        int id = (int) jNode.setPath("id").getNumeric();
         ops[id] = std::move(ptr);
     }
+}
 
-    auto& jsonCo = root.setPath(category,"connections");
-    for(auto& jco : jsonCo.array.values)
+void loadConnections(OperationConnections& co, JsonValue& json)
+{
+    for(auto& jco : json.array.values)
     {
         OperationConnections::Entry entry;
         entry.src = (int) jco.setPath("src").getNumeric();
@@ -124,4 +146,70 @@ void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnect
         entry.dst_index = (int) jco.setPath("dst-pin").getNumeric();
         co.entries.push_back(entry);
     }
+}
+
+void loadRetro4(JsonValue& root, OperationCollection& collection, OperationConnections& co, std::function<BaseOperationNode*(const std::string&)> nodeCreator)
+{
+    std::array category = {"sfx-nodal", "texture-nodal", "sdf-nodal"};
+
+    for(auto cat : category)
+    {
+        auto& jsonOp = root.setPath(cat,"operations");
+
+    auto nameConvertor = [cat, &nodeCreator](const std::string& name)
+    {
+        if (cat == "texture-nodal")
+        {
+            if (name == "add") return nodeCreator("image-add");
+            if (name == "sub") return nodeCreator("image-sub");
+            if (name == "mult") return nodeCreator("image-mult");
+            if (name == "div") return nodeCreator("image-div");
+            if (name == "mix") return nodeCreator("image-mix");
+            if (name == "clamp") return nodeCreator("image-clamp");
+            if (name == "dot") return nodeCreator("image-dot");
+            if (name == "cross") return nodeCreator("image-cross");
+            if (name == "step") return nodeCreator("image-step");
+            if (name == "pow") return nodeCreator("image-pow");
+            if (name == "sqrt") return nodeCreator("image-sqrt");
+            if (name == "abs") return nodeCreator("image-abs");
+            if (name == "sin") return nodeCreator("image-sin");
+            if (name == "cos") return nodeCreator("image-cos");
+            if (name == "tan") return nodeCreator("image-tan");
+            if (name == "mod") return nodeCreator("image-mod");
+            if (name == "exp") return nodeCreator("image-exp");
+            if (name == "log") return nodeCreator("image-log");
+            if (name == "min") return nodeCreator("image-min");
+            if (name == "max") return nodeCreator("image-max");
+        }
+        if (cat == "sdf-nodal")
+        {
+            if (name == "sub") return nodeCreator("geo-sub");
+        }
+        return nodeCreator(name);
+    };
+
+        loadNodes(collection, jsonOp, "properties", nameConvertor);
+    }
+
+    for(auto cat : category)
+    {
+        auto& jsonCo = root.setPath(cat,"connections");
+        loadConnections(co, jsonCo);
+    }
+}
+
+void loadFrom(JsonValue& root, OperationCollection& collection, OperationConnections& co, std::function<BaseOperationNode*(const std::string&)> nodeCreator)
+{
+    auto version = root.setPath("info", "version").getNumeric();
+    if (version < 4.1f)
+    {
+        loadRetro4(root, collection, co, nodeCreator);
+        return;
+    }
+
+    auto& jsonOp = root.setPath("operations");
+    loadNodes(collection, jsonOp, "attributes", nodeCreator);
+
+    auto& jsonCo = root.setPath("connections");
+    loadConnections(co, jsonCo);
 }

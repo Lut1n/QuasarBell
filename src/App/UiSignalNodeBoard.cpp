@@ -2,35 +2,27 @@
 
 #include "Core/Factory.h"
 
-#include "Audio/WavExporter.hpp"
-
 #include "App/SignalNode.hpp"
 #include "App/ImageNode.hpp"
-#include "App/SdfNode.hpp"
+#include "App/GeometryNode.hpp"
+#include "SignalOperation/SignalAttributes.hpp"
+#include "ImageOperation/ImageAttributes.hpp"
+#include "GeometryOperation/GeometryAttributes.hpp"
 
 #include "ReaderWriter/FileIO.hpp"
 #include "ReaderWriter/RwHelpers.hpp"
 #include "ReaderWriter/SignalOperationsRW.hpp"
 
-#include "SignalOperation/OperationType.hpp"
-#include "SignalOperation/Operations.hpp"
+#include "SignalOperation/PcmBuilder.hpp"
+#include "ImageOperation/TextureBuilder.hpp"
 
-#include "ImageOperation/ImageOperationType.hpp"
-#include "ImageOperation/ImageOperation.hpp"
-
-#include "SdfOperation/SdfOperationType.hpp"
-#include "SdfOperation/SdfOperation.hpp"
-
-#include "ImageOperation/HighResOutput.hpp"
-
-void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll, size_t typeFlags)
+void OperationConnections::fill(UiConnections* ui, const OperationCollection& coll)
 {
     for (auto link : ui->links)
     {
         auto co = link.second;
         auto pin1 = co.first;
         auto pin2 = co.second;
-        if (qb::hasFlag(pin1->typeFlags, typeFlags) || qb::hasFlag(pin2->typeFlags, typeFlags)) continue;
         auto node1 = dynamic_cast<BaseOperationNode*>(pin1->parentNode);
         auto node2 = dynamic_cast<BaseOperationNode*>(pin2->parentNode);
         if(!node1 || !node2) continue;
@@ -81,24 +73,6 @@ void UiSignalNodeBoard::update(float t)
         app.fileInput.request = UserFileInput::Nothing;
         app.fileInput.confirmed = false;
     }
-    if(app.waveInput.confirmed)
-    {
-        if(OutputOperation::defaultOutput == nullptr)
-            std::cout << "Error: You must set an audio output node as default" << std::endl;
-        else if(app.waveInput.request == UserFileInput::Export_Wav)
-            exportWav(app.waveInput.filepath, *OutputOperation::defaultOutput);
-        app.waveInput.request = UserFileInput::Nothing;
-        app.waveInput.confirmed = false;
-    }
-    if(app.tgaInput.confirmed)
-    {
-        if(HighResOutput::defaultOutput == nullptr)
-            std::cout << "Error: You must set an highres output node as default" << std::endl;
-        else if(app.tgaInput.request == UserFileInput::Export_Tga)
-            exportTga(app.tgaInput.filepath, *HighResOutput::defaultOutput);
-        app.tgaInput.request = UserFileInput::Nothing;
-        app.tgaInput.confirmed = false;
-    }
 
     auto& col = operations.operations;
     for(auto it = col.begin(); it != col.end();)
@@ -106,7 +80,7 @@ void UiSignalNodeBoard::update(float t)
         if (it->second->toDelete)
         {
             AppInterface& app = AppInterface::get();
-            if(app.getPreviewOperation() == it->second->getOperation())
+            if(app.getPreviewOperation() == it->second.get())
                 app.closeBigPreview();
             it->second->disconnectAllPins();
             nodeboard->rem(it->second.get());
@@ -140,7 +114,7 @@ void UiSignalNodeBoard::update(float t)
         nodeboard->rem(uiConnections);
         nodeboard->add(uiConnections);
     }
-    if(category == NodeCategory_Geometry && type != qb::SdfOperationType_None && type < qb::SdfOperationType_Count)
+    if(category == NodeCategory_Geometry && type != qb::GeometryOperationType_None && type < qb::GeometryOperationType_Count)
     {
         std::unique_ptr<BaseOperationNode> u;
         u.reset( Factory<GeometryNode>::create(type) );
@@ -166,22 +140,36 @@ void UiSignalNodeBoard::cleanup()
 //--------------------------------------------------------------
 void UiSignalNodeBoard::load(const std::string& path)
 {
+    auto nodeCreator = [](const std::string& type)
+    {
+        BaseOperationNode* ret = nullptr;
+        auto signalNames = qb::getOperationNames();
+        auto imageNames = qb::getImageOperationNames();
+        auto geometryNames = qb::getGeometryOperationNames();
+        if (std::find(signalNames.begin(), signalNames.end(), type) != signalNames.end())
+            ret = Factory<SignalNode>::create(qb::getOperationType(type));
+        else if (std::find(imageNames.begin(), imageNames.end(), type) != imageNames.end())
+            ret = Factory<ImageNode>::create(qb::getImageOperationType(type));
+        else if (std::find(geometryNames.begin(), geometryNames.end(), type) != geometryNames.end())
+            ret = Factory<GeometryNode>::create(qb::getGeometryOperationType(type));
+        return ret;
+    };
+
     cleanup();
     OperationConnections connections;
     JsonValue root = loadJsonFile(path);
-    loadFrom(root, operations, connections, "sfx-nodal", UiPin::Type_S1d,
-            [](const std::string& type){return Factory<SignalNode>::create(qb::getOperationType(type));});
-    loadFrom(root, operations, connections, "texture-nodal", UiPin::Type_S2d,
-            [](const std::string& type){return Factory<ImageNode>::create(qb::getImageOperationType(type));});
-    loadFrom(root, operations, connections, "sdf-nodal", UiPin::Type_S3d,
-            [](const std::string& type){return Factory<GeometryNode>::create(qb::getSdfOperationType(type));});
+    loadFrom(root, operations, connections, nodeCreator);
 
     operations.centerNodes(Rect::fromPosAndSize(vec2(0.0f,0.0f),nodeboard->size));
     for(auto& op : operations.operations) nodeboard->add(op.second.get(), true, true);
     for(auto co : connections.entries)
     {
-        auto pin1 = operations.getOperation(co.src)->outputs[co.src_index].get();
-        auto pin2 = operations.getOperation(co.dst)->inputs[co.dst_index].get();
+        auto op1 = operations.getOperation(co.src);
+        auto op2 = operations.getOperation(co.dst);
+        if (op1 == nullptr || op2 == nullptr) continue;
+
+        auto pin1 = op1->outputs[co.src_index].get();
+        auto pin2 = op2->inputs[co.dst_index].get();
         uiConnections->createLink(pin1, pin2);
     }
     nodeboard->rem(uiConnections);
@@ -190,99 +178,105 @@ void UiSignalNodeBoard::load(const std::string& path)
 //--------------------------------------------------------------
 void UiSignalNodeBoard::save(const std::string& path)
 {
+    auto nameGetter = [](BaseOperationNode* node)
+    {
+        if (dynamic_cast<SignalNode*>(node))
+            return qb::getOperationName(static_cast<qb::OperationType>(node->nodeTypeId()));
+        else if (dynamic_cast<ImageNode*>(node))
+            return qb::getImageOperationName(static_cast<qb::ImageOperationType>(node->nodeTypeId()));
+        else if (dynamic_cast<GeometryNode*>(node))
+            return qb::getGeometryOperationName(static_cast<qb::GeometryOperationType>(node->nodeTypeId()));
+        return std::string("error");
+    };
+
     JsonValue root;
     writeInfo(root);
-    OperationConnections connections, iconnections, sconnections;
-    connections.fill(uiConnections, operations, UiPin::Type_S1d);
-    saveInto(root, operations, connections, "sfx-nodal", UiPin::Type_S1d,
-            [](BaseOperationNode* node){return qb::getOperationName(static_cast<qb::OperationType>(node->nodeTypeId()));});
-    iconnections.fill(uiConnections, operations, UiPin::Type_S2d);
-    saveInto(root, operations, iconnections, "texture-nodal", UiPin::Type_S2d,
-            [](BaseOperationNode* node){return qb::getImageOperationName(static_cast<qb::ImageOperationType>(node->nodeTypeId()));});
-    sconnections.fill(uiConnections, operations, UiPin::Type_S3d);
-    saveInto(root, operations, sconnections, "sdf-nodal", UiPin::Type_S3d,
-            [](BaseOperationNode* node){return qb::getSdfOperationName(static_cast<qb::SdfOperationType>(node->nodeTypeId()));});
+    OperationConnections connections;
+    connections.fill(uiConnections, operations);
+    saveInto(root, operations, connections, nameGetter);
     saveJsonFile(path, root);
 }
-//--------------------------------------------------------------
-void UiSignalNodeBoard::exportWav(const std::string& path, OutputOperation& outputNode)
-{
-    std::unique_ptr<PcmDataBase> pcm;
-    if (outputNode.sampleBits == AudioSettings::Format_Mono8 || outputNode.sampleBits == AudioSettings::Format_Stereo8)
-        pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
-    if (outputNode.sampleBits == AudioSettings::Format_Mono16 || outputNode.sampleBits == AudioSettings::Format_Stereo16)
-        pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
-    outputNode.generate(*pcm);
-    WavExporter::exportAsWAV(path, *pcm);
-}
-//--------------------------------------------------------------
-void UiSignalNodeBoard::exportTga(const std::string& path, HighResOutput& outputNode)
-{
-    if(auto frame = outputNode.preview.renderFrame.get())
-    {
-        qb::ImageData image = RenderInterface::downloadTargetImage((unsigned)frame->glResource);
-        qb::exportTGA(path, image);
-    }
-}
+
+
+static std::unordered_map<OutputData*, PcmGenerator> generators;
+static std::unordered_map<ImageOutput*, TextureGenerator> textureGenerators;
+static std::unordered_map<HighResSdfOutputData*, TextureGenerator> sdfGenerators;
+static std::unordered_map<VoxelOutputData*, TextureGenerator> voxGenerators;
+
 //--------------------------------------------------------------
 void UiSignalNodeBoard::updatePreviews()
 {
     if(RenderInterface::getTime() - _lastUpdateTime < 0.0) return;
     _lastUpdateTime = RenderInterface::getTime();
 
-    auto& col = operations.operations;
-    for (auto& op : col) op.second->updatePreview();
+    for(auto& node : operations.operations)
+    {
+        auto attributes = node.second->getAttributes();
+        if (auto output = dynamic_cast<OutputData*>(attributes))
+        {
+            auto& generator = generators[output];
+            generator.compute(node.second.get());
+        }
+        if (auto texture = dynamic_cast<ImageOutput*>(attributes))
+        {
+            auto& generator = textureGenerators[texture];
+            generator.compute(node.second.get());
+        }
+        if (auto sdf = dynamic_cast<HighResSdfOutputData*>(attributes))
+        {
+            auto& generator = sdfGenerators[sdf];
+            generator.compute(node.second.get());
+        }
+        if (auto vox = dynamic_cast<VoxelOutputData*>(attributes))
+        {
+            auto& generator = voxGenerators[vox];
+            generator.compute(node.second.get());
+        }
+
+        if (auto texPreview = dynamic_cast<TexturePreview*>(node.second->getPreview()))
+        {
+            if (texPreview->previewClicked)
+                AppInterface::get().openBigPreview(node.second.get());
+            texPreview->previewClicked = false;
+        }
+    }
 }
 //--------------------------------------------------------------
 void UiSignalNodeBoard::onConnect(UiPin* a, UiPin* b)
 {
-    auto* node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
-    auto* node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
-    if(qb::hasFlag(a->typeFlags, b->typeFlags))
-    {
-        bool node1_is_src = !a->isInput;
+    auto node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
+    auto node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
 
-        int node1_index = (int)node1->getIndex(a);
-        int node2_index = (int)node2->getIndex(b);
+    CustomNodeVisitor connectionVisitor([](BaseOperationNode& node){
+        node.setPreview(nullptr);
+        node.getAttributes()->onChanged();
+        node.getAttributes()->onConnectionChanged();
+    });
 
-        BaseOperation* op1 =node1->getOperation();
-        BaseOperation* op2 = node2->getOperation();
+    CleanPreviews cleaner;
 
-        if(node1_is_src)
-            BaseOperation::setConnection(op1, node1_index, op2, node2_index);
-        else
-            BaseOperation::setConnection(op2, node2_index, op1, node1_index);
-    }
-    else
-    {
-        std::cout << "Error: nodes have incompatible type" << std::endl;
-    }
+    if (node1)
+        node1->accept(connectionVisitor);
+    if (node2)
+        node2->accept(connectionVisitor);
 }
 //--------------------------------------------------------------
 void UiSignalNodeBoard::onDisconnect(UiPin* a, UiPin* b)
 {
-    auto* node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
-    auto* node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
+    auto node1 = dynamic_cast<BaseOperationNode*>(a->parentNode);
+    auto node2 = dynamic_cast<BaseOperationNode*>(b->parentNode);
 
-    if(qb::hasFlag(a->typeFlags, b->typeFlags))
-    {
-        bool node1_is_src = !a->isInput;
+    CustomNodeVisitor connectionVisitor([](BaseOperationNode& node){
+        node.setPreview(nullptr);
+        node.getAttributes()->onConnectionChanged();
+    });
 
-        if(node1_is_src)
-        {
-            int node2_index = (int)node2->getIndex(b);
-            BaseOperation::remConnection(node2->getOperation(), node2_index);
-        }
-        if(!node1_is_src)
-        {
-            int node1_index = (int)node1->getIndex(a);
-            BaseOperation::remConnection(node1->getOperation(), node1_index);
-        }
-    }
-    else
-    {
-        std::cout << "Error: nodes have incompatible type" << std::endl;
-    }
+    CleanPreviews cleaner;
+
+    if (node1)
+        node1->accept(connectionVisitor);
+    if (node2)
+        node2->accept(connectionVisitor);
 }
 
 //--------------------------------------------------------------

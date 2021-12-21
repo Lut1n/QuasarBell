@@ -178,6 +178,7 @@ void RenderInterface::deleteTarget(unsigned id)
     {
         delete s_targets[id].texture;
         s_targets[id].texture = nullptr;
+        // s_targets.erase(s_targets.begin() + id);
         GL_CHECKERROR("delete target");
     }
 }
@@ -256,8 +257,21 @@ unsigned RenderInterface::createTarget(unsigned width, unsigned height, bool win
         GL_CHECKERROR("create render texture");
     }
     
-    unsigned idx = (unsigned) s_targets.size();
-    s_targets.push_back(target);
+    unsigned idx = 0;
+    auto it = std::find_if(s_targets.begin(), s_targets.end(), [](auto t) { return t.texture == nullptr && t.window == nullptr; });
+    if (it == s_targets.end())
+    {
+        idx = (unsigned) s_targets.size();
+        s_targets.push_back(target);
+    }
+    else
+    {
+        idx = (unsigned) (it - s_targets.begin());
+        s_targets[idx] = target;
+    }
+    /*unsigned idx = (unsigned)s_targets.size();
+    s_targets.push_back(target);*/
+    
     return idx;
 }
 

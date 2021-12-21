@@ -6,9 +6,10 @@
 
 #include "Audio/PcmData.hpp"
 #include "App/UserFileInput.hpp"
+#include "App/BaseOperationNode.hpp"
 #include "SignalOperation/OperationType.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
-#include "SdfOperation/SdfOperationType.hpp"
+#include "GeometryOperation/GeometryOperationType.hpp"
 #include "Ui/UiNodeBoard.h"
 
 enum NodeCategory
@@ -27,9 +28,9 @@ public:
     ~AppInterface() = default;
     
     void display();
-    void openBigPreview(BaseOperation* op);
+    void openBigPreview(BaseOperationNode* op);
     void closeBigPreview();
-    BaseOperation* getPreviewOperation() {return stickyOperation;}
+    BaseOperationNode* getPreviewOperation() {return stickyOperation;}
 
     static AppInterface& get();
 
@@ -48,10 +49,10 @@ public:
 
 private:
     bool _bigPreviewOpened = false;
-    BaseOperation* stickyOperation = nullptr;
+    BaseOperationNode* stickyOperation = nullptr;
     std::vector<std::string> operationNames;
     std::vector<std::string> imageOperationNames;
-    std::vector<std::string> SdfOperationNames;
+    std::vector<std::string> geometryOperationNames;
 
     AboutPanel _aboutPanel;
 };

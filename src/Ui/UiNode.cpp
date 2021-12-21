@@ -198,7 +198,12 @@ UiNode* UiNode::getSourceNode(int id)
         return nullptr;
 }
 
-void UiNode::displayProperties()
+size_t UiNode::getSourceCount() const
+{
+    return inputs.size();
+}
+
+void UiNode::displayAttributes()
 {
 }
 

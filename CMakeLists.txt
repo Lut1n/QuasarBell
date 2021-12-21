@@ -18,9 +18,21 @@ set(QB_SOURCES
     src/App/TypedSignalNode.hpp
     src/App/ImageNode.hpp
     src/App/TypedImageNode.hpp
-    src/App/SdfNode.hpp
-    src/App/TypedSdfNode.hpp
+    src/App/GeometryNode.hpp
+    src/App/TypedGeometryNode.hpp
+    src/App/BaseAttributes.hpp
+    src/App/BaseOperation.hpp
     src/App/BaseOperationNode.hpp
+    src/Core/Version.hpp
+    src/Core/Vec2.h
+    src/Core/Factory.h
+    src/Core/Quat.hpp
+    src/Core/Math.hpp
+    src/Core/ProgressiveWork.hpp
+    src/Core/PseudoRand.hpp
+    src/Font/DefaultFontMaker.h
+    src/Font/FontMaker.h
+    src/Font/GlyphRenderer.h
     src/Json/Json.hpp
     src/Json/JsonReaderWriter.hpp
     src/ReaderWriter/FileIO.hpp
@@ -34,45 +46,19 @@ set(QB_SOURCES
     src/Audio/Signal.hpp
     src/Audio/WavExporter.hpp
     src/SignalOperation/OperationType.hpp
-    src/SignalOperation/SignalOperation.hpp
-    src/SignalOperation/Operations.hpp
-    src/SignalOperation/Oscillator.hpp
-    src/SignalOperation/Quantizer.hpp
-    src/SignalOperation/MixOperation.hpp
-    src/SignalOperation/EnvelopOperation.hpp
-    src/SignalOperation/StepOperation.hpp
-    src/SignalOperation/FilterOperation.hpp
-    src/SignalOperation/PitchSelector.hpp
-    src/SignalOperation/Waveform.hpp
-    src/SignalOperation/KeySampler.hpp
-    src/SignalOperation/Harmonics.hpp
+    src/SignalOperation/SignalAttributes.hpp
+    src/SignalOperation/SignalOperations.hpp
     src/SignalOperation/PcmBuilder.hpp
-    src/ImageOperation/GlslBuilder.hpp
-    src/ImageOperation/HighResOutput.hpp
-    src/ImageOperation/ImageNoises.hpp
-    src/ImageOperation/ImageSampling.hpp
-    src/ImageOperation/ImageUvOperations.hpp
-    src/ImageOperation/ImageBasicOperators.hpp
-    src/ImageOperation/ImageOperation.hpp
+    src/ImageOperation/ImageAttributes.hpp
+    src/ImageOperation/ImageOperations.hpp
     src/ImageOperation/ImageOperationType.hpp
-    src/SdfOperation/SdfOperation.hpp
-    src/SdfOperation/SdfOperationType.hpp
-    src/SdfOperation/SdfPrimitives.hpp
-    src/SdfOperation/SdfBasicOperations.hpp
-    src/SdfOperation/SdfTransforms.hpp
-    src/SdfOperation/SdfSampling.hpp
-    src/SdfOperation/SdfVoxel.hpp
+    src/ImageOperation/GlslBuilder.hpp
+    src/ImageOperation/TextureBuilder.hpp
+    src/ImageOperation/FrameRenderer.hpp
+    src/GeometryOperation/GeometryAttributes.hpp
+    src/GeometryOperation/GeometryOperationType.hpp
+    src/SdfOperation/SdfOperations.hpp
     src/SdfOperation/VoxelExporter.hpp
-    src/Core/Version.hpp
-    src/Core/Vec2.h
-    src/Core/Factory.h
-    src/Core/Quat.hpp
-    src/Core/Math.hpp
-    src/Core/ProgressiveWork.hpp
-    src/Core/PseudoRand.hpp
-    src/Font/DefaultFontMaker.h
-    src/Font/FontMaker.h
-    src/Font/GlyphRenderer.h
     src/Graphics/GlError.h
     src/Graphics/GlQuadShader.h
     src/Graphics/GlSpriteShader.h
@@ -108,9 +94,17 @@ set(QB_SOURCES
     src/App/TypedSignalNode.cpp
     src/App/ImageNode.cpp
     src/App/TypedImageNode.cpp
-    src/App/SdfNode.cpp
-    src/App/TypedSdfNode.cpp
+    src/App/GeometryNode.cpp
+    src/App/TypedGeometryNode.cpp
+    src/App/BaseAttributes.cpp
+    src/App/BaseOperation.cpp
     src/App/BaseOperationNode.cpp
+    src/Core/Vec2.cpp
+    src/Core/Quat.cpp
+    src/Core/PseudoRand.cpp
+    src/Font/DefaultFontMaker.cpp
+    src/Font/FontMaker.cpp
+    src/Font/GlyphRenderer.cpp
     src/Json/Json.cpp
     src/Json/JsonReaderWriter.cpp
     src/ReaderWriter/FileIO.cpp
@@ -121,42 +115,20 @@ set(QB_SOURCES
     src/Audio/PcmData.cpp
     src/Audio/Signal.cpp
     src/Audio/WavExporter.cpp
+    src/SignalOperation/SignalAttributes.cpp
     src/SignalOperation/OperationType.cpp
-    src/SignalOperation/SignalOperation.cpp
-    src/SignalOperation/Operations.cpp
-    src/SignalOperation/Oscillator.cpp
-    src/SignalOperation/Quantizer.cpp
-    src/SignalOperation/MixOperation.cpp
-    src/SignalOperation/EnvelopOperation.cpp
-    src/SignalOperation/StepOperation.cpp
-    src/SignalOperation/FilterOperation.cpp
-    src/SignalOperation/PitchSelector.cpp
-    src/SignalOperation/Waveform.cpp
-    src/SignalOperation/KeySampler.cpp
-    src/SignalOperation/Harmonics.cpp
+    src/SignalOperation/SignalOperations.cpp
     src/SignalOperation/PcmBuilder.cpp
-    src/ImageOperation/GlslBuilder.cpp
-    src/ImageOperation/HighResOutput.cpp
-    src/ImageOperation/ImageNoises.cpp
-    src/ImageOperation/ImageSampling.cpp
-    src/ImageOperation/ImageUvOperations.cpp
-    src/ImageOperation/ImageBasicOperators.cpp
-    src/ImageOperation/ImageOperation.cpp
+    src/ImageOperation/ImageAttributes.cpp
     src/ImageOperation/ImageOperationType.cpp
-    src/SdfOperation/SdfOperation.cpp
-    src/SdfOperation/SdfOperationType.cpp
-    src/SdfOperation/SdfPrimitives.cpp
-    src/SdfOperation/SdfBasicOperations.cpp
-    src/SdfOperation/SdfTransforms.cpp
-    src/SdfOperation/SdfSampling.cpp
-    src/SdfOperation/SdfVoxel.cpp
+    src/ImageOperation/ImageOperations.cpp
+    src/ImageOperation/GlslBuilder.cpp
+    src/ImageOperation/TextureBuilder.cpp
+    src/ImageOperation/FrameRenderer.cpp
+    src/GeometryOperation/GeometryAttributes.cpp
+    src/GeometryOperation/GeometryOperationType.cpp
+    src/SdfOperation/SdfOperations.cpp
     src/SdfOperation/VoxelExporter.cpp
-    src/Core/Vec2.cpp
-    src/Core/Quat.cpp
-    src/Core/PseudoRand.cpp
-    src/Font/DefaultFontMaker.cpp
-    src/Font/FontMaker.cpp
-    src/Font/GlyphRenderer.cpp
     src/Graphics/GlQuadShader.cpp
     src/Graphics/GlSpriteShader.cpp
     src/Graphics/GlQuad.cpp

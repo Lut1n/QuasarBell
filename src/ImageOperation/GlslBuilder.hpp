@@ -9,8 +9,9 @@
 #include "Core/Vec2.h"
 #include "Core/Math.hpp"
 #include "ImageOperation/ImageOperationType.hpp"
-#include "SdfOperation/SdfOperationType.hpp"
-#include "App/BaseOperationNode.hpp"
+#include "GeometryOperation/GeometryOperationType.hpp"
+//#include "App/BaseOperationNode.hpp"
+#include "App/BaseAttributes.hpp"
 
 //--------------------------------------------------------------
 namespace qb
@@ -65,7 +66,7 @@ namespace qb
         }
     };
 
-    using IdStack = Stack<BaseOperation*,size_t>;
+    using IdStack = Stack<BaseAttributes*,size_t>;
 
     std::string uv(size_t i);
     std::string va(size_t i);
@@ -81,7 +82,7 @@ namespace qb
 
     struct GlslContext
     {
-        std::unordered_map<BaseOperation*, bool> visited;
+        std::unordered_map<BaseAttributes*, bool> visited;
         std::string code;
 
         IdStack vaStack;
@@ -131,7 +132,7 @@ namespace qb
         std::vector<GlslFrame> frames;
 
         std::unordered_map<ImageOperationType, std::string> functions;
-        std::unordered_map<SdfOperationType, std::string> sdfFunctions;
+        std::unordered_map<GeometryOperationType, std::string> sdfFunctions;
         std::unordered_map<std::string, std::string> optFunctions;
 
         GlslContext mainContext;
@@ -143,7 +144,7 @@ namespace qb
         IdStack contextStack;
 
         void setFunctions(ImageOperationType operationType, const std::string& functionCode);
-        void setFunctions(SdfOperationType operationType, const std::string& functionCode);
+        void setFunctions(GeometryOperationType operationType, const std::string& functionCode);
         void setFunctions(const std::string& id, const std::string& functionCode);
 
         size_t pushInput(const vec4& v4);
@@ -160,21 +161,23 @@ namespace qb
         bool needUv() const { return hasUv || type == Type::Sdf || type == Type::VoxelPlan; }
 
         void repushall();
+
+        size_t totalFrameCount();
     };
 
-    struct GlslBuilderVisitor : public BaseOperationVisitor
+    struct GlslBuilderVisitor
     {
-        std::unordered_map<BaseOperation*, bool> visited;
+        std::unordered_map<BaseAttributes*, bool> visited;
 
         GlslFrame mainFrame;
-        Stack<BaseOperation*, GlslFrame*> frameStack;
+        Stack<BaseAttributes*, GlslFrame*> frameStack;
 
         GlslFrame& getCurrentFrame();
 
         size_t pushFrame(GlslFrame::Type type);
         void popFrame();
 
-        void setCurrentOperation(BaseOperation* o);
+        void setCurrentOperation(BaseAttributes* o);
         void unsetCurrentOperation();
         size_t repushall();
     };

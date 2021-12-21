@@ -2,6 +2,8 @@
 
 #include "Graphics/GlError.h"
 
+static size_t texture_counter = 0;
+
 RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     : width(w)
     , height(h)
@@ -11,13 +13,17 @@ RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     GL_CHECKERROR("create frame buffer");
 
     glGenTextures(1, &tex);
+    GL_CHECKERROR("renderable texture gen");
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    GL_CHECKERROR("renderable texture bind");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    GL_CHECKERROR("renderable texture params");
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    GL_CHECKERROR("renderable texture buffer");
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
@@ -27,10 +33,14 @@ RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     }
     
     GL_CHECKERROR("renderable texture ctor");
+    texture_counter++;
+    std::cout << "textures count : " << texture_counter << std::endl;
 }
 
 RenderableTexture::~RenderableTexture()
 {
+    texture_counter--;
+    std::cout << "textures count : " << texture_counter << std::endl;
     glDeleteTextures(1, &tex);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);

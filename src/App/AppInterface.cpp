@@ -4,8 +4,7 @@
 
 #include "Audio/Signal.hpp"
 
-#include "SdfOperation/SdfOperation.hpp"
-#include "ImageOperation/ImageOperation.hpp"
+#include "ImageOperation/ImageOperations.hpp"
 
 namespace qb
 {
@@ -20,7 +19,7 @@ AppInterface::AppInterface()
 {
     operationNames = qb::getOperationNames();
     imageOperationNames = qb::getImageOperationNames();
-    SdfOperationNames = qb::getSdfOperationNames();
+    geometryOperationNames = qb::getGeometryOperationNames();
     qb::appInstance = this;
 }
 
@@ -56,7 +55,7 @@ void AppInterface::display()
     ImGui::SetNextWindowSize(ImVec2(300, 530), ImGuiCond_FirstUseEver);
     ImGui::Begin("Node properties", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
     if(!UiNode::selected.empty())
-        UiNode::selected.front()->displayProperties();
+        UiNode::selected.front()->displayAttributes();
     ImGui::End();
 
     
@@ -64,18 +63,9 @@ void AppInterface::display()
     {
         if(ImGui::Begin("Bigger preview",&_bigPreviewOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings))
         {
-            SdfOperation* sdf = dynamic_cast<SdfOperation*>(stickyOperation);
-            if(sdf)
-            {
-                ImGui::Image(RenderInterface::getTargetResource((unsigned)sdf->preview.renderFrame->glResource),
-                            ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
-            }
-            ImageOperation* img = dynamic_cast<ImageOperation*>(stickyOperation);
-            if(img)
-            {
-                ImGui::Image(RenderInterface::getTargetResource((unsigned)img->preview.renderFrame->glResource),
-                            ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
-            }
+            auto preview = dynamic_cast<TexturePreview*>(stickyOperation->getPreview());
+            ImGui::Image(RenderInterface::getTargetResource((unsigned)preview->glTextureId),
+                        ImVec2(512, 512), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
         }
         ImGui::End();
     }
@@ -122,9 +112,9 @@ void AppInterface::display()
         }
         if (ImGui::BeginMenu("Geometry"))
         {
-            for(size_t i=0; i<SdfOperationNames.size(); ++i)
+            for(size_t i=0; i<geometryOperationNames.size(); ++i)
             {
-                if(ImGui::MenuItem(SdfOperationNames[i].c_str()))
+                if(ImGui::MenuItem(geometryOperationNames[i].c_str()))
                 {
                     nodeToCreateCategory = NodeCategory_Geometry;
                     nodeToCreateType = i;
@@ -141,7 +131,7 @@ void AppInterface::display()
     _aboutPanel.display();
 }
 
-void AppInterface::openBigPreview(BaseOperation* op)
+void AppInterface::openBigPreview(BaseOperationNode* op)
 {
     stickyOperation = op;
     _bigPreviewOpened = true;

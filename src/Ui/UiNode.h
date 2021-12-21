@@ -23,8 +23,9 @@ struct UiNode : public UiFrame
 
     void addPin(int id, const std::string& label, bool isOutput, size_t typeFlags);
     UiNode* getSourceNode(int id);
+    size_t getSourceCount() const;
 
-    virtual void displayProperties();
+    virtual void displayAttributes();
 
     size_t getIndex(UiPin* pin) const;
 

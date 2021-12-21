@@ -37,6 +37,16 @@ namespace qb
     qb::VoxelData& getOptimizedVoxel(qb::ProgressiveWork& state);
     void colorIndexing(VoxelData& voxels, qb::ProgressiveWork& state);
     void exportVoxel(const std::string& filepath, const VoxelData& voxels, qb::ProgressiveWork& state);
+
+    struct ScanningWork : public qb::ProgressiveWork::Work
+    {
+        VoxelData result;
+        int count = 0;
+        int lastRendered = -1;
+        // int lastDownloaded = -1;
+        float nStep = 0.0f;
+        float zPlan = -2.0f;
+    };
 };
 
 

@@ -40,13 +40,13 @@ public:
     bool rightClicking = false;
 
     // input flags
-    static constexpr size_t Type_None = 0;
-    static constexpr size_t Type_S1d = 0x1;
-    static constexpr size_t Type_S2d = 0x2;
-    static constexpr size_t Type_S3d = 0x4;
-    static constexpr size_t Type_S2d_3d = Type_S2d | Type_S3d;
+    // static constexpr size_t Type_None = 0;
+    // static constexpr size_t Type_S1d = 0x1;
+    // static constexpr size_t Type_S2d = 0x2;
+    // static constexpr size_t Type_S3d = 0x4;
+    // static constexpr size_t Type_S2d_3d = Type_S2d | Type_S3d;
 
-    size_t typeFlags = Type_None;
+    size_t typeFlags = 0;
 };
 
 #endif // UI_PIN_H

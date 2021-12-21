@@ -1,7 +1,9 @@
 #ifndef QUASAR_BELL_OPERATION_TYPE_HPP
 #define QUASAR_BELL_OPERATION_TYPE_HPP
 
-#include "SignalOperation/SignalOperation.hpp"
+// //#include "SignalOperation/SignalOperation.hpp"
+#include <string>
+#include <vector>
 
 //--------------------------------------------------------------
 namespace qb

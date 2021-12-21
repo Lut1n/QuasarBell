@@ -33,7 +33,7 @@ struct OperationConnections
     };
     std::vector<Entry> entries;
 
-    void fill(UiConnections* ui, const OperationCollection& coll, size_t pinType);
+    void fill(UiConnections* ui, const OperationCollection& coll);
 };
 
 class OutputOperation;
@@ -47,8 +47,6 @@ public:
     void cleanup();
     void load(const std::string& path);
     void save(const std::string& path);
-    void exportWav(const std::string& path, OutputOperation& outputNode);
-    void exportTga(const std::string& path, HighResOutput& outputNode);
     
     void onConnect(UiPin* a, UiPin* b) override;
     void onDisconnect(UiPin* a, UiPin* b) override;

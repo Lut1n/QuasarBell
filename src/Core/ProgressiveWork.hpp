@@ -1,6 +1,8 @@
 #ifndef QUASAR_BELL_WORK_HPP
 #define QUASAR_BELL_WORK_HPP
 
+#include "Core/Math.hpp"
+
 #include <memory>
 #include <limits>
 
@@ -33,7 +35,7 @@ namespace qb
     //--------------------------------------------------------------
     struct ProgressiveWork
     {
-        struct Work {};
+        struct Work { virtual ~Work() = default; };
 
         float progress = 0.0f;
         bool initialized = false;

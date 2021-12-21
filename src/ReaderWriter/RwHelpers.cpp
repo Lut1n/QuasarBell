@@ -14,10 +14,22 @@ void toJson(JsonValue& json, const vec2& v)
     json.setPath(1).set(v.y);
 }
 //--------------------------------------------------------------
+void toJson(JsonValue& json, const float* fv, size_t sz)
+{
+    for(size_t i=0; i<sz; ++i)
+        json.setPath(i).set(fv[i]);
+}
+//--------------------------------------------------------------
 void jsonTo(JsonValue& json, vec2& v)
 {
     v.x = (float) json.setPath(0).getNumeric();
     v.y = (float) json.setPath(1).getNumeric();
+}
+//--------------------------------------------------------------
+void jsonTo(JsonValue& json, float* fv, size_t sz)
+{
+    for(size_t i=0; i<sz; ++i)
+        fv[i] = (float) json.setPath(i).getNumeric();
 }
 //--------------------------------------------------------------
 void writeInfo(JsonValue& root)

@@ -2,8 +2,9 @@
 #define GUI_ADD_SIGNAL_NODE_H
 
 #include "App/SignalNode.hpp"
-#include "SignalOperation/Operations.hpp"
-#include "SignalOperation/EnvelopOperation.hpp"
+// #include "SignalOperation/SignalOperations.hpp"
+#include "SignalOperation/SignalAttributes.hpp"
+/*#include "SignalOperation/EnvelopOperation.hpp"
 #include "SignalOperation/FilterOperation.hpp"
 #include "SignalOperation/MixOperation.hpp"
 #include "SignalOperation/Oscillator.hpp"
@@ -12,31 +13,31 @@
 #include "SignalOperation/Quantizer.hpp"
 #include "SignalOperation/Harmonics.hpp"
 #include "SignalOperation/StepOperation.hpp"
-#include "SignalOperation/Waveform.hpp"
+#include "SignalOperation/Waveform.hpp"*/
 
-MAKE_SIGNAL_NODE(AddOperation, qb::OperationType_Add)
-MAKE_SIGNAL_NODE(SubOperation, qb::OperationType_Sub)
-MAKE_SIGNAL_NODE(MultOperation, qb::OperationType_Mult)
-MAKE_SIGNAL_NODE(DivOperation, qb::OperationType_Div)
-MAKE_SIGNAL_NODE(ClampOperation, qb::OperationType_Clamp)
-MAKE_SIGNAL_NODE(AbsOperation, qb::OperationType_Abs)
-MAKE_SIGNAL_NODE(TimeScale, qb::OperationType_TimeScale)
-MAKE_SIGNAL_NODE(Repeater, qb::OperationType_Repeater)
-MAKE_SIGNAL_NODE(CubicSampler, qb::OperationType_CubicSampler)
-MAKE_SIGNAL_NODE(EnvelopOperation, qb::OperationType_Envelop)
-MAKE_SIGNAL_NODE(FreqFilter, qb::OperationType_Filter)
-MAKE_SIGNAL_NODE(FloatInput, qb::OperationType_Float)
-MAKE_SIGNAL_NODE(NoiseInput, qb::OperationType_Noise)
-MAKE_SIGNAL_NODE(MixOperation, qb::OperationType_Mix)
-MAKE_SIGNAL_NODE(Oscillator, qb::OperationType_Oscillator)
-MAKE_SIGNAL_NODE(PitchSelector, qb::OperationType_Pitch)
-MAKE_SIGNAL_NODE(KeySampler, qb::OperationType_KeySampler)
-MAKE_SIGNAL_NODE(PolynomialSampler, qb::OperationType_Polynomial)
-MAKE_SIGNAL_NODE(Quantizer, qb::OperationType_Quantizer)
-MAKE_SIGNAL_NODE(Harmonics, qb::OperationType_Harmonics)
-MAKE_SIGNAL_NODE(StepOperation, qb::OperationType_Step)
-MAKE_SIGNAL_NODE(Waveform, qb::OperationType_Waveform)
-MAKE_SIGNAL_NODE(OutputOperation, qb::OperationType_AudioOutput)
+MAKE_SIGNAL_NODE(AddData)
+MAKE_SIGNAL_NODE(SubData)
+MAKE_SIGNAL_NODE(MultData)
+MAKE_SIGNAL_NODE(DivData)
+MAKE_SIGNAL_NODE(ClampData)
+MAKE_SIGNAL_NODE(AbsData)
+MAKE_SIGNAL_NODE(TimeScaleData)
+MAKE_SIGNAL_NODE(RepeaterData)
+MAKE_SIGNAL_NODE(CubicSamplerData)
+MAKE_SIGNAL_NODE(EnvelopData)
+MAKE_SIGNAL_NODE(FreqFilterData)
+MAKE_SIGNAL_NODE(FloatData)
+MAKE_SIGNAL_NODE(NoiseData)
+MAKE_SIGNAL_NODE(MixData)
+MAKE_SIGNAL_NODE(OscillatorData)
+MAKE_SIGNAL_NODE(PitchData)
+MAKE_SIGNAL_NODE(KeySamplerData)
+MAKE_SIGNAL_NODE(PolynomialSamplerData)
+MAKE_SIGNAL_NODE(QuantizerData)
+MAKE_SIGNAL_NODE(HarmonicsData)
+MAKE_SIGNAL_NODE(StepData)
+MAKE_SIGNAL_NODE(WaveformData)
+MAKE_SIGNAL_NODE(OutputData)
 
 
 #endif // GUI_ADD_SIGNAL_NODE_H

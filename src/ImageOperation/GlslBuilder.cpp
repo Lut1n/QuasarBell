@@ -2,7 +2,7 @@
 
 namespace qb
 {
-    static Stack<void*, BaseOperation*> s_currentOperation;
+    static Stack<void*, BaseAttributes*> s_currentOperation;
 }
 
 //--------------------------------------------------------------
@@ -155,7 +155,7 @@ void qb::GlslFrame::setFunctions(ImageOperationType operationType, const std::st
         functions[operationType] = functionCode;
 }
 //--------------------------------------------------------------
-void qb::GlslFrame::setFunctions(SdfOperationType operationType, const std::string& functionCode)
+void qb::GlslFrame::setFunctions(GeometryOperationType operationType, const std::string& functionCode)
 {
     if(sdfFunctions.find(operationType) == sdfFunctions.end())
         sdfFunctions[operationType] = functionCode;
@@ -358,6 +358,15 @@ std::string qb::GlslFrame::compile()
     
     return glsl;
 }
+
+size_t qb::GlslFrame::totalFrameCount()
+{
+    size_t ret = 1;
+    for(size_t i=0; i<frames.size(); ++i)
+        ret += frames[i].totalFrameCount();
+    return ret;
+}
+
 //--------------------------------------------------------------
 qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
 {
@@ -382,7 +391,7 @@ void qb::GlslBuilderVisitor::popFrame()
     frameStack.pop();
 }
 
-void qb::GlslBuilderVisitor::setCurrentOperation(BaseOperation* o)
+void qb::GlslBuilderVisitor::setCurrentOperation(BaseAttributes* o)
 {
     s_currentOperation.push(0,o);
 }

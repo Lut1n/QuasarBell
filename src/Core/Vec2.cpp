@@ -210,7 +210,13 @@ bool Rect::over(const Rect& other) const
 }
 
 
-
+Kernel::Kernel()
+{
+    w = 1;
+    h = 1;
+    data.resize(w*h);
+    data = {1};
+}
 
 Kernel::Kernel(int w, int h) : w(w), h(h)
 {

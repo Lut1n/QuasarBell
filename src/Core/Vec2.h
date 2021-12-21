@@ -75,6 +75,7 @@ struct Kernel
     int w=0,h=0;
     std::vector<float> data;
 
+    Kernel();
     Kernel(int w, int h);
     Kernel(std::initializer_list<float> initData);
 
