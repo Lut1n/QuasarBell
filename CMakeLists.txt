@@ -122,12 +122,14 @@ set(QB_SOURCES
     src/ImageOperation/ImageAttributes.cpp
     src/ImageOperation/ImageOperationType.cpp
     src/ImageOperation/ImageOperations.cpp
+    src/ImageOperation/ImageUniforms.cpp
     src/ImageOperation/GlslBuilder.cpp
     src/ImageOperation/TextureBuilder.cpp
     src/ImageOperation/FrameRenderer.cpp
     src/GeometryOperation/GeometryAttributes.cpp
     src/GeometryOperation/GeometryOperationType.cpp
     src/SdfOperation/SdfOperations.cpp
+    src/SdfOperation/SdfUniforms.cpp
     src/SdfOperation/VoxelExporter.cpp
     src/Graphics/GlQuadShader.cpp
     src/Graphics/GlSpriteShader.cpp

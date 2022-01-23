@@ -6,116 +6,6 @@
 #include <algorithm>
 #include <string>
 
-
-
-//--------------------------------------------------------------
-bool sampleInput2(TextureOperationResult& result, TextureOperationInfo* input)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& glslBuilder = result.visitor;
-    glslBuilder.setCurrentOperation(input->attributes);
-
-    auto& context = glslBuilder.getCurrentFrame().getContext();
-    auto& visited = context.visited;
-    auto it = visited.find(input->attributes);
-
-    bool ret = false;
-
-    if (it != visited.end())
-    {
-        context.repushall();
-        ret = it->second;
-    }
-    else
-    {
-        ret = false;
-        if (input->attributes)
-        {
-            input->operation->apply(result, input->attributes, input->inputs);
-            ret = true;
-        }
-        visited.emplace(input->attributes, ret);
-    }
-
-    glslBuilder.unsetCurrentOperation();
-    return ret;
-}
-
-//--------------------------------------------------------------
-bool sampleInContext2(TextureOperationResult& result, TextureOperationInfo* input, size_t& ctxId)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& frame = result.visitor.getCurrentFrame();
-
-    ctxId = frame.pushContext();
-    bool ret = sampleInput2(result, input);
-    frame.popContext();
-    return ret;
-}
-
-//--------------------------------------------------------------
-bool sampleInFrame2(TextureOperationResult& result, TextureOperationInfo* input, size_t& frameId)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& visitor = result.visitor;
-    auto& frame = visitor.getCurrentFrame();
-
-    auto& visited = visitor.visited;
-    auto it = visited.end();
-
-    auto target = input->attributes;
-    it = visited.find(target);
-
-    bool ret = false;
-    visitor.setCurrentOperation(target);
-    if (it != visited.end())
-    {
-        frameId = visitor.repushall();
-        ret = true;
-    }
-    else
-    {
-        frameId = visitor.pushFrame(input->isSdf ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture);
-        ret = sampleInput2(result, input);
-        visited.emplace(target, ret);
-    }
-    visitor.popFrame();
-    visitor.unsetCurrentOperation();
-
-    return ret;
-}
-
-//--------------------------------------------------------------
-std::string pushOpOrInput2(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v)
-{
-    auto& frame = result.visitor.getCurrentFrame();
-    auto& context = frame.getContext();
-    if (sampleInput2(result, input))
-        return qb::va(context.popVa());
-    else
-        return qb::in(frame.pushInput(v));
-}
-//--------------------------------------------------------------
-void pushFallback2(TextureOperationResult& result)
-{
-    auto& frame = result.visitor.getCurrentFrame();
-    auto& context = frame.getContext();
-
-
-    size_t opId = context.getNextVa();
-    std::string glsl = "vec4 v$1 = vec4(0,0,0,1);";
-    glsl = qb::replaceArgs(glsl, {std::to_string(opId)});
-    context.pushVa(opId);
-    context.pushCode(glsl);
-}
-
-
 //--------------------------------------------------------------
 void prepareOperation(qb::GlslBuilderVisitor& visitor, size_t& opId, size_t& tfmrId)
 {
@@ -135,7 +25,7 @@ void setupOperation(qb::GlslBuilderVisitor& visitor, size_t opId, const std::str
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void Sphere::sample(TextureOperationResult& result, SphereData* attributes, InputInfos& inputs)
+void Sphere::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& r = attributes->r;
@@ -144,7 +34,7 @@ void Sphere::sample(TextureOperationResult& result, SphereData* attributes, Inpu
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({r, rgb[0], rgb[1], rgb[2]});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdSphere($2.xyz, $3.x),$3.yzw);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1)});
 
@@ -152,7 +42,7 @@ void Sphere::sample(TextureOperationResult& result, SphereData* attributes, Inpu
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)SphereData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Box::sample(TextureOperationResult& result, BoxData* attributes, InputInfos& inputs)
+void Box::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& sx = attributes->sx;
@@ -163,8 +53,8 @@ void Box::sample(TextureOperationResult& result, BoxData* attributes, InputInfos
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({sx, sy, sz, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdBox($2.xyz, $3.xyz),$4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -172,7 +62,7 @@ void Box::sample(TextureOperationResult& result, BoxData* attributes, InputInfos
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)BoxData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void RoundBox::sample(TextureOperationResult& result, RoundBoxData* attributes, InputInfos& inputs)
+void RoundBox::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& sx = attributes->sx;
@@ -184,8 +74,8 @@ void RoundBox::sample(TextureOperationResult& result, RoundBoxData* attributes, 
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({sx, sy, sz, r});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdRoundBox($2.xyz, $3.xyz, $3.w),$4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -193,7 +83,7 @@ void RoundBox::sample(TextureOperationResult& result, RoundBoxData* attributes, 
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)RoundBoxData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Torus::sample(TextureOperationResult& result, TorusData* attributes, InputInfos& inputs)
+void Torus::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& t1 = attributes->t1;
@@ -203,8 +93,8 @@ void Torus::sample(TextureOperationResult& result, TorusData* attributes, InputI
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({t1, t2, 0.0, 0.0});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdTorus($2.xyz, $3.xy),$4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -212,7 +102,7 @@ void Torus::sample(TextureOperationResult& result, TorusData* attributes, InputI
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)TorusData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void HexagonalPrism::sample(TextureOperationResult& result, HexagonalPrismData* attributes, InputInfos& inputs)
+void HexagonalPrism::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h1 = attributes->h1;
@@ -222,8 +112,8 @@ void HexagonalPrism::sample(TextureOperationResult& result, HexagonalPrismData* 
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({h1, h2, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdHexPrism($2.xyz, $3.xy),$4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -231,7 +121,7 @@ void HexagonalPrism::sample(TextureOperationResult& result, HexagonalPrismData* 
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)HexagonalPrismData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void TriangularPrism::sample(TextureOperationResult& result, TriangularPrismData* attributes, InputInfos& inputs)
+void TriangularPrism::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& t1 = attributes->t1;
@@ -241,8 +131,8 @@ void TriangularPrism::sample(TextureOperationResult& result, TriangularPrismData
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({t1, t2, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdTriPrism($2.xyz, $3.xy),$4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -250,7 +140,7 @@ void TriangularPrism::sample(TextureOperationResult& result, TriangularPrismData
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)TriangularPrismData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Capsule::sample(TextureOperationResult& result, CapsuleData* attributes, InputInfos& inputs)
+void Capsule::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -260,8 +150,8 @@ void Capsule::sample(TextureOperationResult& result, CapsuleData* attributes, In
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({h, r, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdCapsule($2.xyz, $3.x, $3.y), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -269,7 +159,7 @@ void Capsule::sample(TextureOperationResult& result, CapsuleData* attributes, In
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)CapsuleData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Cone::sample(TextureOperationResult& result, ConeData* attributes, InputInfos& inputs)
+void Cone::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -279,8 +169,8 @@ void Cone::sample(TextureOperationResult& result, ConeData* attributes, InputInf
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({r, h, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdCone($2.xyz, $3.x, $3.y), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -288,7 +178,7 @@ void Cone::sample(TextureOperationResult& result, ConeData* attributes, InputInf
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)ConeData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void RoundedCone::sample(TextureOperationResult& result, RoundedConeData* attributes, InputInfos& inputs)
+void RoundedCone::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -299,8 +189,8 @@ void RoundedCone::sample(TextureOperationResult& result, RoundedConeData* attrib
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({r1, r2, h, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdRoundedCone($2.xyz, $3.x, $3.y, $3.z), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -308,7 +198,7 @@ void RoundedCone::sample(TextureOperationResult& result, RoundedConeData* attrib
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)RoundedConeData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Cylinder::sample(TextureOperationResult& result, CylinderData* attributes, InputInfos& inputs)
+void Cylinder::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -318,8 +208,8 @@ void Cylinder::sample(TextureOperationResult& result, CylinderData* attributes, 
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({r, h, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdCylinder($2.xyz, $3.x, $3.y), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -327,7 +217,7 @@ void Cylinder::sample(TextureOperationResult& result, CylinderData* attributes, 
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)CylinderData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void RoundedCylinder::sample(TextureOperationResult& result, RoundedCylinderData* attributes, InputInfos& inputs)
+void RoundedCylinder::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -338,8 +228,8 @@ void RoundedCylinder::sample(TextureOperationResult& result, RoundedCylinderData
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({r1, r2, h, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdRoundedCylinder($2.xyz, $3.x, $3.y, $3.z), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -347,7 +237,7 @@ void RoundedCylinder::sample(TextureOperationResult& result, RoundedCylinderData
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)RoundedCylinderData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Octahedron::sample(TextureOperationResult& result, OctahedronData* attributes, InputInfos& inputs)
+void Octahedron::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& s = attributes->s;
@@ -356,8 +246,8 @@ void Octahedron::sample(TextureOperationResult& result, OctahedronData* attribut
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({s, 0.0f, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdOctahedron($2.xyz, $3.x), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -365,7 +255,7 @@ void Octahedron::sample(TextureOperationResult& result, OctahedronData* attribut
 	visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)OctahedronData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Pyramid::sample(TextureOperationResult& result, PyramidData* attributes, InputInfos& inputs)
+void Pyramid::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& rgb = attributes->rgb;
     auto& h = attributes->h;
@@ -374,8 +264,8 @@ void Pyramid::sample(TextureOperationResult& result, PyramidData* attributes, In
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
 
-    size_t in1 = visitor.getCurrentFrame().pushInput({h, 0.0f, 0.0f, 0.0f});
-    size_t in2 = visitor.getCurrentFrame().pushInput({rgb[0], rgb[1], rgb[2], 0.0f});
+    size_t in1 = visitor.getCurrentFrame().uniformPlaceholder();
+    size_t in2 = visitor.getCurrentFrame().uniformPlaceholder();
     std::string glsl = "vec4 $1 = vec4(sdPyramid($2.xyz, $3.x), $4.xyz);\n";
     glsl = qb::replaceArgs(glsl, {qb::va(opId), qb::tfmr(tfmrId), qb::in(in1), qb::in(in2)});
 
@@ -545,14 +435,14 @@ std::string Pyramid::getOperationCode() const
 }
 
 //--------------------------------------------------------------
-void Union::sample(TextureOperationResult& result, UnionData* attributes, InputInfos& inputs)
+void Union::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
 
     size_t opId = context.getNextVa();
 
@@ -565,14 +455,14 @@ void Union::sample(TextureOperationResult& result, UnionData* attributes, InputI
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)UnionData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Substraction::sample(TextureOperationResult& result, SubstractionData* attributes, InputInfos& inputs)
+void Substraction::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
 
     size_t opId = context.getNextVa();
 
@@ -585,14 +475,14 @@ void Substraction::sample(TextureOperationResult& result, SubstractionData* attr
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)SubstractionData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void Intersection::sample(TextureOperationResult& result, IntersectionData* attributes, InputInfos& inputs)
+void Intersection::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
 
     size_t opId = context.getNextVa();
 
@@ -605,7 +495,7 @@ void Intersection::sample(TextureOperationResult& result, IntersectionData* attr
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)IntersectionData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void SmoothUnion::sample(TextureOperationResult& result, SmoothUnionData* attributes, InputInfos& inputs)
+void SmoothUnion::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& k = attributes->k;
 
@@ -613,9 +503,9 @@ void SmoothUnion::sample(TextureOperationResult& result, SmoothUnionData* attrib
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
-    std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
+    std::string in3 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
 
     size_t opId = context.getNextVa();
 
@@ -628,7 +518,7 @@ void SmoothUnion::sample(TextureOperationResult& result, SmoothUnionData* attrib
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)SmoothUnionData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void SmoothSubstraction::sample(TextureOperationResult& result, SmoothSubstractionData* attributes, InputInfos& inputs)
+void SmoothSubstraction::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& k = attributes->k;
 
@@ -636,9 +526,9 @@ void SmoothSubstraction::sample(TextureOperationResult& result, SmoothSubstracti
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
-    std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
+    std::string in3 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
 
     size_t opId = context.getNextVa();
 
@@ -651,7 +541,7 @@ void SmoothSubstraction::sample(TextureOperationResult& result, SmoothSubstracti
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)SmoothSubstractionData::TypeId, getOperationCode());
 }
 //--------------------------------------------------------------
-void SmoothIntersection::sample(TextureOperationResult& result, SmoothIntersectionData* attributes, InputInfos& inputs)
+void SmoothIntersection::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& k = attributes->k;
 
@@ -659,9 +549,9 @@ void SmoothIntersection::sample(TextureOperationResult& result, SmoothIntersecti
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = pushOpOrInput2(result, inputs[1], {1e10f,1e10f,1e10f,1e10f});
-    std::string in3 = qb::in(visitor.getCurrentFrame().pushInput({k,k,k,k}));
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = visitor.inputOrUniformPlaceholder(result, inputs[1], true);
+    std::string in3 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
 
     size_t opId = context.getNextVa();
 
@@ -734,14 +624,14 @@ std::string SmoothIntersection::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void HighResSdfOutput::sample(TextureOperationResult& result, HighResSdfOutputData* attributes, InputInfos& inputs)
+void HighResSdfOutput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     size_t opId;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId = pushOpOrInput2(result,inputs[0], {1.0f,1.0f,1.0f,1.0f});
+    std::string valueId = visitor.inputOrUniformPlaceholder(result,inputs[0], true);
 
     opId = context.getNextVa();
 
@@ -752,7 +642,7 @@ void HighResSdfOutput::sample(TextureOperationResult& result, HighResSdfOutputDa
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void Transform::sample(TextureOperationResult& result, TransformData* attributes, InputInfos& inputs)
+void Transform::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& x = attributes->x;
     auto& y = attributes->y;
@@ -775,9 +665,9 @@ void Transform::sample(TextureOperationResult& result, TransformData* attributes
     size_t rFrameId = 0;
     size_t sFrameId = 0;
 
-    bool sampleP = sampleInFrame2(result, inputs[1], pFrameId);
-    bool sampleR = sampleInFrame2(result, inputs[2], rFrameId);
-    bool sampleS = sampleInFrame2(result, inputs[3], sFrameId);
+    bool sampleP = visitor.sampleInFrame(result, inputs[1], pFrameId);
+    bool sampleR = visitor.sampleInFrame(result, inputs[2], rFrameId);
+    bool sampleS = visitor.sampleInFrame(result, inputs[3], sFrameId);
 
     if (sampleP)
         posArg = "texture2D(" + qb::sa(pFrameId) + ",vec2(0.0,0.0)).xyz * 4.0 - 2.0";
@@ -785,7 +675,7 @@ void Transform::sample(TextureOperationResult& result, TransformData* attributes
         scaArg = "mix(0.1,2.0,texture2D(" + qb::sa(sFrameId) + ",vec2(0.0,0.0)).x)";
     if (!sampleP || !sampleS)
     {
-        std::string inPosSca = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,s}));
+        std::string inPosSca = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
         if (!sampleP)
             posArg = inPosSca + ".xyz";
         if (!sampleS)
@@ -801,7 +691,7 @@ void Transform::sample(TextureOperationResult& result, TransformData* attributes
         quat qy = quat(vec4(0.0,1.0,0.0,0.0),ry * degToRad);
         quat qz = quat(vec4(0.0,0.0,1.0,0.0),rz * degToRad);
         quat q = qx*(qy*qz);
-        rotArg = qb::in(visitor.getCurrentFrame().pushInput(q));
+        rotArg = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
     }
 
     size_t pos0 = context.getTransformId();
@@ -815,7 +705,7 @@ void Transform::sample(TextureOperationResult& result, TransformData* attributes
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)TransformData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    bool inputValid = sampleInput2(result, inputs[0]);
+    bool inputValid = visitor.sampleInput(result, inputs[0]);
     bool showGizmo = result.lastAttributes == attributes;
     if(showGizmo)
     {
@@ -909,7 +799,7 @@ std::string Transform::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Repetition::sample(TextureOperationResult& result, RepetitionData* attributes, InputInfos& inputs)
+void Repetition::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& c = attributes->c;
     auto& x = attributes->x;
@@ -920,7 +810,7 @@ void Repetition::sample(TextureOperationResult& result, RepetitionData* attribut
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1 = qb::in(visitor.getCurrentFrame().pushInput({c,(float)x,(float)y,(float)z}));
+    std::string in1 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
@@ -932,7 +822,7 @@ void Repetition::sample(TextureOperationResult& result, RepetitionData* attribut
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)RepetitionData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    sampleInput2(result, inputs[0]);
+    visitor.sampleInput(result, inputs[0]);
     context.popTransform();
 }
 //--------------------------------------------------------------
@@ -946,7 +836,7 @@ std::string Repetition::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Twist::sample(TextureOperationResult& result, TwistData* attributes, InputInfos& inputs)
+void Twist::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& k = attributes->k;
 
@@ -956,9 +846,9 @@ void Twist::sample(TextureOperationResult& result, TwistData* attributes, InputI
 
     std::string in;
     if ( inputs[1] && !inputs[1]->isSdf)
-        in = pushOpOrInput2(result, inputs[1], {k / 20.0f + 0.5f,0.0f,0.0f,0.0f}) + ".x * 20.0 - 10.0";
+        in = visitor.inputOrUniformPlaceholder(result, inputs[1], true) + ".x * 20.0 - 10.0";
     else
-        in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f})) + ".x";
+        in = qb::in(visitor.getCurrentFrame().uniformPlaceholder()) + ".x";
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
@@ -970,7 +860,7 @@ void Twist::sample(TextureOperationResult& result, TwistData* attributes, InputI
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)TwistData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    sampleInput2(result, inputs[0]);
+    visitor.sampleInput(result, inputs[0]);
     context.popTransform();
 }
 //--------------------------------------------------------------
@@ -987,7 +877,7 @@ std::string Twist::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Bend::sample(TextureOperationResult& result, BendData* attributes, InputInfos& inputs)
+void Bend::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& k = attributes->k;
 
@@ -997,9 +887,9 @@ void Bend::sample(TextureOperationResult& result, BendData* attributes, InputInf
 
     std::string in;
     if ( inputs[1] && !inputs[1]->isSdf)
-        in = pushOpOrInput2(result, inputs[1], {k / 20.0f + 0.5f,0.0f,0.0f,0.0f}) + ".x * 20.0 - 10.0";
+        in = visitor.inputOrUniformPlaceholder(result, inputs[1], true) + ".x * 20.0 - 10.0";
     else
-        in = qb::in(visitor.getCurrentFrame().pushInput({k,0.0f,0.0f,0.0f})) + ".x";
+        in = qb::in(visitor.getCurrentFrame().uniformPlaceholder()) + ".x";
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
@@ -1011,7 +901,7 @@ void Bend::sample(TextureOperationResult& result, BendData* attributes, InputInf
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)BendData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    sampleInput2(result, inputs[0]);
+    visitor.sampleInput(result, inputs[0]);
     context.popTransform();
 }
 //--------------------------------------------------------------
@@ -1028,7 +918,7 @@ std::string Bend::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Elongation::sample(TextureOperationResult& result, ElongationData* attributes, InputInfos& inputs)
+void Elongation::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& x = attributes->x;
     auto& y = attributes->y;
@@ -1040,9 +930,9 @@ void Elongation::sample(TextureOperationResult& result, ElongationData* attribut
 
     std::string in;
     if ( inputs[1] && !inputs[1]->isSdf)
-        in = pushOpOrInput(result, inputs[1], {x / 4.0f + 0.5f,y / 4.0f + 0.5f,z / 4.0f + 0.5f,0.0f}) + ".xyz * 4.0 - 2.0";
+        in = visitor.inputOrUniformPlaceholder(result, inputs[1], true) + ".xyz * 4.0 - 2.0";
     else
-        in = qb::in(visitor.getCurrentFrame().pushInput({x,y,z,0.0f})) + ".xyz";
+        in = qb::in(visitor.getCurrentFrame().uniformPlaceholder()) + ".xyz";
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
@@ -1054,7 +944,7 @@ void Elongation::sample(TextureOperationResult& result, ElongationData* attribut
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)ElongationData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    bool inputValid = sampleInput2(result, inputs[0]);
+    bool inputValid = visitor.sampleInput(result, inputs[0]);
     context.popTransform();
 
     std::string op2;
@@ -1085,7 +975,7 @@ std::string Elongation::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Symmetry::sample(TextureOperationResult& result, SymmetryData* attributes, InputInfos& inputs)
+void Symmetry::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& x = attributes->x;
     auto& y = attributes->y;
@@ -1095,7 +985,7 @@ void Symmetry::sample(TextureOperationResult& result, SymmetryData* attributes, 
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in = qb::in(visitor.getCurrentFrame().pushInput({(float)x,(float)y,(float)z,0.0f}));
+    std::string in = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
 
     size_t pos0 = context.getTransformId();
     size_t pos1 = context.getNextTransform();
@@ -1107,7 +997,7 @@ void Symmetry::sample(TextureOperationResult& result, SymmetryData* attributes, 
     visitor.getCurrentFrame().setFunctions((qb::GeometryOperationType)SymmetryData::TypeId, getOperationCode());
 
     context.pushTransform(pos1);
-    sampleInput2(result, inputs[0]);
+    visitor.sampleInput(result, inputs[0]);
     context.popTransform();
 }
 //--------------------------------------------------------------
@@ -1199,7 +1089,7 @@ namespace qb
 };
 
 //--------------------------------------------------------------
-void Displacement::sample(TextureOperationResult& result, DisplacementData* attributes, InputInfos& inputs)
+void Displacement::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& intensity = attributes->intensity;
     auto& mode = attributes->mode;
@@ -1209,10 +1099,10 @@ void Displacement::sample(TextureOperationResult& result, DisplacementData* attr
     auto& context = frame.getContext();
 
     size_t frameId = 0;
-    bool inputValid = sampleInFrame2(result, inputs[1], frameId);
+    bool inputValid = visitor.sampleInFrame(result, inputs[1], frameId);
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({intensity,(float)mode,0.0f,0.0f}));
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
     std::string in3 = qb::sa(frameId);
 
     size_t opId = context.getNextVa();
@@ -1253,7 +1143,7 @@ std::string Displacement::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Texturing::sample(TextureOperationResult& result, TexturingData* attributes, InputInfos& inputs)
+void Texturing::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& factor = attributes->factor;
     auto& mode = attributes->mode;
@@ -1263,10 +1153,10 @@ void Texturing::sample(TextureOperationResult& result, TexturingData* attributes
     auto& context = frame.getContext();
 
     size_t frameId = 0;
-    bool inputValid = sampleInFrame2(result, inputs[1], frameId);
+    bool inputValid = visitor.sampleInFrame(result, inputs[1], frameId);
 
-    std::string in1 = pushOpOrInput2(result, inputs[0], {1e10f,1e10f,1e10f,1e10f});
-    std::string in2 = qb::in(visitor.getCurrentFrame().pushInput({factor,(float)mode,0.0f,0.0f}));
+    std::string in1 = visitor.inputOrUniformPlaceholder(result, inputs[0], true);
+    std::string in2 = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
     std::string in3 = qb::sa(frameId);
 
     size_t opId = context.getNextVa();
@@ -1307,7 +1197,7 @@ std::string Texturing::getOperationCode() const
 }
 
 //--------------------------------------------------------------
-std::string VoxelOutput::pushSlice(TextureOperationResult& result, TextureOperationInfo* input, float targetZ, float voxelSize)
+std::string VoxelOutput::pushSlice(TextureOperationResult& result, TextureOperationInfo* input, float targetZ, float voxelSize, bool uniformRequest)
 {
     auto& visitor = result.visitor;
     bool valid = input != nullptr;
@@ -1319,7 +1209,10 @@ std::string VoxelOutput::pushSlice(TextureOperationResult& result, TextureOperat
         currFrame.targetZ = targetZ;
         currFrame.voxelSize = voxelSize;
         
-        input->operation->apply(result, input->attributes, input->inputs);
+        if (uniformRequest)
+            input->operation->setUniforms(result, input->attributes, input->inputs);
+        else
+            input->operation->buildProgram(result, input->attributes, input->inputs);
         visitor.popFrame();
         return qb::sa(frameId);
     }
@@ -1327,7 +1220,7 @@ std::string VoxelOutput::pushSlice(TextureOperationResult& result, TextureOperat
     return "";
 }
 //--------------------------------------------------------------
-void VoxelOutput::sample(TextureOperationResult& result, VoxelOutputData* attributes, InputInfos& inputs)
+void VoxelOutput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -1344,22 +1237,18 @@ void VoxelOutput::sample(TextureOperationResult& result, VoxelOutputData* attrib
 
     std::string valueId = pushSlice(result, inputs[0], targetZ, voxelSize);
 
-    size_t opId = context.getNextVa();
-    std::string glsl;
     if(valueId.empty())
     {
-        // fallback
-        std::cout << "fallback" << std::endl;
-        glsl = "vec4 $1 = vec4(0.0,0.0,0.0,1.0);\n";
-        glsl = qb::replaceArgs(glsl, {qb::va(opId)});
+        visitor.pushFallback(result);
     }
     else
     {
+        size_t opId = context.getNextVa();
         frame.hasUv = true;
-        glsl = "vec4 $1 = texture2D($2, uv0).xyzw;\n";
+        std::string glsl = "vec4 $1 = texture2D($2, uv0).xyzw;\n";
         glsl = qb::replaceArgs(glsl, {qb::va(opId), valueId});
+        context.pushVa(opId);
+        context.pushCode(glsl);
     }
 
-    context.pushVa(opId);
-    context.pushCode(glsl);
 }

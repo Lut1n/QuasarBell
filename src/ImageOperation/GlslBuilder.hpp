@@ -13,6 +13,9 @@
 //#include "App/BaseOperationNode.hpp"
 #include "App/BaseAttributes.hpp"
 
+struct TextureOperationResult;
+struct TextureOperationInfo;
+
 //--------------------------------------------------------------
 namespace qb
 {
@@ -64,6 +67,12 @@ namespace qb
         {
             return idStack.size();
         }
+
+        void clear()
+        {
+            data.clear();
+            idStack.clear();
+        }
     };
 
     using IdStack = Stack<BaseAttributes*,size_t>;
@@ -111,6 +120,8 @@ namespace qb
         void pushCode(const std::string& toAdd);
 
         void repushall();
+
+        void clear();
     };
 
     struct GlslFrame
@@ -147,6 +158,9 @@ namespace qb
         void setFunctions(GeometryOperationType operationType, const std::string& functionCode);
         void setFunctions(const std::string& id, const std::string& functionCode);
 
+        size_t uniformPlaceholder();
+        size_t kernelPlaceholder();
+
         size_t pushInput(const vec4& v4);
         size_t pushKernel(const Kernel& ke);
         GlslContext& getContext();
@@ -163,6 +177,31 @@ namespace qb
         void repushall();
 
         size_t totalFrameCount();
+
+        void clear();
+    };
+
+    struct GlslProgramPipeline
+    {
+        struct Descriptor
+        {
+            std::string glsl;
+            size_t inputCount = 0;
+            size_t kernelCount = 0;
+            size_t textureCount = 0;
+        };
+
+        std::vector<Descriptor> orderedGlslCodes;
+
+        void init(GlslFrame* rootFrame);
+    };
+
+    struct GlslPipelineData
+    {
+        std::vector<vec4> inputs;
+        std::vector<Kernel> kernels;
+        
+        void init(GlslFrame* rootFrame);
     };
 
     struct GlslBuilderVisitor
@@ -180,6 +219,15 @@ namespace qb
         void setCurrentOperation(BaseAttributes* o);
         void unsetCurrentOperation();
         size_t repushall();
+
+        bool sampleInput(TextureOperationResult& result, TextureOperationInfo* input, bool uniformRequest = false);
+        bool sampleInContext(TextureOperationResult& result, TextureOperationInfo* input, size_t& ctxId, bool uniformRequest = false);
+        bool sampleInFrame(TextureOperationResult& result, TextureOperationInfo* input, size_t& frameId, bool uniformRequest = false);
+        void inputOrUniform(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v, bool isSdf = false);
+        std::string inputOrUniformPlaceholder(TextureOperationResult& result, TextureOperationInfo* input, bool isSdf = false);
+        void pushFallback(TextureOperationResult& result);
+
+        void startUniforms();
     };
 };
 

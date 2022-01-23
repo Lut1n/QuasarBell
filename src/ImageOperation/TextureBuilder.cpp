@@ -234,23 +234,76 @@ void TextureGenerator::compute(BaseOperationNode* outputNode)
 
 void TextureGenerator::computeResult(BaseOperationNode* node, TexturePreview* preview)
 {
-    auto& info = infos[node];
+    if(!frameRenderer)
+        frameRenderer = std::make_unique<FrameRenderer>();
 
+    auto& info = infos[node];
+    
+    /*TextureOperationResult rebuildResult;
+    rebuildResult.lastAttributes = info.attributes;
+    auto& glslPipeline = rebuildResult.visitor;
+    glslPipeline.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
+    glslPipeline.mainFrame.resolution = preview->resolution;*/
+    
+    bool rebuildGlsl = !preview->programSet || preview->toRecompile;
+    if (rebuildGlsl)
+    {
+        TextureOperationResult rebuildResult;
+        rebuildResult.lastAttributes = info.attributes;
+        auto& glslPipeline = rebuildResult.visitor;
+        glslPipeline.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
+        glslPipeline.mainFrame.resolution = preview->resolution;
+        glslPipeline.setCurrentOperation(nullptr);
+        info.operation->buildProgram(rebuildResult, info.attributes, info.inputs);
+        glslPipeline.unsetCurrentOperation();
+        
+        frameRenderer->render(preview, &glslPipeline.mainFrame);
+    }
+    
     TextureOperationResult result;
     result.lastAttributes = info.attributes;
+    auto& glslPipelineData = result.visitor;
+    glslPipelineData.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
+    glslPipelineData.mainFrame.resolution = preview->resolution;
+    // glslPipeline.startUniforms();
+    glslPipelineData.setCurrentOperation(nullptr);
+    info.operation->setUniforms(result, info.attributes, info.inputs);
+    glslPipelineData.unsetCurrentOperation();
+
+    frameRenderer->render(preview, &glslPipelineData.mainFrame);
+}
+
+/*
+
+    auto& info = infos[node];
     
-    auto& visitor = result.visitor;
-    visitor.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
-    visitor.mainFrame.resolution = preview->resolution;
-    visitor.setCurrentOperation(nullptr);
-    info.operation->apply(result, info.attributes, info.inputs);
-    visitor.unsetCurrentOperation();
+    bool rebuildGlsl = !preview->programSet || preview->toRecompile;
+    if (rebuildGlsl)
+    {
+        TextureOperationResult rebuildResult;
+        rebuildResult.lastAttributes = info.attributes;
+        auto& glslPipeline = rebuildResult.visitor;
+        glslPipeline.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
+        glslPipeline.mainFrame.resolution = preview->resolution;
+        glslPipeline.setCurrentOperation(nullptr);
+        info.operation->buildProgram(rebuildResult, info.attributes, info.inputs);
+        glslPipeline.unsetCurrentOperation();
+    }
+    
+    TextureOperationResult result;
+    result.lastAttributes = info.attributes;
+    auto& glslPipelineData = result.visitor;
+    glslPipelineData.mainFrame.type = dynamic_cast<GeometryNode*>(node) ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture;
+    glslPipelineData.mainFrame.resolution = preview->resolution;
+    glslPipelineData.setCurrentOperation(nullptr);
+    info.operation->setUniforms(result, info.attributes, info.inputs);
+    glslPipelineData.unsetCurrentOperation();
 
     if(!frameRenderer)
         frameRenderer = std::make_unique<FrameRenderer>();
 
-    frameRenderer->render(preview, &visitor.mainFrame);
-}
+    frameRenderer->render(preview, &glslPipelineData.mainFrame);
+*/
 
 void TextureGenerator::computePreviews(BaseOperationNode* node)
 {

@@ -161,5 +161,8 @@ void FrameRenderer::render(TexturePreview* target, qb::GlslFrame* glslFrame)
     programIndex = 0;
 
     render(target->glTextureId, target->toRecompile, glslFrame);
+
+    if (target->toRecompile)
+        std::cout << "total frame allocated: " << (framePool->used.size() + framePool->availables.size()) << std::endl;
     target->toRecompile = false;
 }

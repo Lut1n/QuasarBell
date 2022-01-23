@@ -17,222 +17,251 @@
 
 
 //--------------------------------------------------------------
-struct Sphere  : public ConcretImageOperation<SphereData>
+struct Sphere  : public ImageOperation<SphereData>
 {
-    void sample(TextureOperationResult& result, SphereData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Box  : public ConcretImageOperation<BoxData>
+struct Box  : public ImageOperation<BoxData>
 {
-    void sample(TextureOperationResult& result, BoxData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct RoundBox  : public ConcretImageOperation<RoundBoxData>
+struct RoundBox  : public ImageOperation<RoundBoxData>
 {
-    void sample(TextureOperationResult& result, RoundBoxData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Torus  : public ConcretImageOperation<TorusData>
+struct Torus  : public ImageOperation<TorusData>
 {
-    void sample(TextureOperationResult& result, TorusData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct HexagonalPrism  : public ConcretImageOperation<HexagonalPrismData>
+struct HexagonalPrism  : public ImageOperation<HexagonalPrismData>
 {
-    void sample(TextureOperationResult& result, HexagonalPrismData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct TriangularPrism  : public ConcretImageOperation<TriangularPrismData>
+struct TriangularPrism  : public ImageOperation<TriangularPrismData>
 {
-    void sample(TextureOperationResult& result, TriangularPrismData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Capsule  : public ConcretImageOperation<CapsuleData>
+struct Capsule  : public ImageOperation<CapsuleData>
 {
-    void sample(TextureOperationResult& result, CapsuleData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Cone  : public ConcretImageOperation<ConeData>
+struct Cone  : public ImageOperation<ConeData>
 {
-    void sample(TextureOperationResult& result, ConeData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct RoundedCone  : public ConcretImageOperation<RoundedConeData>
+struct RoundedCone  : public ImageOperation<RoundedConeData>
 {
-    void sample(TextureOperationResult& result, RoundedConeData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Cylinder  : public ConcretImageOperation<CylinderData>
+struct Cylinder  : public ImageOperation<CylinderData>
 {
-    void sample(TextureOperationResult& result, CylinderData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct RoundedCylinder  : public ConcretImageOperation<RoundedCylinderData>
+struct RoundedCylinder  : public ImageOperation<RoundedCylinderData>
 {
-    void sample(TextureOperationResult& result, RoundedCylinderData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Octahedron  : public ConcretImageOperation<OctahedronData>
+struct Octahedron  : public ImageOperation<OctahedronData>
 {
-    void sample(TextureOperationResult& result, OctahedronData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Pyramid  : public ConcretImageOperation<PyramidData>
+struct Pyramid  : public ImageOperation<PyramidData>
 {
-    void sample(TextureOperationResult& result, PyramidData* attributes, InputInfos& inputs) override;
-
-    std::string getOperationCode() const;
-};
-
-//--------------------------------------------------------------
-struct Union  : public ConcretImageOperation<UnionData>
-{
-    void sample(TextureOperationResult& result, UnionData* attributes, InputInfos& inputs) override;
-
-    std::string getOperationCode() const;
-};
-
-//--------------------------------------------------------------
-struct Substraction  : public ConcretImageOperation<SubstractionData>
-{
-    void sample(TextureOperationResult& result, SubstractionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Intersection  : public ConcretImageOperation<IntersectionData>
+struct Union  : public ImageOperation<UnionData>
 {
-    void sample(TextureOperationResult& result, IntersectionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct SmoothUnion  : public ConcretImageOperation<SmoothUnionData>
+struct Substraction  : public ImageOperation<SubstractionData>
 {
-    void sample(TextureOperationResult& result, SmoothUnionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct SmoothSubstraction  : public ConcretImageOperation<SmoothSubstractionData>
+struct Intersection  : public ImageOperation<IntersectionData>
 {
-    void sample(TextureOperationResult& result, SmoothSubstractionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct SmoothIntersection  : public ConcretImageOperation<SmoothIntersectionData>
+struct SmoothUnion  : public ImageOperation<SmoothUnionData>
 {
-    void sample(TextureOperationResult& result, SmoothIntersectionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct HighResSdfOutput  : public ConcretImageOperation<HighResSdfOutputData>
+struct SmoothSubstraction  : public ImageOperation<SmoothSubstractionData>
 {
-    void sample(TextureOperationResult& result, HighResSdfOutputData* attributes, InputInfos& inputs) override;
-};
-
-//--------------------------------------------------------------
-struct Transform  : public ConcretImageOperation<TransformData>
-{
-    void sample(TextureOperationResult& result, TransformData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Repetition  : public ConcretImageOperation<RepetitionData>
+struct SmoothIntersection  : public ImageOperation<SmoothIntersectionData>
 {
-    void sample(TextureOperationResult& result, RepetitionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Twist  : public ConcretImageOperation<TwistData>
+struct HighResSdfOutput  : public ImageOperation<HighResSdfOutputData>
 {
-    void sample(TextureOperationResult& result, TwistData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+};
+
+//--------------------------------------------------------------
+struct Transform  : public ImageOperation<TransformData>
+{
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Bend  : public ConcretImageOperation<BendData>
+struct Repetition  : public ImageOperation<RepetitionData>
 {
-    void sample(TextureOperationResult& result, BendData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Elongation  : public ConcretImageOperation<ElongationData>
+struct Twist  : public ImageOperation<TwistData>
 {
-    void sample(TextureOperationResult& result, ElongationData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Symmetry  : public ConcretImageOperation<SymmetryData>
+struct Bend  : public ImageOperation<BendData>
 {
-    void sample(TextureOperationResult& result, SymmetryData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Displacement  : public ConcretImageOperation<DisplacementData>
+struct Elongation  : public ImageOperation<ElongationData>
 {
-    void sample(TextureOperationResult& result, DisplacementData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct Texturing  : public ConcretImageOperation<TexturingData>
+struct Symmetry  : public ImageOperation<SymmetryData>
 {
-    void sample(TextureOperationResult& result, TexturingData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 
 //--------------------------------------------------------------
-struct VoxelOutput : public ConcretImageOperation<VoxelOutputData>
+struct Displacement  : public ImageOperation<DisplacementData>
 {
-    void sample(TextureOperationResult& result, VoxelOutputData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
-    std::string pushSlice(TextureOperationResult& result, TextureOperationInfo* input, float targetZ, float voxelSize);
+    std::string getOperationCode() const;
+};
+
+//--------------------------------------------------------------
+struct Texturing  : public ImageOperation<TexturingData>
+{
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+
+    std::string getOperationCode() const;
+};
+
+//--------------------------------------------------------------
+struct VoxelOutput : public ImageOperation<VoxelOutputData>
+{
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+
+    std::string pushSlice(TextureOperationResult& result, TextureOperationInfo* input, float targetZ, float voxelSize, bool uniformRequest = false);
 };
 
 #endif // QB_SDF_OPERATIONS_HPP

@@ -1,5 +1,8 @@
 #include "ImageOperation/GlslBuilder.hpp"
 
+#include "ImageOperation/ImageOperations.hpp"
+#include <functional>
+
 namespace qb
 {
     static Stack<void*, BaseAttributes*> s_currentOperation;
@@ -167,6 +170,22 @@ void qb::GlslFrame::setFunctions(const std::string& id, const std::string& funct
         optFunctions[id] = functionCode;
 }
 //--------------------------------------------------------------
+size_t qb::GlslFrame::uniformPlaceholder()
+{
+    size_t id = inputs.size();
+    inputs.push_back(vec4(0,0,0,0));
+    inputStack.push(s_currentOperation.get(), id);
+    return id;
+}
+//--------------------------------------------------------------
+size_t qb::GlslFrame::kernelPlaceholder()
+{
+    size_t id = kernels.size();
+    kernels.push_back(Kernel());
+    kernelStack.push(s_currentOperation.get(), id);
+    return id;
+}
+//--------------------------------------------------------------
 size_t qb::GlslFrame::pushInput(const vec4& v4)
 {
     size_t id = inputs.size();
@@ -301,7 +320,7 @@ std::string qb::GlslFrame::compile()
 
     // uniforms
     for(size_t i=0; i<inputs.size(); ++i)
-        glsl += replaceArgs("uniform vec4 $1 = $2;\n", {in(i), glslVec4(inputs[i])});
+        glsl += replaceArgs("uniform vec4 $1;\n", {in(i)});//, glslVec4(inputs[i])});
         
     for(size_t i=0; i<kernels.size(); ++i)
         glsl += replaceArgs("uniform float $1[512];\n", {ke(i)});
@@ -368,6 +387,40 @@ size_t qb::GlslFrame::totalFrameCount()
 }
 
 //--------------------------------------------------------------
+void qb::GlslProgramPipeline::init(GlslFrame* rootFrame)
+{
+    orderedGlslCodes.clear();
+
+    std::function<void(GlslFrame*)> ancestorFirst = [&ancestorFirst, this](GlslFrame* frame)
+    {
+        for(auto& f : frame->frames)
+            ancestorFirst(&f);
+
+        orderedGlslCodes.push_back({frame->compile(), frame->inputs.size(), frame->kernels.size(), frame->frames.size()});
+    };
+
+    ancestorFirst(rootFrame);
+}
+
+//--------------------------------------------------------------
+void qb::GlslPipelineData::init(GlslFrame* rootFrame)
+{
+    inputs.clear();
+    kernels.clear();
+
+    std::function<void(GlslFrame*)> ancestorFirst = [&ancestorFirst, this](GlslFrame* frame)
+    {
+        for(auto& f : frame->frames)
+            ancestorFirst(&f);
+
+        inputs.insert(inputs.end(), frame->inputs.begin(), frame->inputs.end());
+        kernels.insert(kernels.end(), frame->kernels.begin(), frame->kernels.end());
+    };
+
+    ancestorFirst(rootFrame);
+}
+
+//--------------------------------------------------------------
 qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
 {
     if(frameStack.size() > 0)
@@ -413,4 +466,171 @@ size_t qb::GlslBuilderVisitor::repushall()
 
     frameStack.repush(s_currentOperation.get());
     return id;
+}
+
+//--------------------------------------------------------------
+bool qb::GlslBuilderVisitor::sampleInput(TextureOperationResult& result, TextureOperationInfo* input, bool uniformRequest)
+{
+    if (input == nullptr)
+        return false;
+
+    setCurrentOperation(input->attributes);
+
+    auto& context = getCurrentFrame().getContext();
+    auto& visited = context.visited;
+    auto it = visited.find(input->attributes);
+
+    bool ret = false;
+
+    if (it != visited.end())
+    {
+        context.repushall();
+        ret = it->second;
+    }
+    else
+    {
+        ret = false;
+        if (input->attributes)
+        {
+            if (uniformRequest)
+                input->operation->setUniforms(result, input->attributes, input->inputs);
+            else
+                input->operation->buildProgram(result, input->attributes, input->inputs);
+            ret = true;
+        }
+        visited.emplace(input->attributes, ret);
+    }
+
+    unsetCurrentOperation();
+    return ret;
+}
+
+//--------------------------------------------------------------
+bool qb::GlslBuilderVisitor::sampleInContext(TextureOperationResult& result, TextureOperationInfo* input, size_t& ctxId, bool uniformRequest)
+{
+    if (input == nullptr)
+        return false;
+
+    auto& frame = getCurrentFrame();
+
+    ctxId = frame.pushContext();
+    bool ret = sampleInput(result, input, uniformRequest);
+    frame.popContext();
+    return ret;
+}
+
+//--------------------------------------------------------------
+bool qb::GlslBuilderVisitor::sampleInFrame(TextureOperationResult& result, TextureOperationInfo* input, size_t& frameId, bool uniformRequest)
+{
+    if (input == nullptr)
+        return false;
+
+    auto& frame = getCurrentFrame();
+
+    auto it = visited.end();
+
+    auto target = input->attributes;
+    it = visited.find(target);
+
+    bool ret = false;
+    setCurrentOperation(target);
+    if (it != visited.end())
+    {
+        frameId = repushall();
+        ret = true;
+    }
+    else
+    {
+        frameId = pushFrame(input->isSdf ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture);
+        ret = sampleInput(result, input, uniformRequest);
+        visited.emplace(target, ret);
+    }
+    popFrame();
+    unsetCurrentOperation();
+
+    return ret;
+}
+
+//--------------------------------------------------------------
+void qb::GlslBuilderVisitor::inputOrUniform(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v, bool isSdf)
+{
+    auto& frame = getCurrentFrame();
+    if (input && input->isSdf != isSdf)
+    {
+        size_t frameId;
+        sampleInFrame(result, input, frameId, true);
+    }
+    if (!sampleInput(result, input, true))
+        frame.pushInput(v);
+}
+std::string qb::GlslBuilderVisitor::inputOrUniformPlaceholder(TextureOperationResult& result, TextureOperationInfo* input, bool isSdf)
+{
+    auto& frame = getCurrentFrame();
+    auto& context = frame.getContext();
+
+    // do a projection
+    if (input && input->isSdf != isSdf)
+    {
+        size_t frameId;
+        if (sampleInFrame(result, input, frameId, false))
+        {
+            frame.hasUv = true;
+            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
+        }
+    }
+
+    if (sampleInput(result, input, false))
+        return qb::va(context.popVa());
+    else
+        return qb::in(frame.uniformPlaceholder());
+}
+//--------------------------------------------------------------
+void qb::GlslBuilderVisitor::pushFallback(TextureOperationResult& result)
+{
+    auto& frame = getCurrentFrame();
+    auto& context = frame.getContext();
+
+
+    size_t opId = context.getNextVa();
+    std::string glsl = "vec4 v$1 = vec4(0,0,0,1);";
+    glsl = qb::replaceArgs(glsl, {std::to_string(opId)});
+    context.pushVa(opId);
+    context.pushCode(glsl);
+}
+void qb::GlslBuilderVisitor::startUniforms()
+{
+    visited.clear();
+    frameStack.clear();
+    frameStack.clear();
+}
+
+void qb::GlslFrame::clear()
+{
+    targetZ = 0.0f;
+    voxelSize = 0.1f;
+    hasUv = false;
+    inputs.clear();
+    kernels.clear();
+    frames.clear();
+
+    mainContext.clear();
+    subContexts.clear();
+    
+    inputStack.clear();
+    kernelStack.clear();
+    frameStack.clear();
+    contextStack.clear();
+}
+
+void qb::GlslContext::clear()
+{
+    visited.clear();
+    
+    vaStack.clear();
+    uvStack.clear();
+    tfmrStack.clear();
+
+    nextUvId = 1;
+    nextVaId = 0;
+    nextTfmrId = 1;
 }

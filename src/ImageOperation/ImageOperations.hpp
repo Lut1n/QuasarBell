@@ -33,90 +33,111 @@ struct TextureOperationResult
 struct AbstractImageOperation
 {
     virtual ~AbstractImageOperation() = default;
-    virtual void apply(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) = 0;
+    virtual void buildProgram(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) = 0;
+    virtual void setUniforms(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) = 0;
 };
 
-template<typename PropsType>
-struct ConcretImageOperation : public AbstractImageOperation
+template<typename Type>
+struct ImageOperation : public AbstractImageOperation
 {
-    static constexpr size_t TypeId = PropsType::TypeId;
+    using AttributeType = Type;
+    static constexpr size_t TypeId = AttributeType::TypeId;
 
-    void apply(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) override
+    void buildProgram(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) override
     {
-        return sample(result, static_cast<PropsType*>(attributes),inputs);
+        return buildProgramImpl(result, static_cast<AttributeType*>(attributes),inputs);
+    }
+    
+    void setUniforms(TextureOperationResult& result, BaseAttributes* attributes, InputInfos& inputs) override
+    {
+        return setUniformsImpl(result, static_cast<AttributeType*>(attributes),inputs);
     }
 
-    virtual void sample(TextureOperationResult& result, PropsType* attributes, InputInfos& inputs) = 0;
+    virtual void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) = 0;
+    virtual void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) {};
 };
 
-std::string pushOpOrInput(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v);
+// std::string pushOpOrInput(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v);
 
 //--------------------------------------------------------------
-struct ColorInput : public ConcretImageOperation<ColorData>
+struct ColorInput : public ImageOperation<ColorData>
 {
-    void sample(TextureOperationResult& result, ColorData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct Construct3f : public ConcretImageOperation<Construct3fData>
+struct Construct3f : public ImageOperation<Construct3fData>
 {
-    void sample(TextureOperationResult& result, Construct3fData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct Split3f : public ConcretImageOperation<Split3fData>
+struct Split3f : public ImageOperation<Split3fData>
 {
-    void sample(TextureOperationResult& result, Split3fData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct Dynamics : public ConcretImageOperation<DynamicsData>
+struct Dynamics : public ImageOperation<DynamicsData>
 {
-    void sample(TextureOperationResult& result, DynamicsData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct DirectionalSignal : public ConcretImageOperation<DirectionalSignalData>
+struct DirectionalSignal : public ImageOperation<DirectionalSignalData>
 {
-    void sample(TextureOperationResult& result, DirectionalSignalData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct RadialSignal : public ConcretImageOperation<RadialSignalData>
+struct RadialSignal : public ImageOperation<RadialSignalData>
 {
-    void sample(TextureOperationResult& result, RadialSignalData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct TimeInput : public ConcretImageOperation<TimeData>
+struct TimeInput : public ImageOperation<TimeData>
 {
-    void sample(TextureOperationResult& result, TimeData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct HighResOutput : public ConcretImageOperation<ImageOutput>
+struct HighResOutput : public ImageOperation<ImageOutput>
 {
-    void sample(TextureOperationResult& result, ImageOutput* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct UvInput : public ConcretImageOperation<UvInputData>
+struct UvInput : public ImageOperation<UvInputData>
 {
-    void sample(TextureOperationResult& result, UvInputData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct SphericalCoord : public ConcretImageOperation<SphericalCoordData>
+struct SphericalCoord : public ImageOperation<SphericalCoordData>
 {
-    void sample(TextureOperationResult& result, SphericalCoordData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct UvDistortion : public ConcretImageOperation<UvDistortionData>
+struct UvDistortion : public ImageOperation<UvDistortionData>
 {
-    void sample(TextureOperationResult& result, UvDistortionData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct UvMapping : public ConcretImageOperation<UvMappingData>
+struct UvMapping : public ImageOperation<UvMappingData>
 {
-    void sample(TextureOperationResult& result, UvMappingData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct BlurFilter : public ConcretImageOperation<BlurFilterData>
+struct BlurFilter : public ImageOperation<BlurFilterData>
 {
-    void sample(TextureOperationResult& result, BlurFilterData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     void updateKernel(int radius);
 
     std::string getOperationCode() const;
@@ -124,9 +145,10 @@ struct BlurFilter : public ConcretImageOperation<BlurFilterData>
     Kernel kernel;
 };
 //--------------------------------------------------------------
-struct SharpenFilter : public ConcretImageOperation<SharpenFilterData>
+struct SharpenFilter : public ImageOperation<SharpenFilterData>
 {
-    void sample(TextureOperationResult& result, SharpenFilterData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     void updateKernel(int radius);
 
     std::string getOperationCode() const;
@@ -134,54 +156,62 @@ struct SharpenFilter : public ConcretImageOperation<SharpenFilterData>
     Kernel kernel;
 };
 //--------------------------------------------------------------
-struct MorphoFilter : public ConcretImageOperation<MorphoFilterData>
+struct MorphoFilter : public ImageOperation<MorphoFilterData>
 {
-    void sample(TextureOperationResult& result, MorphoFilterData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct BumpToNormal : public ConcretImageOperation<BumpToNormalData>
+struct BumpToNormal : public ImageOperation<BumpToNormalData>
 {
-    void sample(TextureOperationResult& result, BumpToNormalData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 };
 //--------------------------------------------------------------
-struct WhiteNoise : public ConcretImageOperation<WhiteNoiseData>
+struct WhiteNoise : public ImageOperation<WhiteNoiseData>
 {
-    void sample(TextureOperationResult& result, WhiteNoiseData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct ValueNoise : public ConcretImageOperation<ValueNoiseData>
+struct ValueNoise : public ImageOperation<ValueNoiseData>
 {
-    void sample(TextureOperationResult& result, ValueNoiseData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct GradientNoise : public ConcretImageOperation<GradientNoiseData>
+struct GradientNoise : public ImageOperation<GradientNoiseData>
 {
-    void sample(TextureOperationResult& result, GradientNoiseData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct SimplexNoise : public ConcretImageOperation<SimplexNoiseData>
+struct SimplexNoise : public ImageOperation<SimplexNoiseData>
 {
-    void sample(TextureOperationResult& result, SimplexNoiseData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct VoronoiNoise : public ConcretImageOperation<VoronoiNoiseData>
+struct VoronoiNoise : public ImageOperation<VoronoiNoiseData>
 {
-    void sample(TextureOperationResult& result, VoronoiNoiseData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
 //--------------------------------------------------------------
-struct Mandelbrot : public ConcretImageOperation<MandelbrotData>
+struct Mandelbrot : public ImageOperation<MandelbrotData>
 {
-    void sample(TextureOperationResult& result, MandelbrotData* attributes, InputInfos& inputs) override;
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
 
     std::string getOperationCode() const;
 };
@@ -211,11 +241,11 @@ static std::unordered_map<qb::ImageOperationType, std::string> s_symbols = {
 
 
 //--------------------------------------------------------------
-template<typename DataType>
-struct ImageBasicOperator : public ConcretImageOperation<DataType>
+template<typename AttributeType>
+struct ImageBasicOperator : public ImageOperation<AttributeType>
 {
-    std::string operatorSymbol = s_symbols[(qb::ImageOperationType)DataType::TypeId];
-    void sample(TextureOperationResult& result, DataType* attributes, InputInfos& inputs) override
+    std::string operatorSymbol = s_symbols[(qb::ImageOperationType)AttributeType::TypeId];
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override
     {
         auto in1 = attributes->in1;
         auto in2 = attributes->in2;
@@ -224,14 +254,23 @@ struct ImageBasicOperator : public ConcretImageOperation<DataType>
         auto& frame = visitor.getCurrentFrame();
         auto& context = frame.getContext();
 
-        std::string operand1 = pushOpOrInput(result, inputs[0], {in1,in1,in1,1.0f});
-        std::string operand2 = pushOpOrInput(result, inputs[1], {in2,in2,in2,1.0f});
+        std::string operand1 = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+        std::string operand2 = visitor.inputOrUniformPlaceholder(result, inputs[1]);
 
         size_t opId = context.getNextVa();
         std::string glsl = "vec4 $1 = vec4($2.xyz $3 $4.xyz, 1.0);\n";
         glsl = qb::replaceArgs(glsl, {qb::va(opId), operand1, operatorSymbol, operand2});
         context.pushVa(opId);
         context.pushCode(glsl);
+    }
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override
+    {
+        auto in1 = attributes->in1;
+        auto in2 = attributes->in2;
+
+        auto& visitor = result.visitor;
+        visitor.inputOrUniform(result, inputs[0], {in1,in1,in1,1.0f});
+        visitor.inputOrUniform(result, inputs[1], {in2,in2,in2,1.0f});
     }
 };
 
@@ -246,13 +285,13 @@ MAKE_BASIC_OPERATOR(Mult)
 MAKE_BASIC_OPERATOR(Div)
 
 //--------------------------------------------------------------
-template<typename DataType>
-struct ImageBuiltInFunc : public ConcretImageOperation<DataType>
+template<typename AttributeType>
+struct ImageBuiltInFunc : public ImageOperation<AttributeType>
 {
-    std::string funcName = s_symbols[(qb::ImageOperationType)DataType::TypeId];
+    std::string funcName = s_symbols[(qb::ImageOperationType)AttributeType::TypeId];
     std::string glslTemplate;
 
-    void sample(TextureOperationResult& result, DataType* attributes, InputInfos& inputs) override
+    void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override
     {
         if (glslTemplate.empty())
         {
@@ -275,7 +314,7 @@ struct ImageBuiltInFunc : public ConcretImageOperation<DataType>
         for(size_t i=0; i<argValues.size(); ++i)
         {
             float arg = argValues[i];
-            idsCache[i+1] = pushOpOrInput(result, inputs[i],{arg,arg,arg,arg});
+            idsCache[i+1] = visitor.inputOrUniformPlaceholder(result, inputs[i]);
         }
 
         size_t opId = context.getNextVa();
@@ -284,6 +323,13 @@ struct ImageBuiltInFunc : public ConcretImageOperation<DataType>
         std::string glsl = qb::replaceArgs(glslTemplate, idsCache);
         context.pushVa(opId);
         context.pushCode(glsl);
+    }
+
+    void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override
+    {
+        size_t i=0;
+        for(auto arg : attributes->argValues)
+            result.visitor.inputOrUniform(result, inputs[i++],{arg,arg,arg,arg});
     }
 };
 
@@ -313,25 +359,18 @@ MAKE_BUILTIN_OPERATION(Max)
 struct ProgramSet
 {
     std::vector<size_t> ids;
-    //std::vector<size_t> frames;
     std::vector<std::string> codes;
 
-    ProgramSet(size_t c/*, int resolution*/)
+    ProgramSet(size_t c)
     {
         ids.resize(c);
-        // frames.resize(c);
         codes.resize(c);
         for(size_t i=0; i<c; ++i)
-        {
-            // frames[i] = RenderInterface::createTarget(resolution,resolution,false);
             ids[i] = RenderInterface::createCustomProgram();
-        }
     }
 
     ~ProgramSet()
     {
-        /*for(size_t id : frames)
-            RenderInterface::deleteTarget((unsigned)id);*/
         for(size_t id : ids)
             RenderInterface::destroyCustomProgram((unsigned)id);
     }
@@ -340,11 +379,6 @@ struct ProgramSet
     {
         return ids[i];
     }
-
-    /*size_t frameAt(size_t i) const
-    {
-        return frames[i];
-    }*/
 
     const std::string& codeAt(size_t i) const
     {

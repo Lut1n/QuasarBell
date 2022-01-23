@@ -10,137 +10,14 @@ namespace qb
     "}\n";
 }
 
-
 //--------------------------------------------------------------
-bool sampleInput(TextureOperationResult& result, TextureOperationInfo* input)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& glslBuilder = result.visitor;
-    glslBuilder.setCurrentOperation(input->attributes);
-
-    auto& context = glslBuilder.getCurrentFrame().getContext();
-    auto& visited = context.visited;
-    auto it = visited.find(input->attributes);
-
-    bool ret = false;
-
-    if (it != visited.end())
-    {
-        context.repushall();
-        ret = it->second;
-    }
-    else
-    {
-        ret = false;
-        if (input->attributes)
-        {
-            input->operation->apply(result, input->attributes, input->inputs);
-            ret = true;
-        }
-        visited.emplace(input->attributes, ret);
-    }
-
-    glslBuilder.unsetCurrentOperation();
-    return ret;
-}
-
-//--------------------------------------------------------------
-bool sampleInContext(TextureOperationResult& result, TextureOperationInfo* input, size_t& ctxId)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& frame = result.visitor.getCurrentFrame();
-
-    ctxId = frame.pushContext();
-    bool ret = sampleInput(result, input);
-    frame.popContext();
-    return ret;
-}
-
-//--------------------------------------------------------------
-bool sampleInFrame(TextureOperationResult& result, TextureOperationInfo* input, size_t& frameId)
-{
-    if (input == nullptr)
-        return false;
-
-    auto& visitor = result.visitor;
-    auto& frame = visitor.getCurrentFrame();
-
-    auto& visited = visitor.visited;
-    auto it = visited.end();
-
-    auto target = input->attributes;
-    it = visited.find(target);
-
-    bool ret = false;
-    visitor.setCurrentOperation(target);
-    if (it != visited.end())
-    {
-        frameId = visitor.repushall();
-        ret = true;
-    }
-    else
-    {
-        frameId = visitor.pushFrame(input->isSdf ? qb::GlslFrame::Type::Sdf : qb::GlslFrame::Type::Texture);
-        ret = sampleInput(result, input);
-        visited.emplace(target, ret);
-    }
-    visitor.popFrame();
-    visitor.unsetCurrentOperation();
-
-    return ret;
-}
-
-//--------------------------------------------------------------
-std::string pushOpOrInput(TextureOperationResult& result, TextureOperationInfo* input, const vec4 v)
-{
-    auto& frame = result.visitor.getCurrentFrame();
-    auto& context = frame.getContext();
-
-    // do a projection
-    if (input && input->isSdf)
-    {
-        size_t frameId;
-        if (sampleInFrame(result, input, frameId))
-        {
-            frame.hasUv = true;
-            return "texture2D(" + qb::sa(frameId) + "," + qb::uv(context.getUvId()) + ")";
-        }
-    }
-
-    if (sampleInput(result, input))
-        return qb::va(context.popVa());
-    else
-        return qb::in(frame.pushInput(v));
-}
-//--------------------------------------------------------------
-void pushFallback(TextureOperationResult& result)
-{
-    auto& frame = result.visitor.getCurrentFrame();
-    auto& context = frame.getContext();
-
-
-    size_t opId = context.getNextVa();
-    std::string glsl = "vec4 v$1 = vec4(0,0,0,1);";
-    glsl = qb::replaceArgs(glsl, {std::to_string(opId)});
-    context.pushVa(opId);
-    context.pushCode(glsl);
-}
-
-
-
-
-//--------------------------------------------------------------
-void ColorInput::sample(TextureOperationResult& result, ColorData* attributes, InputInfos& inputs)
+void ColorInput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    size_t inId = frame.pushInput({attributes->r,attributes->g,attributes->b,attributes->a});
+    size_t inId = frame.uniformPlaceholder();
     size_t opId = context.getNextVa();
 
     std::string glsl = "vec4 $1 = $2;\n";
@@ -150,7 +27,7 @@ void ColorInput::sample(TextureOperationResult& result, ColorData* attributes, I
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void Construct3f::sample(TextureOperationResult& result, Construct3fData* attributes, InputInfos& inputs)
+void Construct3f::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto c1 = attributes->c1;
     auto c2 = attributes->c2;
@@ -160,9 +37,9 @@ void Construct3f::sample(TextureOperationResult& result, Construct3fData* attrib
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string in1Id = pushOpOrInput(result, inputs[0], {c1,c1,c1,1.0f});
-    std::string in2Id = pushOpOrInput(result, inputs[1], {c2,c2,c2,1.0f});
-    std::string in3Id = pushOpOrInput(result, inputs[2], {c3,c3,c3,1.0f});
+    std::string in1Id = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string in2Id = visitor.inputOrUniformPlaceholder(result, inputs[1]);
+    std::string in3Id = visitor.inputOrUniformPlaceholder(result, inputs[2]);
 
     size_t opId = context.getNextVa();
 
@@ -173,7 +50,7 @@ void Construct3f::sample(TextureOperationResult& result, Construct3fData* attrib
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void Split3f::sample(TextureOperationResult& result, Split3fData* attributes, InputInfos& inputs)
+void Split3f::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto index = attributes->index;
     auto r = attributes->r;
@@ -184,12 +61,12 @@ void Split3f::sample(TextureOperationResult& result, Split3fData* attributes, In
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string inId = qb::in(frame.pushInput({r,g,b,(float)index}));
+    std::string inId = qb::in(frame.uniformPlaceholder());
     std::string vaId;
 
     std::string glsl = "vec4 $1 = vec4(vec3($3[int($2.w)]),1.0);\n";
 
-    if(sampleInput(result, inputs[0]))
+    if(visitor.sampleInput(result, inputs[0]))
         vaId = qb::va(context.popVa());
     else
         vaId = inId;
@@ -201,7 +78,7 @@ void Split3f::sample(TextureOperationResult& result, Split3fData* attributes, In
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void DirectionalSignal::sample(TextureOperationResult& result, DirectionalSignalData* attributes, InputInfos& inputs)
+void DirectionalSignal::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto directionX = attributes->directionX;
     auto directionY = attributes->directionY;
@@ -212,7 +89,7 @@ void DirectionalSignal::sample(TextureOperationResult& result, DirectionalSignal
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    size_t inId = frame.pushInput({directionX,directionY,frequency,amplitude});
+    size_t inId = frame.uniformPlaceholder();
     size_t uvId = context.getUvId();
     size_t opId = context.getNextVa();
 
@@ -225,7 +102,7 @@ void DirectionalSignal::sample(TextureOperationResult& result, DirectionalSignal
     frame.hasUv = true;
 }
 //--------------------------------------------------------------
-void RadialSignal::sample(TextureOperationResult& result, RadialSignalData* attributes, InputInfos& inputs)
+void RadialSignal::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto centerX = attributes->centerX;
     auto centerY = attributes->centerY;
@@ -237,7 +114,7 @@ void RadialSignal::sample(TextureOperationResult& result, RadialSignalData* attr
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    size_t inId = frame.pushInput({centerX,centerY,frequency,amplitude});
+    size_t inId = frame.uniformPlaceholder();
     size_t uvId = context.getUvId();
     size_t opId = context.getNextVa();
 
@@ -250,7 +127,7 @@ void RadialSignal::sample(TextureOperationResult& result, RadialSignalData* attr
     frame.hasUv = true;
 }
 //--------------------------------------------------------------
-void Dynamics::sample(TextureOperationResult& result, DynamicsData* attributes, InputInfos& inputs)
+void Dynamics::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto brightness = attributes->brightness;
     auto contrast = attributes->contrast;
@@ -259,9 +136,9 @@ void Dynamics::sample(TextureOperationResult& result, DynamicsData* attributes, 
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string inId = pushOpOrInput(result, inputs[0], {1.0f,1.0f,1.0f,1.0f});
-    std::string briId = pushOpOrInput(result, inputs[1], {brightness,brightness,brightness,brightness});
-    std::string contId = pushOpOrInput(result, inputs[2], {contrast,contrast,contrast,contrast});
+    std::string inId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string briId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
+    std::string contId = visitor.inputOrUniformPlaceholder(result, inputs[2]);
 
     size_t outId = context.getNextVa();
 
@@ -272,14 +149,14 @@ void Dynamics::sample(TextureOperationResult& result, DynamicsData* attributes, 
     frame.setFunctions((qb::ImageOperationType)DynamicsData::TypeId, std::string(qb::dynamicsCode));
 }
 //--------------------------------------------------------------
-void HighResOutput::sample(TextureOperationResult& result, ImageOutput* attributes, InputInfos& inputs)
+void HighResOutput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     size_t opId;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string valueId = pushOpOrInput(result, inputs[0], {1.0f,1.0f,1.0f,1.0f});
+    std::string valueId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
 
     opId = context.getNextVa();
 
@@ -290,14 +167,14 @@ void HighResOutput::sample(TextureOperationResult& result, ImageOutput* attribut
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void TimeInput::sample(TextureOperationResult& result, TimeData* attributes, InputInfos& inputs)
+void TimeInput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
     float ti = (float)RenderInterface::getTime();
-    size_t inId = frame.pushInput({ti,ti,ti,ti});
+    size_t inId = frame.uniformPlaceholder();
     size_t opId = context.getNextVa();
 
     std::string glsl = "vec4 $1 = vec4(vec3($2.x),1.0);\n";
@@ -307,7 +184,7 @@ void TimeInput::sample(TextureOperationResult& result, TimeData* attributes, Inp
     context.pushCode(glsl);
 }
 //--------------------------------------------------------------
-void UvInput::sample(TextureOperationResult& result, UvInputData* attributes, InputInfos& inputs)
+void UvInput::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -322,7 +199,7 @@ void UvInput::sample(TextureOperationResult& result, UvInputData* attributes, In
     frame.hasUv = true;
 }
 //--------------------------------------------------------------
-void SphericalCoord::sample(TextureOperationResult& result, SphericalCoordData* attributes, InputInfos& inputs)
+void SphericalCoord::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -349,7 +226,7 @@ std::string SphericalCoord::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void UvDistortion::sample(TextureOperationResult& result, UvDistortionData* attributes, InputInfos& inputs)
+void UvDistortion::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto force = attributes->force;
 
@@ -359,12 +236,12 @@ void UvDistortion::sample(TextureOperationResult& result, UvDistortionData* attr
 
     std::string inputUv, inputNormals;
 
-    if(sampleInput(result, inputs[0])) inputUv = qb::va( context.popVa() );
+    if(visitor.sampleInput(result, inputs[0])) inputUv = qb::va( context.popVa() );
     else inputUv = "uv0";
-    if(sampleInput(result, inputs[1])) inputNormals = qb::va( context.popVa() );
+    if(visitor.sampleInput(result, inputs[1])) inputNormals = qb::va( context.popVa() );
     else inputNormals = "vec4(0.5,0.5,1.0,1.0)";
 
-    std::string forceIn = qb::in( frame.pushInput({force,force,force,force}) );
+    std::string forceIn = qb::in( frame.uniformPlaceholder() );
 
     size_t opId = context.getNextVa();
     std::string glsl = "vec4 $1 = vec4($2.xy + ($3.xy - vec2(0.5)) * $4.x,0.0,1.0);\n";
@@ -375,7 +252,7 @@ void UvDistortion::sample(TextureOperationResult& result, UvDistortionData* attr
     frame.hasUv = true;
 }
 //--------------------------------------------------------------
-void UvMapping::sample(TextureOperationResult& result, UvMappingData* attributes, InputInfos& inputs)
+void UvMapping::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto uOft = attributes->uOft;
     auto vOft = attributes->vOft;
@@ -388,7 +265,7 @@ void UvMapping::sample(TextureOperationResult& result, UvMappingData* attributes
 
     std::string glsl;
 
-    bool inputValid = sampleInput(result, inputs[1]); // uv map
+    bool inputValid = visitor.sampleInput(result, inputs[1]); // uv map
 
     size_t uvId2 = context.getNextUv();
     size_t uvId = context.getUvId();
@@ -401,7 +278,7 @@ void UvMapping::sample(TextureOperationResult& result, UvMappingData* attributes
     }
     else
     {
-        size_t in1 = frame.pushInput({uOft, vOft, uFct, vFct});
+        size_t in1 = frame.uniformPlaceholder();
         glsl = "vec2 $1 = uv_mapping($2,$3);\n";
         glsl = qb::replaceArgs(glsl, {qb::uv(uvId2), qb::uv(uvId), qb::in(in1)});
     }
@@ -410,10 +287,10 @@ void UvMapping::sample(TextureOperationResult& result, UvMappingData* attributes
 
     context.pushCode(glsl);
     context.pushUv(uvId2);
-    bool ret = sampleInput(result, inputs[0]);
+    bool ret = visitor.sampleInput(result, inputs[0]);
     context.popUv();
     if (!ret)
-        pushFallback(result);
+        visitor.pushFallback(result);
 }
 //--------------------------------------------------------------
 std::string UvMapping::getOperationCode() const
@@ -425,7 +302,7 @@ std::string UvMapping::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void BlurFilter::sample(TextureOperationResult& result, BlurFilterData* attributes, InputInfos& inputs)
+void BlurFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto radius = attributes->radius;
 
@@ -435,13 +312,13 @@ void BlurFilter::sample(TextureOperationResult& result, BlurFilterData* attribut
     auto& frame = visitor.getCurrentFrame();
 
     size_t frameId = 0;
-    if(sampleInFrame(result, inputs[0], frameId))
+    if(visitor.sampleInFrame(result, inputs[0], frameId))
     {
         auto& context = frame.getContext();
 
         size_t opId = context.getNextVa();
-        size_t in1 = frame.pushInput({(float)radius, 0.0, 0.0, 0.0});
-        size_t ke1 = frame.pushKernel(kernel);
+        size_t in1 = frame.uniformPlaceholder();
+        size_t ke1 = frame.kernelPlaceholder();
         size_t uvId = context.getUvId();
 
         std::string glsl = "vec4 v$1 = image_filter($3, $4, $5, int($2.x));\n";
@@ -454,11 +331,11 @@ void BlurFilter::sample(TextureOperationResult& result, BlurFilterData* attribut
     }
     else
     {
-        pushFallback(result);
+        visitor.pushFallback(result);
     }
 }
 //--------------------------------------------------------------
-void SharpenFilter::sample(TextureOperationResult& result, SharpenFilterData* attributes, InputInfos& inputs)
+void SharpenFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto radius = attributes->radius;
 
@@ -468,13 +345,13 @@ void SharpenFilter::sample(TextureOperationResult& result, SharpenFilterData* at
     auto& frame = visitor.getCurrentFrame();
 
     size_t frameId = 0;
-    if(sampleInFrame(result, inputs[0], frameId))
+    if(visitor.sampleInFrame(result, inputs[0], frameId))
     {
         auto& context = frame.getContext();
 
         size_t opId = context.getNextVa();
-        size_t in1 = frame.pushInput({(float)radius, 0.0, 0.0, 0.0});
-        size_t ke1 = frame.pushKernel(kernel);
+        size_t in1 = frame.uniformPlaceholder();
+        size_t ke1 = frame.kernelPlaceholder();
         size_t uvId = context.getUvId();
 
         std::string glsl = "vec4 v$1 = image_filter2($3, $4, $5, int($2.x));\n";
@@ -487,7 +364,7 @@ void SharpenFilter::sample(TextureOperationResult& result, SharpenFilterData* at
     }
     else
     {
-        pushFallback(result);
+        visitor.pushFallback(result);
     }
 }
 //--------------------------------------------------------------
@@ -544,7 +421,7 @@ void SharpenFilter::updateKernel(int radius)
         kernel = Kernel::convProduct(kernel, k0);
 }
 //--------------------------------------------------------------
-void MorphoFilter::sample(TextureOperationResult& result, MorphoFilterData* attributes, InputInfos& inputs)
+void MorphoFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto radius = attributes->radius;
     auto mode = attributes->mode;
@@ -553,14 +430,14 @@ void MorphoFilter::sample(TextureOperationResult& result, MorphoFilterData* attr
     auto& frame = visitor.getCurrentFrame();
 
     size_t frameId = 0;
-    if(sampleInFrame(result, inputs[0], frameId))
+    if(visitor.sampleInFrame(result, inputs[0], frameId))
     {
         auto& context = frame.getContext();
 
         float radiusf = (float)radius;
-        std::string radiusId = pushOpOrInput(result, inputs[1], {radiusf,radiusf,radiusf,radiusf});
+        std::string radiusId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
 
-        size_t in1 = frame.pushInput({(float)mode, 0.0, 0.0, 0.0});
+        size_t in1 = frame.uniformPlaceholder();
 
         size_t opId = context.getNextVa();
         size_t uvId = context.getUvId();
@@ -586,18 +463,18 @@ void MorphoFilter::sample(TextureOperationResult& result, MorphoFilterData* attr
     }
     else
     {
-        pushFallback(result);
+        visitor.pushFallback(result);
     }
 }
 //--------------------------------------------------------------
-void BumpToNormal::sample(TextureOperationResult& result, BumpToNormalData* attributes, InputInfos& inputs)
+void BumpToNormal::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
     size_t ctx = 0;
-    bool inputValid = sampleInContext(result, inputs[0], ctx);
+    bool inputValid = visitor.sampleInContext(result, inputs[0], ctx);
 
     if(inputValid)
     {
@@ -620,11 +497,11 @@ void BumpToNormal::sample(TextureOperationResult& result, BumpToNormalData* attr
     }
     else
     {
-        pushFallback(result);
+        visitor.pushFallback(result);
     }
 }
 //--------------------------------------------------------------
-void WhiteNoise::sample(TextureOperationResult& result, WhiteNoiseData* attributes, InputInfos& inputs)
+void WhiteNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -655,7 +532,7 @@ std::string WhiteNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void ValueNoise::sample(TextureOperationResult& result, ValueNoiseData* attributes, InputInfos& inputs)
+void ValueNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -666,11 +543,11 @@ void ValueNoise::sample(TextureOperationResult& result, ValueNoiseData* attribut
     auto smoothness = attributes->smoothness;
     auto octaves = attributes->octaves;
 
-    std::string freqId = pushOpOrInput(result, inputs[0], {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(result, inputs[1], {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(result, inputs[2], {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string persId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
+    std::string smoothId = visitor.inputOrUniformPlaceholder(result, inputs[2]);
 
-    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+    std::string octaveId = qb::in(frame.uniformPlaceholder());
 
     size_t opId = context.getNextVa();
     size_t uvId = context.getUvId();
@@ -719,7 +596,7 @@ std::string ValueNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void GradientNoise::sample(TextureOperationResult& result, GradientNoiseData* attributes, InputInfos& inputs)
+void GradientNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto frequency = attributes->frequency;
     auto persistance = attributes->persistance;
@@ -730,11 +607,11 @@ void GradientNoise::sample(TextureOperationResult& result, GradientNoiseData* at
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string freqId = pushOpOrInput(result, inputs[0], {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(result, inputs[1], {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(result, inputs[2], {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string persId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
+    std::string smoothId = visitor.inputOrUniformPlaceholder(result, inputs[2]);
 
-    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+    std::string octaveId = qb::in(frame.uniformPlaceholder());
 
     size_t opId = context.getNextVa();
     size_t uvId = context.getUvId();
@@ -788,7 +665,7 @@ std::string GradientNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void SimplexNoise::sample(TextureOperationResult& result, SimplexNoiseData* attributes, InputInfos& inputs)
+void SimplexNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto frequency = attributes->frequency;
     auto persistance = attributes->persistance;
@@ -799,11 +676,11 @@ void SimplexNoise::sample(TextureOperationResult& result, SimplexNoiseData* attr
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string freqId = pushOpOrInput(result, inputs[0], {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(result, inputs[1], {persistance,persistance,persistance,persistance});
-    std::string smoothId = pushOpOrInput(result, inputs[2], {smoothness,smoothness,smoothness,smoothness});
+    std::string freqId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string persId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
+    std::string smoothId = visitor.inputOrUniformPlaceholder(result, inputs[2]);
 
-    std::string octaveId = qb::in(frame.pushInput({(float)octaves, 0.0, 0.0, 0.0}));
+    std::string octaveId = qb::in(frame.uniformPlaceholder());
 
     size_t opId = context.getNextVa();
     size_t uvId = context.getUvId();
@@ -875,7 +752,7 @@ std::string SimplexNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void VoronoiNoise::sample(TextureOperationResult& result, VoronoiNoiseData* attributes, InputInfos& inputs)
+void VoronoiNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto frequency = attributes->frequency;
     auto persistance = attributes->persistance;
@@ -886,10 +763,10 @@ void VoronoiNoise::sample(TextureOperationResult& result, VoronoiNoiseData* attr
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    std::string freqId = pushOpOrInput(result, inputs[0], {frequency,frequency,frequency,frequency});
-    std::string persId = pushOpOrInput(result, inputs[1], {persistance,persistance,persistance,persistance});
+    std::string freqId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
+    std::string persId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
 
-    std::string octaveModeId = qb::in(frame.pushInput({(float)octaves, (float)mode, 0.0, 0.0}));
+    std::string octaveModeId = qb::in(frame.uniformPlaceholder());
 
     size_t opId = context.getNextVa();
     size_t uvId = context.getUvId();
@@ -959,7 +836,7 @@ std::string VoronoiNoise::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void Mandelbrot::sample(TextureOperationResult& result, MandelbrotData* attributes, InputInfos& inputs)
+void Mandelbrot::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
     auto iterations = attributes->iterations;
     auto oftx = attributes->oftx;
@@ -970,7 +847,7 @@ void Mandelbrot::sample(TextureOperationResult& result, MandelbrotData* attribut
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
     size_t opId = context.getNextVa();
-    size_t in1 = frame.pushInput({(float)iterations, oftx, ofty, scale});
+    size_t in1 = frame.uniformPlaceholder();
     size_t uvId = context.getUvId();
 
     std::string glsl = "vec4 $1 = mandelbrot($2, $3);\n";

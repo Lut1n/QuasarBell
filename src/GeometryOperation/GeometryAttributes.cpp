@@ -196,6 +196,7 @@ void HighResSdfOutputData::ui()
     if (ImGui::SliderInt("power", &resolution, 0, 12))
     {
         textureResolution = (int)std::pow(2.0,(float)resolution);
+        onConnectionChanged();
         onChanged();
     }
     int res = textureResolution;
