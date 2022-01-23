@@ -53,6 +53,7 @@ set(QB_SOURCES
     src/ImageOperation/ImageOperations.hpp
     src/ImageOperation/ImageOperationType.hpp
     src/ImageOperation/GlslBuilder.hpp
+    src/ImageOperation/GlslProgramPipeline.hpp
     src/ImageOperation/TextureBuilder.hpp
     src/ImageOperation/FrameRenderer.hpp
     src/GeometryOperation/GeometryAttributes.hpp
@@ -124,6 +125,7 @@ set(QB_SOURCES
     src/ImageOperation/ImageOperations.cpp
     src/ImageOperation/ImageUniforms.cpp
     src/ImageOperation/GlslBuilder.cpp
+    src/ImageOperation/GlslProgramPipeline.cpp
     src/ImageOperation/TextureBuilder.cpp
     src/ImageOperation/FrameRenderer.cpp
     src/GeometryOperation/GeometryAttributes.cpp

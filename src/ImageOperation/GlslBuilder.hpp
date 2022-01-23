@@ -181,29 +181,6 @@ namespace qb
         void clear();
     };
 
-    struct GlslProgramPipeline
-    {
-        struct Descriptor
-        {
-            std::string glsl;
-            size_t inputCount = 0;
-            size_t kernelCount = 0;
-            size_t textureCount = 0;
-        };
-
-        std::vector<Descriptor> orderedGlslCodes;
-
-        void init(GlslFrame* rootFrame);
-    };
-
-    struct GlslPipelineData
-    {
-        std::vector<vec4> inputs;
-        std::vector<Kernel> kernels;
-        
-        void init(GlslFrame* rootFrame);
-    };
-
     struct GlslBuilderVisitor
     {
         std::unordered_map<BaseAttributes*, bool> visited;

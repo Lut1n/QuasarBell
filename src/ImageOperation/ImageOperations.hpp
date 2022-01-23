@@ -2,11 +2,10 @@
 #define QB_TEXTURE_OPERATIONS_HPP
 
 #include "App/BaseOperationNode.hpp"
-
 #include "App/AppInterface.hpp"
 #include "ImageOperation/ImageAttributes.hpp"
-
 #include "ImageOperation/GlslBuilder.hpp"
+#include "ImageOperation/GlslProgramPipeline.hpp"
 
 #include "Core/Vec2.h"
 
@@ -402,6 +401,8 @@ struct TexturePreview : BasePreview
     std::string glslCode;
 
     std::unique_ptr<ProgramSet> programSet;
+    std::unique_ptr<qb::GlslProgramPipeline> programPipeline;
+    std::unique_ptr<qb::GlslPipelineData> uniforms;
 
     TexturePreview(int resolution);
 

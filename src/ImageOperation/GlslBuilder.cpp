@@ -387,40 +387,6 @@ size_t qb::GlslFrame::totalFrameCount()
 }
 
 //--------------------------------------------------------------
-void qb::GlslProgramPipeline::init(GlslFrame* rootFrame)
-{
-    orderedGlslCodes.clear();
-
-    std::function<void(GlslFrame*)> ancestorFirst = [&ancestorFirst, this](GlslFrame* frame)
-    {
-        for(auto& f : frame->frames)
-            ancestorFirst(&f);
-
-        orderedGlslCodes.push_back({frame->compile(), frame->inputs.size(), frame->kernels.size(), frame->frames.size()});
-    };
-
-    ancestorFirst(rootFrame);
-}
-
-//--------------------------------------------------------------
-void qb::GlslPipelineData::init(GlslFrame* rootFrame)
-{
-    inputs.clear();
-    kernels.clear();
-
-    std::function<void(GlslFrame*)> ancestorFirst = [&ancestorFirst, this](GlslFrame* frame)
-    {
-        for(auto& f : frame->frames)
-            ancestorFirst(&f);
-
-        inputs.insert(inputs.end(), frame->inputs.begin(), frame->inputs.end());
-        kernels.insert(kernels.end(), frame->kernels.begin(), frame->kernels.end());
-    };
-
-    ancestorFirst(rootFrame);
-}
-
-//--------------------------------------------------------------
 qb::GlslFrame& qb::GlslBuilderVisitor::getCurrentFrame()
 {
     if(frameStack.size() > 0)
@@ -558,7 +524,8 @@ void qb::GlslBuilderVisitor::inputOrUniform(TextureOperationResult& result, Text
     if (input && input->isSdf != isSdf)
     {
         size_t frameId;
-        sampleInFrame(result, input, frameId, true);
+        if (sampleInFrame(result, input, frameId, true))
+            return;
     }
     if (!sampleInput(result, input, true))
         frame.pushInput(v);
@@ -601,7 +568,7 @@ void qb::GlslBuilderVisitor::startUniforms()
 {
     visited.clear();
     frameStack.clear();
-    frameStack.clear();
+    mainFrame.clear();
 }
 
 void qb::GlslFrame::clear()

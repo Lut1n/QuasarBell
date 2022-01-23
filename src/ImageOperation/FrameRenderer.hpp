@@ -2,21 +2,11 @@
 #define QB_FRAME_RENDERER_HPP
 
 #include "ImageOperation/ImageOperations.hpp"
+#include "ImageOperation/GlslProgramPipeline.hpp"
+
 #include <list>
 #include <vector>
 #include <memory>
-
-//--------------------------------------------------------------
-/*struct FramePoolItem
-{
-    size_t gl = 0;
-    bool valid = false;
-    FramePoolItem(int resolution);
-    FramePoolItem(FramePoolItem&& other) noexcept;
-    ~FramePoolItem();
-
-    FramePoolItem& operator=(FramePoolItem&& other) noexcept;
-};*/
 
 struct FramePool
 {
@@ -44,6 +34,9 @@ struct FrameRenderer
 
     void render(size_t frameId, bool recompile, qb::GlslFrame* glsl);
     void render(TexturePreview* target, qb::GlslFrame* glslFrame);
+
+    void render(size_t frame, qb::GlslProgramPipeline::Descriptor& desc, qb::GlslPipelineData& data, std::list<size_t>& inputTextures, size_t& uniformIndex, size_t& kernelIndex, float resolution);
+    void render(TexturePreview* target, qb::GlslProgramPipeline& pipeline, qb::GlslPipelineData& data);
 };
 
 

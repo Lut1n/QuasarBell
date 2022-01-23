@@ -146,7 +146,7 @@ void FrameRenderer::render(TexturePreview* target, qb::GlslFrame* glslFrame)
 {
     auto& framePool = framePools[glslFrame->resolution];
     if (!framePool)
-        framePool = std::make_unique<FramePool>(8, glslFrame->resolution);
+        framePool = std::make_unique<FramePool>(1, glslFrame->resolution);
 
     if (!target->programSet || target->toRecompile)
     {
@@ -161,6 +161,168 @@ void FrameRenderer::render(TexturePreview* target, qb::GlslFrame* glslFrame)
     programIndex = 0;
 
     render(target->glTextureId, target->toRecompile, glslFrame);
+
+    if (target->toRecompile)
+        std::cout << "total frame allocated: " << (framePool->used.size() + framePool->availables.size()) << std::endl;
+    target->toRecompile = false;
+}
+
+void FrameRenderer::render(size_t frame, qb::GlslProgramPipeline::Descriptor& desc, qb::GlslPipelineData& data, std::list<size_t>& inputTextures, size_t& uniformIndex, size_t& kernelIndex, float resolution)
+{
+    size_t glProgram = desc.programId;
+
+    if (desc.voxelPlan)
+    {
+        RenderInterface::debugCheck("Before update voxel uniforms");
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, "u_zEpsilon", data.voxelSize);
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, "u_zTargetPlan", data.targetZ);
+        RenderInterface::debugCheck("After update voxel uniforms");
+    }
+
+    for(int i=0; i<desc.inputCount; ++i)
+    {
+        RenderInterface::debugCheck("Before update uniforms");
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, i, data.inputs[uniformIndex++]);
+        RenderInterface::debugCheck("After update uniforms");
+    }
+
+    for(int i=0; i<desc.kernelCount; ++i)
+    {
+        RenderInterface::debugCheck("Before update kernel");
+        RenderInterface::setInputCustomProgram((unsigned)glProgram, i, data.kernels[kernelIndex++]);
+        RenderInterface::debugCheck("After update kernel");
+    }
+    
+    size_t uniformId = 0;
+    size_t textureUnit = 0;
+    for (auto& fid : inputTextures)
+    {
+        RenderInterface::debugCheck("Before update samplers");
+        RenderInterface::setInputFrameCustomProgram((unsigned)glProgram, fid, textureUnit++, uniformId++);
+        RenderInterface::debugCheck("After update samplers");
+    }
+
+    RenderInterface::setTarget((unsigned)frame);
+    RenderInterface::clear(0x000000FF);
+    RenderInterface::applyCustomProgram((unsigned)glProgram, vec2(0.0f,0.0f), vec2(resolution,resolution));
+}
+
+void FrameRenderer::render(TexturePreview* target, qb::GlslProgramPipeline& pipeline, qb::GlslPipelineData& data)
+{
+    const size_t MAGIC_NUMBER = 6666; // when frame is not instanciated
+
+    auto& framePool = framePools[pipeline.resolution];
+    if (!framePool)
+        framePool = std::make_unique<FramePool>(1, pipeline.resolution);
+
+    size_t count = pipeline.orderedDescriptors.size();
+    // std::cout << "start render: " << count << " program count" << std::endl;
+
+    if (!target->programSet || target->toRecompile)
+    {
+        target->programSet = std::make_unique<ProgramSet>(count);
+        target->glslCode = pipeline.orderedDescriptors[count-1].glsl;
+    }
+
+    int programIndex = 0;
+    size_t vec4Index = 0;
+    size_t kernelIndex = 0;
+    
+    std::list<int> programStack;
+    std::list<size_t> frameStack;
+    // std::list<int> depStack;
+    programStack.push_back(programIndex);
+    frameStack.push_back(MAGIC_NUMBER);
+    // depStack.push_back(pipeline.orderedDescriptors[stack.back()].textureCount);
+
+    bool finalFrame = programIndex == count - 1;
+
+    do
+    {
+        // find next program to execute
+        auto desc = pipeline.orderedDescriptors[programStack.back()];
+        while(desc.textureCount == 0 && !finalFrame)
+        {
+            programIndex++;
+            programStack.push_back(programIndex);
+            frameStack.push_back(MAGIC_NUMBER);
+            desc = pipeline.orderedDescriptors[programStack.back()];
+            // depStack.push_back(desc.textureCount);
+            finalFrame = programIndex == count - 1;
+        }
+
+        // get current program and current frame
+        int program = programStack.back();
+        size_t frame = frameStack.back();
+        // int dep = depStack.back();
+        programStack.pop_back();
+        frameStack.pop_back();
+        // depStack.pop_back();
+
+        std::list<size_t> inputFrames;
+        std::list<size_t> inputPrograms;
+
+        // collect inputs
+        // std::cout << "collect " << desc.textureCount << " inputs" << std::endl;
+        for(size_t i=0; i< desc.textureCount; ++i)
+        {
+            int inputProgram = programStack.back();
+            size_t inputFrame = frameStack.back();
+            // size_t inputDep = depStack.back();
+            programStack.pop_back();
+            frameStack.pop_back();
+            // depStack.pop_back();
+            
+            /*if (inputDep > 0)
+                std::cout << "FrameRenderer: error dep != 0" << std::endl;*/
+
+            inputFrames.push_front(inputFrame);
+            inputPrograms.push_front(inputProgram);
+        }
+
+        // render if necessary
+        auto programIt = inputPrograms.begin();
+        auto frameIt = inputFrames.begin();
+        for(size_t i=0; i<desc.textureCount; ++i)
+        {
+            int inputProgram = *programIt;
+            size_t inputFrame = *frameIt;
+            if (inputFrame == MAGIC_NUMBER)
+            {
+                // std::cout << "new frame as input" << std::endl;
+                // only append when children count = 0;
+                inputFrame = framePool->getFrame();
+                std::list<size_t> ignored;
+                // std::cout << "render frame " << inputProgram << std::endl;
+                render(inputFrame, pipeline.orderedDescriptors[inputProgram], data, ignored, vec4Index, kernelIndex, (float)pipeline.resolution);
+                *frameIt = inputFrame;
+            }
+            programIt++;
+            frameIt++;
+        }
+
+        // render current frame
+        std::cout << "render a frame " << std::endl;
+        if (finalFrame)
+        {
+            // std::cout << "final frame" << std::endl;
+            frame = target->glTextureId;    // final frame
+        }
+        else
+        {
+            // std::cout << "new frame as current" << std::endl;
+            frame = framePool->getFrame();
+        }
+        
+        // std::cout << "render frame " << program << std::endl;
+        render(frame, pipeline.orderedDescriptors[program], data, inputFrames, vec4Index, kernelIndex, (float)pipeline.resolution);
+        for(auto fid : inputFrames) framePool->freeFrame(fid);
+
+        programStack.push_back(program);
+        frameStack.push_back(frame);
+        // depStack.push_back(0);
+    }
+    while(!finalFrame);
 
     if (target->toRecompile)
         std::cout << "total frame allocated: " << (framePool->used.size() + framePool->availables.size()) << std::endl;
