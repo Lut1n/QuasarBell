@@ -22,7 +22,6 @@ PcmGenerator::PcmGenerator()
     registerSignalOperation<Harmonics>();
     registerSignalOperation<KeySampler>();
     registerSignalOperation<MixOperation>();
-    registerSignalOperation<Oscillator>();
     registerSignalOperation<PitchSelector>();
     registerSignalOperation<Quantizer>();
     registerSignalOperation<StepOperation>();

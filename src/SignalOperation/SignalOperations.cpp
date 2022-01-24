@@ -130,29 +130,6 @@ float MixOperation::sample(const Time& time,MixData* attributes, std::vector<Ope
     return in1 * (1.f-dt) + in2 * dt;
 }
 //--------------------------------------------------------------
-float Oscillator::sample(const Time& time, OscillatorData* attributes, std::vector<OperationInfo*>& inputs)
-{
-    static float phase = 0.0f;
-    if (time.advance == 0.0f)
-        phase = 0.0f;
-
-    float fe = inputOrAttribute(time, inputs[0], attributes->freq);
-    float am = inputOrAttribute(time, inputs[1], attributes->ampl);
-
-    phase += time.timestep * fe;
-    while(phase > 1.0f) phase -= 1.0f;
-
-    Time time2;
-    time2.duration = 1.0f;
-    time2.elapsed = phase;
-    time2.advance = phase;
-
-    float dfltVal = std::sin(phase * 2.0f * 3.141592f);
-    float wave = inputOrAttribute(time2, inputs[2], dfltVal);
-    return wave * am;
-}
-
-//--------------------------------------------------------------
 int PitchSelector::getMidiIndex(PitchData* props) const
 {
     constexpr int midi_first_octave = -1;
@@ -362,5 +339,22 @@ float TimeScale::sample(const Time& time,TimeScaleData* attributes, std::vector<
 //--------------------------------------------------------------
 float OutputOperation::sample(const Time& time,OutputData* attributes, std::vector<OperationInfo*>& inputs)
 {
-    return inputOrAttribute(time, inputs[0], 0.0f);
+    static float phase = 0.0f;
+    if (time.advance == 0.0f)
+        phase = 0.0f;
+
+    float fe = inputOrAttribute(time, inputs[0], attributes->freq);
+    float am = inputOrAttribute(time, inputs[1], attributes->ampl);
+
+    phase += time.timestep * fe;
+    while(phase > 1.0f) phase -= 1.0f;
+
+    Time time2;
+    time2.duration = 1.0f;
+    time2.elapsed = phase;
+    time2.advance = phase;
+
+    float dfltVal = std::sin(phase * 2.0f * 3.141592f);
+    float wave = inputOrAttribute(time2, inputs[2], dfltVal);
+    return (wave > 1.0f ? 1.0f : wave < -1.0f ? -1.0f : wave) * am;
 }

@@ -212,8 +212,10 @@ struct OutputData : public BaseAttributes
     OutputData();
     void ui() override;
 
-    float range = 1.0;
+    float freq = 440.0f;
+    float ampl = 1.0f;
     float duration = 1.0;
+
     int sampleRate = 44100;
     int sampleBits = 16;
 
@@ -224,16 +226,6 @@ struct OutputData : public BaseAttributes
     std::string path = "./exported/output.wav";
     bool toPlay = false;
     bool toExport = false;
-};
-//--------------------------------------------------------------
-struct OscillatorData : public BaseAttributes
-{
-    static constexpr size_t TypeId = (size_t)qb::OperationType_Oscillator;
-
-    OscillatorData();
-
-    float freq = 440.0f;
-    float ampl = 1.0f;
 };
 //--------------------------------------------------------------
 struct PitchData : public BaseAttributes

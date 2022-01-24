@@ -153,11 +153,6 @@ struct MixOperation : public ConcretSignalOperation<MixData>
     float sample(const Time& time, MixData* attributes, std::vector<OperationInfo*>& inputs) override;
 };
 
-struct Oscillator : public ConcretSignalOperation<OscillatorData>
-{
-    float sample(const Time& time, OscillatorData* attributes, std::vector<OperationInfo*>& inputs) override;
-};
-
 struct PitchSelector : public ConcretSignalOperation<PitchData>
 {
     float sample(const Time& time, PitchData* attributes, std::vector<OperationInfo*>& inputs) override;

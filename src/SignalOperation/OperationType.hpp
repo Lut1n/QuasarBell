@@ -14,7 +14,6 @@ namespace qb
         OperationType_Mult,
         OperationType_Float,
         OperationType_CubicSampler,
-        OperationType_Oscillator,
         OperationType_Quantizer,
         OperationType_Mix,
         OperationType_Envelop,

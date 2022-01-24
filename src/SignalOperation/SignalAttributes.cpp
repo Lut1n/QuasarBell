@@ -239,21 +239,14 @@ TimeScaleData::TimeScaleData() : BaseAttributes(TypeId)
 //--------------------------------------------------------------
 OutputData::OutputData() : BaseAttributes(TypeId)
 {
-    addInput("signal", IoType::Signal);
-    add("range", Type::Float, &range);
-    add("duration", Type::Float, &duration);
-    add("sample-rate", Type::Int, &sampleRate);
-    add("sample-bits", Type::Int, &sampleBits);
-}
-//--------------------------------------------------------------
-OscillatorData::OscillatorData() : BaseAttributes(TypeId)
-{
     addInput("freq", IoType::Signal);
     addInput("ampl", IoType::Signal);
     addInput("waveform", IoType::Signal);
-    addOutput("signal", IoType::Signal);
     add("freq", Type::Float, &freq);
     add("ampl", Type::Float, &ampl);
+    add("duration", Type::Float, &duration);
+    add("sample-rate", Type::Int, &sampleRate);
+    add("sample-bits", Type::Int, &sampleBits);
 }
 //--------------------------------------------------------------
 PitchData::PitchData() : BaseAttributes(TypeId)
@@ -333,7 +326,8 @@ void OutputData::ui()
     static constexpr std::array<const char*,sampleFormatCount> sampleFormatNames = {"Format_Mono8", "Format_Mono16"};
 
 
-    if (ImGui::InputFloat("range", &range)) onChanged();
+    if (ImGui::InputFloat("freq", &freq)) onChanged();
+    if (ImGui::InputFloat("ampl", &ampl)) onChanged();
     if (ImGui::InputFloat("duration scale", &duration)) onChanged();
 
     if (sampleRateIndex == -1)

@@ -14,7 +14,6 @@ namespace qb
         {OperationType_Float, "float"},
         {OperationType_Mix, "mix"},
         {OperationType_Mult, "mult"},
-        {OperationType_Oscillator, "oscillator"},
         {OperationType_Quantizer, "quantizer"},
         {OperationType_Step, "step"},
         {OperationType_Filter, "filter"},
