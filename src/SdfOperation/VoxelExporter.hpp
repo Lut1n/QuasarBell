@@ -31,6 +31,8 @@ namespace qb
 
         void forEach(std::function<void(size_t x, size_t y)> fun) const;
         void forEach(std::function<void(size_t x, size_t y, size_t z)> fun) const;
+
+        void copyTo(VoxelData& dst) const;
     };
     
     void optimizeVoxels(const VoxelData& voxels, qb::ProgressiveWork& state);

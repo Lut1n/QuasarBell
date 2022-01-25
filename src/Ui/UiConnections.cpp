@@ -82,7 +82,7 @@ void UiConnections::deleteLink(std::uint64_t id, bool useCallback)
     }
 
     auto& link = links[id];
-    std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << "]" << std::endl;
+    // std::cout << "destroy link " << id << "[" << link.first->label->text << " - " << link.second->label->text << "]" << std::endl;
     if(handler && useCallback) handler->onDisconnect(link.first,link.second);
 
     link.first->remConnectionId(id);

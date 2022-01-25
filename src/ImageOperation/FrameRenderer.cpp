@@ -4,7 +4,6 @@
 FramePool::FramePool(size_t c, int resolution)
     : resolution(resolution)
 {
-    std::cout << "new FramePool (" << resolution << ")" << std::endl;
     for(size_t i=0; i<c; ++i)
         availables.push_back( RenderInterface::createTarget(resolution, resolution, false) );
 }
@@ -97,7 +96,7 @@ void FrameRenderer::render(TexturePreview* target, qb::GlslProgramPipeline& pipe
 
     auto& framePool = framePools[pipeline.resolution];
     if (!framePool)
-        framePool = std::make_unique<FramePool>(1, pipeline.resolution);
+        framePool = std::make_unique<FramePool>(4, pipeline.resolution);
 
     size_t count = pipeline.orderedDescriptors.size();
 

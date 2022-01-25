@@ -2,8 +2,6 @@
 
 #include "Graphics/GlError.h"
 
-static size_t texture_counter = 0;
-
 RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     : width(w)
     , height(h)
@@ -33,14 +31,10 @@ RenderableTexture::RenderableTexture(unsigned w, unsigned h)
     }
     
     GL_CHECKERROR("renderable texture ctor");
-    texture_counter++;
-    std::cout << "textures count : " << texture_counter << std::endl;
 }
 
 RenderableTexture::~RenderableTexture()
 {
-    texture_counter--;
-    std::cout << "textures count : " << texture_counter << std::endl;
     glDeleteTextures(1, &tex);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);

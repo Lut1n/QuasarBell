@@ -45,9 +45,7 @@ std::vector<qb::GlslFrame*> qb::getOrderedFrames(GlslFrame* outputFrame)
 {
     GraphStats stats;
 
-    // std::list<GlslFrame*> frameList;
-
-    std::function<void(GlslFrame*)> getStats = [&getStats, &stats/*, &frameList*/](GlslFrame* frame)
+    std::function<void(GlslFrame*)> getStats = [&getStats, &stats](GlslFrame* frame)
     {
         int maxDepth = 0;
         int totalWidth = 0;
@@ -62,11 +60,9 @@ std::vector<qb::GlslFrame*> qb::getOrderedFrames(GlslFrame* outputFrame)
         if (totalWidth == 0) totalWidth = 1;
         stats.frameStats[frame].depth = maxDepth;
         stats.frameStats[frame].width = totalWidth;
-        // frameList.push_back(frame);
     };
 
     getStats(outputFrame);
-    // std::cout << "scanning graph: " << frameList.size() << " frame detected" << std::endl;
 
     std::vector<GlslFrame*> ret;
 
@@ -99,8 +95,6 @@ qb::GlslProgramPipeline::~GlslProgramPipeline()
 //--------------------------------------------------------------
 void qb::GlslProgramPipeline::init(std::vector<GlslFrame*>& orderedFrames)
 {
-    std::cout << "init program pipeline with " << orderedFrames.size() << " frame count" << std::endl;
-
     for(auto desc : orderedDescriptors)
         RenderInterface::destroyCustomProgram((unsigned)desc.programId);
     orderedDescriptors.clear();

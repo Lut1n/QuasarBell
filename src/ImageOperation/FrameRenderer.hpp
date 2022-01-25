@@ -14,7 +14,7 @@ struct FramePool
     std::list<size_t> availables;
     std::list<size_t> used;
     
-    FramePool(size_t c = 1, int resolution = 256);
+    FramePool(size_t c = 4, int resolution = 256);
     ~FramePool();
 
     size_t getFrame();

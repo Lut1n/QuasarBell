@@ -22,6 +22,15 @@ void qb::VoxelData::resize(size_t x, size_t y, size_t z)
 }
 
 //--------------------------------------------------------------
+void qb::VoxelData::copyTo(VoxelData& dst) const
+{
+    const auto& src = *this;
+    dst.forEach([&src,&dst](size_t i, size_t j, size_t k){
+        dst.set(i,j,k, src.get(i,j,k));
+    });
+}
+
+//--------------------------------------------------------------
 size_t qb::VoxelData::idx(size_t x, size_t y, size_t z) const
 {
     x = qb::clamp((int)x, 0, (int)size[0]-1);
@@ -136,11 +145,22 @@ struct ExportationWork : public qb::ProgressiveWork::Work
     bool initialized = false;
     int z = 0;
     int n = 0;
+    
+    std::unique_ptr<qb::VoxelData> resized;
 
     ExportationWork(const std::string& filepath, const qb::VoxelData* data)
         : ostrm(filepath,std::ios::binary)
         , data(data)
-    {}
+    {
+        size_t size[3];
+        for(size_t i=0; i<3; ++i)
+            size[i] = qb::min(256ULL, data->size[i]);
+
+        resized = std::make_unique<qb::VoxelData>();
+        resized->resize(size[0],size[1],size[2]);
+        data->copyTo(*resized);
+        
+    }
 };
 
 //--------------------------------------------------------------
@@ -203,7 +223,7 @@ void writeMAINChunk(ExportationWork& state)
 void writeSIZEChunk(ExportationWork& state)
 {
     auto& ostrm = state.ostrm;
-    auto& voxelData = *state.data;
+    auto& voxelData = *state.resized;
 
     char id[4] = {'S','I','Z','E'};
     ostrm.write(id, 4);
@@ -225,7 +245,7 @@ void writeXYZIChunk(qb::ProgressiveWork& state, bool progressive = false)
 {
     auto& work = state.getWork<ExportationWork>();
     auto& ostrm = work.ostrm;
-    auto& voxelData = *work.data;
+    auto& voxelData = *work.resized;
 
     if (work.z == 0)
     {
@@ -275,14 +295,14 @@ void qb::exportVoxel(const std::string& filepath, const VoxelData& voxels, qb::P
     // minimum data in magicavoxel file format
     // last commit ee2216c28a78ebb68691dc6cfa9c4ba429117ea2     (2021/09/18)
     // cf. https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
-    
+
     if (!state.initialized)
     {
         state.initialize<ExportationWork>(filepath, &voxels);
         auto& work = state.getWork<ExportationWork>();
 
-        for(size_t i = 0; i<voxels.data.size(); ++i)
-            if (voxels.data[i] > 0) work.n++;
+        for(size_t i = 0; i<work.resized->data.size(); ++i)
+            if (work.resized->data[i] > 0) work.n++;
         
         writeHeader(work);              // RIFF style header
         writeMAINChunk(work);           // chunk MAIN
