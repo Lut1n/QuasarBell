@@ -29,10 +29,6 @@ void ColorInput::buildProgramImpl(TextureOperationResult& result, AttributeType*
 //--------------------------------------------------------------
 void Construct3f::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto c1 = attributes->c1;
-    auto c2 = attributes->c2;
-    auto c3 = attributes->c3;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -52,11 +48,6 @@ void Construct3f::buildProgramImpl(TextureOperationResult& result, AttributeType
 //--------------------------------------------------------------
 void Split3f::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto index = attributes->index;
-    auto r = attributes->r;
-    auto g = attributes->g;
-    auto b = attributes->b;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -80,11 +71,6 @@ void Split3f::buildProgramImpl(TextureOperationResult& result, AttributeType* at
 //--------------------------------------------------------------
 void DirectionalSignal::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto directionX = attributes->directionX;
-    auto directionY = attributes->directionY;
-    auto frequency = attributes->frequency;
-    auto amplitude = attributes->amplitude;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -104,11 +90,6 @@ void DirectionalSignal::buildProgramImpl(TextureOperationResult& result, Attribu
 //--------------------------------------------------------------
 void RadialSignal::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto centerX = attributes->centerX;
-    auto centerY = attributes->centerY;
-    auto frequency = attributes->frequency;
-    auto amplitude = attributes->amplitude;
-
     auto& visitor = result.visitor;
 
     auto& frame = visitor.getCurrentFrame();
@@ -129,9 +110,6 @@ void RadialSignal::buildProgramImpl(TextureOperationResult& result, AttributeTyp
 //--------------------------------------------------------------
 void Dynamics::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto brightness = attributes->brightness;
-    auto contrast = attributes->contrast;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -228,8 +206,6 @@ std::string SphericalCoord::getOperationCode() const
 //--------------------------------------------------------------
 void UvDistortion::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto force = attributes->force;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -254,11 +230,6 @@ void UvDistortion::buildProgramImpl(TextureOperationResult& result, AttributeTyp
 //--------------------------------------------------------------
 void UvMapping::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto uOft = attributes->uOft;
-    auto vOft = attributes->vOft;
-    auto uFct = attributes->uFct;
-    auto vFct = attributes->vFct;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -304,10 +275,6 @@ std::string UvMapping::getOperationCode() const
 //--------------------------------------------------------------
 void BlurFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto radius = attributes->radius;
-
-    updateKernel(radius);
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
 
@@ -337,10 +304,6 @@ void BlurFilter::buildProgramImpl(TextureOperationResult& result, AttributeType*
 //--------------------------------------------------------------
 void SharpenFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto radius = attributes->radius;
-
-    updateKernel(radius);
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
 
@@ -400,32 +363,8 @@ std::string SharpenFilter::getOperationCode() const
     return std::string(code);
 }
 //--------------------------------------------------------------
-void BlurFilter::updateKernel(int radius)
-{
-    // gaussian
-    Kernel k0(3,3);
-    for(int i=0;i<9;++i)k0.data[i] = (float)(1.0/9.0);
-    kernel = k0;
-    for(int i=1; i<radius; ++i)
-        kernel = Kernel::convProduct(kernel, k0);
-}
-//--------------------------------------------------------------
-void SharpenFilter::updateKernel(int radius)
-{
-    Kernel k0(3,3);
-    k0 = { 0,-1, 0,
-          -1, 5,-1,
-           0,-1, 0};
-    kernel = k0;
-    for(int i=1; i<radius; ++i)
-        kernel = Kernel::convProduct(kernel, k0);
-}
-//--------------------------------------------------------------
 void MorphoFilter::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto radius = attributes->radius;
-    auto mode = attributes->mode;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
 
@@ -434,7 +373,6 @@ void MorphoFilter::buildProgramImpl(TextureOperationResult& result, AttributeTyp
     {
         auto& context = frame.getContext();
 
-        float radiusf = (float)radius;
         std::string radiusId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
 
         size_t in1 = frame.uniformPlaceholder();
@@ -538,11 +476,6 @@ void ValueNoise::buildProgramImpl(TextureOperationResult& result, AttributeType*
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
 
-    auto frequency = attributes->frequency;
-    auto persistance = attributes->persistance;
-    auto smoothness = attributes->smoothness;
-    auto octaves = attributes->octaves;
-
     std::string freqId = visitor.inputOrUniformPlaceholder(result, inputs[0]);
     std::string persId = visitor.inputOrUniformPlaceholder(result, inputs[1]);
     std::string smoothId = visitor.inputOrUniformPlaceholder(result, inputs[2]);
@@ -598,11 +531,6 @@ std::string ValueNoise::getOperationCode() const
 //--------------------------------------------------------------
 void GradientNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto frequency = attributes->frequency;
-    auto persistance = attributes->persistance;
-    auto octaves = attributes->octaves;
-    auto smoothness = attributes->smoothness;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -667,11 +595,6 @@ std::string GradientNoise::getOperationCode() const
 //--------------------------------------------------------------
 void SimplexNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto frequency = attributes->frequency;
-    auto persistance = attributes->persistance;
-    auto octaves = attributes->octaves;
-    auto smoothness = attributes->smoothness;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -754,11 +677,6 @@ std::string SimplexNoise::getOperationCode() const
 //--------------------------------------------------------------
 void VoronoiNoise::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto frequency = attributes->frequency;
-    auto persistance = attributes->persistance;
-    auto octaves = attributes->octaves;
-    auto mode = attributes->mode;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -838,11 +756,6 @@ std::string VoronoiNoise::getOperationCode() const
 //--------------------------------------------------------------
 void Mandelbrot::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto iterations = attributes->iterations;
-    auto oftx = attributes->oftx;
-    auto ofty = attributes->ofty;
-    auto scale = attributes->scale;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -891,13 +804,11 @@ TexturePreview::TexturePreview(int resolution)
     glTextureId = RenderInterface::createTarget(resolution,resolution,false);
     RenderInterface::setTarget((unsigned)glTextureId);
     RenderInterface::clear(0x000000FF);
-    // glProgram = RenderInterface::createCustomProgram();
 }
 
 TexturePreview::~TexturePreview()
 {
     RenderInterface::deleteTarget((unsigned)glTextureId);
-    // RenderInterface::destroyCustomProgram((unsigned)glProgram);
 }
 
 void TexturePreview::attributePreview()

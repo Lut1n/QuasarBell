@@ -3,6 +3,7 @@
 
 #include "ImageOperation/ImageOperationType.hpp"
 #include "App/BaseAttributes.hpp"
+#include "Core/Vec2.h"
 
 
 //--------------------------------------------------------------
@@ -135,6 +136,9 @@ struct BlurFilterData : public BaseAttributes
     static constexpr size_t TypeId = (size_t)qb::ImageOperationType_Blur;
 
     BlurFilterData();
+    
+    void updateKernel();
+    Kernel kernel;
 
     int radius = 1;
 };
@@ -144,6 +148,9 @@ struct SharpenFilterData : public BaseAttributes
     static constexpr size_t TypeId = (size_t)qb::ImageOperationType_Sharpen;
 
     SharpenFilterData();
+
+    void updateKernel();
+    Kernel kernel;
 
     int radius = 1;
 };

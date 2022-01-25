@@ -27,9 +27,6 @@ void setupOperation(qb::GlslBuilderVisitor& visitor, size_t opId, const std::str
 //--------------------------------------------------------------
 void Sphere::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& r = attributes->r;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -44,11 +41,6 @@ void Sphere::buildProgramImpl(TextureOperationResult& result, AttributeType* att
 //--------------------------------------------------------------
 void Box::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& sx = attributes->sx;
-    auto& sy = attributes->sy;
-    auto& sz = attributes->sz;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -64,12 +56,6 @@ void Box::buildProgramImpl(TextureOperationResult& result, AttributeType* attrib
 //--------------------------------------------------------------
 void RoundBox::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& sx = attributes->sx;
-    auto& sy = attributes->sy;
-    auto& sz = attributes->sz;
-    auto& r = attributes->r;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -85,10 +71,6 @@ void RoundBox::buildProgramImpl(TextureOperationResult& result, AttributeType* a
 //--------------------------------------------------------------
 void Torus::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& t1 = attributes->t1;
-    auto& t2 = attributes->t2;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -104,10 +86,6 @@ void Torus::buildProgramImpl(TextureOperationResult& result, AttributeType* attr
 //--------------------------------------------------------------
 void HexagonalPrism::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h1 = attributes->h1;
-    auto& h2 = attributes->h2;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -123,10 +101,6 @@ void HexagonalPrism::buildProgramImpl(TextureOperationResult& result, AttributeT
 //--------------------------------------------------------------
 void TriangularPrism::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& t1 = attributes->t1;
-    auto& t2 = attributes->t2;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -142,10 +116,6 @@ void TriangularPrism::buildProgramImpl(TextureOperationResult& result, Attribute
 //--------------------------------------------------------------
 void Capsule::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-    auto& r = attributes->r;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -161,10 +131,6 @@ void Capsule::buildProgramImpl(TextureOperationResult& result, AttributeType* at
 //--------------------------------------------------------------
 void Cone::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-    auto& r = attributes->r;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -180,11 +146,6 @@ void Cone::buildProgramImpl(TextureOperationResult& result, AttributeType* attri
 //--------------------------------------------------------------
 void RoundedCone::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-    auto& r1 = attributes->r1;
-    auto& r2 = attributes->r2;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -200,10 +161,6 @@ void RoundedCone::buildProgramImpl(TextureOperationResult& result, AttributeType
 //--------------------------------------------------------------
 void Cylinder::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-    auto& r = attributes->r;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -219,11 +176,6 @@ void Cylinder::buildProgramImpl(TextureOperationResult& result, AttributeType* a
 //--------------------------------------------------------------
 void RoundedCylinder::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-    auto& r1 = attributes->r1;
-    auto& r2 = attributes->r2;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -239,9 +191,6 @@ void RoundedCylinder::buildProgramImpl(TextureOperationResult& result, Attribute
 //--------------------------------------------------------------
 void Octahedron::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& s = attributes->s;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -257,9 +206,6 @@ void Octahedron::buildProgramImpl(TextureOperationResult& result, AttributeType*
 //--------------------------------------------------------------
 void Pyramid::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& rgb = attributes->rgb;
-    auto& h = attributes->h;
-
     auto& visitor = result.visitor;
     size_t opId, tfmrId;
     prepareOperation(visitor,opId,tfmrId);
@@ -497,8 +443,6 @@ void Intersection::buildProgramImpl(TextureOperationResult& result, AttributeTyp
 //--------------------------------------------------------------
 void SmoothUnion::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& k = attributes->k;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -520,8 +464,6 @@ void SmoothUnion::buildProgramImpl(TextureOperationResult& result, AttributeType
 //--------------------------------------------------------------
 void SmoothSubstraction::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& k = attributes->k;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -543,8 +485,6 @@ void SmoothSubstraction::buildProgramImpl(TextureOperationResult& result, Attrib
 //--------------------------------------------------------------
 void SmoothIntersection::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& k = attributes->k;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -644,14 +584,6 @@ void HighResSdfOutput::buildProgramImpl(TextureOperationResult& result, Attribut
 //--------------------------------------------------------------
 void Transform::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& x = attributes->x;
-    auto& y = attributes->y;
-    auto& z = attributes->z;
-    auto& rx = attributes->rx;
-    auto& ry = attributes->ry;
-    auto& rz = attributes->rz;
-    auto& s = attributes->s;
-
     auto& visitor = result.visitor;
     const float degToRad = std::acos(-1.0) / 180.0f;
     auto& frame = visitor.getCurrentFrame();
@@ -687,10 +619,6 @@ void Transform::buildProgramImpl(TextureOperationResult& result, AttributeType* 
     }
     else
     {
-        quat qx = quat(vec4(1.0,0.0,0.0,0.0),rx * degToRad);
-        quat qy = quat(vec4(0.0,1.0,0.0,0.0),ry * degToRad);
-        quat qz = quat(vec4(0.0,0.0,1.0,0.0),rz * degToRad);
-        quat q = qx*(qy*qz);
         rotArg = qb::in(visitor.getCurrentFrame().uniformPlaceholder());
     }
 
@@ -801,11 +729,6 @@ std::string Transform::getOperationCode() const
 //--------------------------------------------------------------
 void Repetition::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& c = attributes->c;
-    auto& x = attributes->x;
-    auto& y = attributes->y;
-    auto& z = attributes->z;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -838,8 +761,6 @@ std::string Repetition::getOperationCode() const
 //--------------------------------------------------------------
 void Twist::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& k = attributes->k;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -879,8 +800,6 @@ std::string Twist::getOperationCode() const
 //--------------------------------------------------------------
 void Bend::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& k = attributes->k;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -920,10 +839,6 @@ std::string Bend::getOperationCode() const
 //--------------------------------------------------------------
 void Elongation::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& x = attributes->x;
-    auto& y = attributes->y;
-    auto& z = attributes->z;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -977,10 +892,6 @@ std::string Elongation::getOperationCode() const
 //--------------------------------------------------------------
 void Symmetry::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& x = attributes->x;
-    auto& y = attributes->y;
-    auto& z = attributes->z;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -1091,9 +1002,6 @@ namespace qb
 //--------------------------------------------------------------
 void Displacement::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& intensity = attributes->intensity;
-    auto& mode = attributes->mode;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();
@@ -1145,9 +1053,6 @@ std::string Displacement::getOperationCode() const
 //--------------------------------------------------------------
 void Texturing::buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
-    auto& factor = attributes->factor;
-    auto& mode = attributes->mode;
-
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
     auto& context = frame.getContext();

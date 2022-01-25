@@ -125,12 +125,39 @@ BlurFilterData::BlurFilterData()
     add("radius", &radius, 1, 10);
 }
 //--------------------------------------------------------------
+void BlurFilterData::updateKernel()
+{
+    if (kernel.w == radius)
+        return;
+
+    // gaussian
+    Kernel k0(3,3);
+    for(int i=0;i<9;++i)k0.data[i] = (float)(1.0/9.0);
+    kernel = k0;
+    for(int i=1; i<radius; ++i)
+        kernel = Kernel::convProduct(kernel, k0);
+}
+//--------------------------------------------------------------
 SharpenFilterData::SharpenFilterData()
     : BaseAttributes(TypeId)
 {
     addInput("in", IoType::Image);
     addOutput("out", IoType::Image);
     add("radius", &radius, 1, 10);
+}
+//--------------------------------------------------------------
+void SharpenFilterData::updateKernel()
+{
+    if (kernel.w == radius)
+        return;
+        
+    Kernel k0(3,3);
+    k0 = { 0,-1, 0,
+          -1, 5,-1,
+           0,-1, 0};
+    kernel = k0;
+    for(int i=1; i<radius; ++i)
+        kernel = Kernel::convProduct(kernel, k0);
 }
 //--------------------------------------------------------------
 MorphoFilterData::MorphoFilterData()

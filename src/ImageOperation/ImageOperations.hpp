@@ -7,8 +7,6 @@
 #include "ImageOperation/GlslBuilder.hpp"
 #include "ImageOperation/GlslProgramPipeline.hpp"
 
-#include "Core/Vec2.h"
-
 
 struct AbstractImageOperation;
 
@@ -137,22 +135,16 @@ struct BlurFilter : public ImageOperation<BlurFilterData>
 {
     void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
-    void updateKernel(int radius);
 
     std::string getOperationCode() const;
-
-    Kernel kernel;
 };
 //--------------------------------------------------------------
 struct SharpenFilter : public ImageOperation<SharpenFilterData>
 {
     void buildProgramImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
     void setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs) override;
-    void updateKernel(int radius);
 
     std::string getOperationCode() const;
-
-    Kernel kernel;
 };
 //--------------------------------------------------------------
 struct MorphoFilter : public ImageOperation<MorphoFilterData>
@@ -397,12 +389,9 @@ struct TexturePreview : BasePreview
     bool previewClicked = false;
 
     size_t glTextureId = 0;
-    size_t glProgram = 0;
     std::string glslCode;
 
-    std::unique_ptr<ProgramSet> programSet;
     std::unique_ptr<qb::GlslProgramPipeline> programPipeline;
-    std::unique_ptr<qb::GlslPipelineData> uniforms;
 
     TexturePreview(int resolution);
 

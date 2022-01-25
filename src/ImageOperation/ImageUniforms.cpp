@@ -124,9 +124,10 @@ void UvMapping::setUniformsImpl(TextureOperationResult& result, AttributeType* a
 //--------------------------------------------------------------
 void BlurFilter::setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
+    attributes->updateKernel();
+    
     auto radius = attributes->radius;
-
-    updateKernel(radius);
+    auto& kernel = attributes->kernel;
 
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
@@ -141,9 +142,10 @@ void BlurFilter::setUniformsImpl(TextureOperationResult& result, AttributeType* 
 //--------------------------------------------------------------
 void SharpenFilter::setUniformsImpl(TextureOperationResult& result, AttributeType* attributes, InputInfos& inputs)
 {
+    attributes->updateKernel();
+    
     auto radius = attributes->radius;
-
-    updateKernel(radius);
+    auto& kernel = attributes->kernel;
 
     auto& visitor = result.visitor;
     auto& frame = visitor.getCurrentFrame();
