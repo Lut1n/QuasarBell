@@ -28,14 +28,13 @@ struct FramePool
 struct FrameRenderer
 {
     std::unordered_map<int, std::unique_ptr<FramePool>> framePools;
-    FramePool* currentPool = nullptr;
-    ProgramSet* programs;
+
     size_t programIndex = 0;
+    size_t uniformIndex = 0;
+    size_t kernelIndex = 0;
+    float resolution = 256.0f;
 
-    void render(size_t frameId, bool recompile, qb::GlslFrame* glsl);
-    void render(TexturePreview* target, qb::GlslFrame* glslFrame);
-
-    void render(size_t frame, qb::GlslProgramPipeline::Descriptor& desc, qb::GlslPipelineData& data, std::list<size_t>& inputTextures, size_t& uniformIndex, size_t& kernelIndex, float resolution);
+    void render(size_t frame, qb::GlslProgramPipeline::Descriptor& desc, qb::GlslPipelineData& data, std::list<size_t>& inputTextures);
     void render(TexturePreview* target, qb::GlslProgramPipeline& pipeline, qb::GlslPipelineData& data);
 };
 

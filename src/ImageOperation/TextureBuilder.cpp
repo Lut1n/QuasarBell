@@ -119,8 +119,10 @@ void TextureGenerator::prepare(BaseOperationNode* node)
         state.voxelOutput = true;
         // state.path = output->path;
         state.toExport = output->toExport;
+        state.toCancel = output->toCancel;
         state.sdfMode = true;
         output->toExport = false;
+        output->toCancel = false;
     }
 }
 
@@ -213,6 +215,7 @@ void TextureGenerator::compute(BaseOperationNode* outputNode)
     {
         computeVoxels(outputNode);
         state.toExport = false;
+        state.toCancel = false;
     }
     
     if (!changed)
@@ -244,7 +247,7 @@ void TextureGenerator::computeResult(BaseOperationNode* node, TexturePreview* pr
     glslPipeline.mainFrame.resolution = preview->resolution;
     
     // rebuild glsl pipeline
-    bool rebuildGlsl = !preview->programSet || preview->toRecompile;
+    bool rebuildGlsl = preview->toRecompile;
     if (rebuildGlsl)
     {
         glslPipeline.setCurrentOperation(nullptr);
@@ -255,6 +258,7 @@ void TextureGenerator::computeResult(BaseOperationNode* node, TexturePreview* pr
         preview->programPipeline = std::make_unique<qb::GlslProgramPipeline>();
         preview->programPipeline->init(frames);
         preview->programPipeline->resolution = preview->resolution;
+        preview->glslCode = preview->programPipeline->orderedDescriptors[preview->programPipeline->orderedDescriptors.size() - 1].glsl;
     }
     
     // collect uniforms
@@ -322,6 +326,11 @@ void TextureGenerator::computeVoxels(BaseOperationNode* node)
     auto& indexingWork = voxelOutput->indexingWork;
     auto& exportationWork = voxelOutput->exportationWork;
     auto voxelSize = voxelOutput->voxelSize;
+    
+    if (state.toCancel)
+    {
+        voxelOutput->resetWorks();
+    }
 
     if (scanningWork.initialized)
     {

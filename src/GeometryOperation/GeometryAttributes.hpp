@@ -264,6 +264,7 @@ struct VoxelOutputData : public BaseAttributes
     float zPlan = 0.0f;
     float voxelSize = 0.1f;
     bool toExport = false;
+    bool toCancel = false;
 
     qb::ProgressiveWork scanningWork;
     qb::ProgressiveWork indexingWork;

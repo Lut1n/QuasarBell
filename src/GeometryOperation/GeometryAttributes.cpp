@@ -329,4 +329,9 @@ void VoxelOutputData::ui()
     {
         toExport = true;
     }
+
+    if (scanningWork.initialized && ImGui::Button("Cancel"))
+    {
+        toCancel = true;
+    }
 }

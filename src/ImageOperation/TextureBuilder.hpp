@@ -45,6 +45,7 @@ struct TextureGenerator
         std::string path;
         BaseOperationNode* selectedNode = nullptr;
         bool toExport = false;
+        bool toCancel = false;
         bool sdfMode = false;
         bool voxelOutput = false;
         bool recompile = false;
