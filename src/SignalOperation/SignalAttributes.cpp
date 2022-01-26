@@ -328,7 +328,7 @@ void OutputData::ui()
 
     if (ImGui::InputFloat("freq", &freq)) onChanged();
     if (ImGui::InputFloat("ampl", &ampl)) onChanged();
-    if (ImGui::InputFloat("duration scale", &duration)) onChanged();
+    if (ImGui::InputFloat("duration", &duration)) onChanged();
 
     if (sampleRateIndex == -1)
     {
@@ -372,11 +372,22 @@ void OutputData::ui()
         onChanged();
     }
 
-    if (ImGui::Button("Play"))
+    if (!pcmPlaying.initialized && ImGui::Button("Play"))
     {
         toPlay = true;
         onChanged();
     }
+    if (pcmPlaying.initialized)
+    {
+        if(ImGui::Button("Stop"))
+            toStop = true;
+    }
+    
+    ImGui::Text("generation");
+    ImGui::SameLine();
+    ImGui::ProgressBar(pcmPlaying.progress);
+
+    ImGui::Separator();
 
     if (ImGui::Button("..."))
         waveExportIo.open();

@@ -41,6 +41,7 @@ struct PcmGenerator
         int sampleBits;
         std::string path;
         bool toPlay = false;
+        bool toStop = false;
         bool toExport = false;
     };
 

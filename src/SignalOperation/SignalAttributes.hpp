@@ -2,8 +2,8 @@
 #define QB_SIGNAL_PROPERTIES_HPP
 
 #include "App/BaseAttributes.hpp"
-
 #include "SignalOperation/OperationType.hpp"
+#include "Core/ProgressiveWork.hpp"
 
 //--------------------------------------------------------------
 struct EnvelopData : public BaseAttributes
@@ -225,7 +225,10 @@ struct OutputData : public BaseAttributes
 
     std::string path = "./exported/output.wav";
     bool toPlay = false;
+    bool toStop = false;
     bool toExport = false;
+
+    qb::ProgressiveWork pcmPlaying;
 };
 //--------------------------------------------------------------
 struct PitchData : public BaseAttributes

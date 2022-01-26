@@ -113,6 +113,7 @@ public:
     void load(const PcmDataBase& pcm);
     void queue(const PcmDataBase& pcm);
     void play();
+    void stop();
     
     virtual void update() override;
     

@@ -2,6 +2,96 @@
 
 #include "Audio/WavExporter.hpp"
 
+//--------------------------------------------------------------
+struct PcmGeneratorWork : public qb::ProgressiveWork::Work
+{
+    std::list<std::unique_ptr<PcmDataBase>> pcmQueue;
+
+    BaseOperationNode* node = nullptr;
+    std::unordered_map<BaseOperationNode*, OperationInfo> infos;
+    int sampleBits = 16;
+
+    Time time;
+    float duration = 1.0f;
+    size_t sampleRate = 0;
+    size_t count = 0;
+    size_t index = 0;
+    size_t remaining = 0;
+
+    const float chunkDuration = 1.0f;
+    size_t chunkSize = 0;
+
+    PcmGeneratorWork(BaseOperationNode* node, const std::unordered_map<BaseOperationNode*, OperationInfo>& infos, float duration, size_t sampleRate, int sampleBits)
+        : node(node)
+        , infos(infos)
+        , sampleBits(sampleBits)
+        , duration(duration)
+        , sampleRate(sampleRate)
+    {
+        count = (size_t)duration * sampleRate;
+        remaining = count;
+        chunkSize = (size_t)chunkDuration * sampleRate;
+        
+        time = Time();
+        time.duration = duration;
+        time.elapsed = 0.0f;
+        time.advance = 0.0f;
+        time.timestep = time.duration / count;
+        time.samplerate = 1.f / time.timestep;
+    }
+
+    void play()
+    {
+        if (remaining <= 0)
+            return;
+        
+        size_t size = qb::min(remaining, chunkSize);
+        std::vector<float> data(size);
+
+        auto& info = infos[node];
+        for(size_t i=0; i<size; ++i)
+        {
+            data[i] = info.operation->sample(time, info.attributes, info.inputs);
+            time.elapsed += time.timestep;
+            time.advance = time.elapsed / time.duration;
+        }
+
+        std::unique_ptr<PcmDataBase> pcm;
+        if (sampleBits == AudioSettings::Format_Mono8 || sampleBits == AudioSettings::Format_Stereo8)
+            pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
+        if (sampleBits == AudioSettings::Format_Mono16 || sampleBits == AudioSettings::Format_Stereo16)
+            pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
+
+        pcm->sampleRate = (AudioSettings::SampleRate)sampleRate;
+        pcm->resize((size_t)size);
+
+        for(size_t i = 0; i<data.size(); ++i)
+            pcm->set(i, data[i]);
+
+        auto& sound = *SoundNode::getDefault();
+        sound.queue(*pcm);
+        if(sound.getState() != SoundNode::Playing)
+        {
+            sound.play();
+        }
+
+        index += size;
+        remaining -= size;
+    }
+
+    void stop()
+    {
+        auto& sound = *SoundNode::getDefault();
+        sound.stop();
+    }
+
+    bool isPlaying()
+    {
+        auto& sound = *SoundNode::getDefault();
+        return sound.getState() == SoundNode::Playing;
+    }
+};
+
 PcmGenerator::PcmGenerator()
 {
     registerSignalOperation<FloatInput>();
@@ -53,8 +143,10 @@ void PcmGenerator::prepare(BaseOperationNode* node)
 
         state.path = output->path;
         state.toPlay = output->toPlay;
+        state.toStop = output->toStop;
         state.toExport = output->toExport;
         output->toPlay = false;
+        output->toStop = false;
         output->toExport = false;
     }
 }
@@ -77,9 +169,32 @@ bool PcmGenerator::hasChanged()
 }
 
 void PcmGenerator::compute(BaseOperationNode* outputNode)
-{
+{            
     reset();
     outputNode->accept(collector);
+
+    if (auto output = dynamic_cast<OutputData*>(outputNode->getAttributes()))
+    {
+        if (output->pcmPlaying.initialized)
+        {
+            if (output->pcmPlaying.completed || hasChanged() || output->toStop)
+            {
+                if (output->toStop)
+                {
+                    auto& work = output->pcmPlaying.getWork<PcmGeneratorWork>();
+                    work.stop();
+                }
+                output->pcmPlaying.reset();
+            }
+            else
+            {
+                auto& work = output->pcmPlaying.getWork<PcmGeneratorWork>();
+                work.play();
+                output->pcmPlaying.progress = (float)work.index / (float)work.count;
+                output->pcmPlaying.completed = output->pcmPlaying.progress >= 1.0f && !work.isPlaying();
+            }
+        }
+    }
 
     if (!hasChanged()) return;
 
@@ -152,43 +267,42 @@ void PcmGenerator::computePreviews(BaseOperationNode* node)
 
 void PcmGenerator::generateAudio(BaseOperationNode* node)
 {
-    const size_t count = state.duration * state.sampleRate;
-
-    currentNode = node;
-    auto pcmPreview = createPreview();
-    pcmPreview->data.resize(count);
-
-    Time time;
-    time.duration = state.duration;
-    time.elapsed = 0.0f;
-    time.advance = 0.0f;
-    time.samplerate = state.sampleRate;
-    time.timestep = 1.0f / time.samplerate;
-
-    computeResult(node, pcmPreview, time);
-
-    std::unique_ptr<PcmDataBase> pcm;
-    if (state.sampleBits == AudioSettings::Format_Mono8 || state.sampleBits == AudioSettings::Format_Stereo8)
-        pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
-    if (state.sampleBits == AudioSettings::Format_Mono16 || state.sampleBits == AudioSettings::Format_Stereo16)
-        pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
-
-    pcm->sampleRate = (AudioSettings::SampleRate)state.sampleRate;
-    pcm->resize((size_t)(state.duration * state.sampleRate));
-
-    for(size_t i = 0; i<pcmPreview->data.size(); ++i)
-        pcm->set(i, pcmPreview->data[i]);
-
     if (state.toExport)
+    {
+        const size_t count = state.duration * state.sampleRate;
+
+        currentNode = node;
+        auto pcmPreview = createPreview();
+        pcmPreview->data.resize(count);
+
+        Time time;
+        time.duration = state.duration;
+        time.elapsed = 0.0f;
+        time.advance = 0.0f;
+        time.samplerate = state.sampleRate;
+        time.timestep = 1.0f / time.samplerate;
+
+        computeResult(node, pcmPreview, time);
+
+        std::unique_ptr<PcmDataBase> pcm;
+        if (state.sampleBits == AudioSettings::Format_Mono8 || state.sampleBits == AudioSettings::Format_Stereo8)
+            pcm = std::make_unique<PcmData<AudioSettings::Format_Mono8>>();
+        if (state.sampleBits == AudioSettings::Format_Mono16 || state.sampleBits == AudioSettings::Format_Stereo16)
+            pcm = std::make_unique<PcmData<AudioSettings::Format_Mono16>>();
+
+        pcm->sampleRate = (AudioSettings::SampleRate)state.sampleRate;
+        pcm->resize((size_t)(state.duration * state.sampleRate));
+
+        for(size_t i = 0; i<pcmPreview->data.size(); ++i)
+            pcm->set(i, pcmPreview->data[i]);
         WavExporter::exportAsWAV(state.path, *pcm);
+    }
 
     if (state.toPlay)
     {
-        auto& sound = *SoundNode::getDefault();
-        if(sound.getState() != SoundNode::Playing)
+        if (auto output = dynamic_cast<OutputData*>(node->getAttributes()))
         {
-            sound.queue(*pcm.get());
-            sound.play();
+            output->pcmPlaying.initialize<PcmGeneratorWork>(node, infos, state.duration, state.sampleRate, state.sampleBits);
         }
     }
 }

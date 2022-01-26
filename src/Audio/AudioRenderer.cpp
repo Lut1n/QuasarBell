@@ -173,6 +173,30 @@ void SoundNode::play()
     alSourcePlay(_sourceID);
 }
 //--------------------------------------------------------------
+void SoundNode::stop()
+{
+    // stop source
+    alSourceStop(_sourceID);
+
+    // unqueue all buffer
+    if (_stream)
+    {
+        ALint iBuffers;
+        alGetSourcei(_sourceID, AL_BUFFERS_QUEUED, &iBuffers);
+
+        for (int i = 0; i < iBuffers; ++i)
+        {
+            ALuint uiBuffer;
+            alSourceUnqueueBuffers(_sourceID, 1, &uiBuffer);
+            ackErr("alSourceUnqueueBuffers");
+            _bufferReady.push_back(uiBuffer);
+        }
+    }
+
+    // clear local data
+    _PcmDatas.clear();
+}
+//--------------------------------------------------------------
 void SoundNode::update()
 {
     if(_changed)
